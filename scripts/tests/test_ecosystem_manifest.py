@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import stat
 import subprocess
 import tempfile
 import unittest
@@ -103,6 +105,53 @@ class BootstrapTests(unittest.TestCase):
             self.assertIn(f"{repo}: cloning", out)
         for repo in OPTIONAL:
             self.assertNotIn(f"{repo}: cloning", out)
+
+    def _dry_run_with_fakes(self, ffmpeg_version: str, python_version: str | None = None) -> str:
+        """A dry run with a fake ffmpeg/ffprobe (and optionally a python3 that reports another
+        version for the version check, and is the real one for everything else) first on PATH."""
+        with tempfile.TemporaryDirectory() as tmp:
+            bin_dir = Path(tmp) / "bin"
+            bin_dir.mkdir()
+            fakes = {name: f'#!/bin/sh\necho "{name} version {ffmpeg_version} Copyright (c) 2000-2024 the FFmpeg developers"\n'
+                     for name in ("ffmpeg", "ffprobe")}
+            if python_version:
+                real = shutil.which("python3")
+                fakes["python3"] = (f'#!/bin/sh\ncase "$2" in *version_info*) echo "{python_version}"; exit 0 ;; esac\n'
+                                    f'exec "{real}" "$@"\n')
+            for name, body in fakes.items():
+                (bin_dir / name).write_text(body, encoding="utf-8")
+                (bin_dir / name).chmod((bin_dir / name).stat().st_mode | stat.S_IXUSR)
+            env = _env(Path(tmp))
+            env["PATH"] = f"{bin_dir}{os.pathsep}{env['PATH']}"
+            out = subprocess.run([BASH, str(BOOTSTRAP), "--dir", str(Path(tmp) / "ws"), "--dry-run"],
+                                 env=env, capture_output=True, text=True, timeout=60)
+            self.assertEqual(out.returncode, 0, out.stderr)   # a too-old tool is a note, never fatal
+            return out.stdout
+
+    def test_too_old_ffmpeg_is_a_note_that_names_the_requirement(self):
+        out = self._dry_run_with_fakes("5.1.2-0+deb12u1")
+        self.assertIn("ffmpeg 5.1.2-0+deb12u1 is older than 6.1", out)
+        self.assertIn("npx ffmpeg-skill doctor", out)
+        self.assertIn("brew install ffmpeg-full", out)
+        self.assertIn("Done, with notes", out)
+
+    def test_supported_ffmpeg_versions_give_no_note(self):
+        for version in ("6.1", "n6.1", "6.1.1-3ubuntu5", "7.1-full_build-www.gyan.dev", "8.0.1"):
+            with self.subTest(version=version):
+                out = self._dry_run_with_fakes(version)
+                self.assertNotIn("older than 6.1", out)
+                self.assertNotIn("not a release number", out)
+
+    def test_git_build_is_unknown_not_a_failure(self):
+        out = self._dry_run_with_fakes("N-115000-g1a2b3c4d5e")
+        self.assertIn("not a release number", out)
+        self.assertNotIn("older than 6.1", out)
+
+    def test_too_old_python_is_a_note(self):
+        out = self._dry_run_with_fakes("6.1", python_version="3.9")
+        self.assertIn("Python 3.9 (python3) is older than 3.10", out)
+        self.assertIn("Python 3.9 is older than 3.10 (required)", out)
+        self.assertNotIn("older than 3.10", self._dry_run_with_fakes("6.1", python_version="3.10"))
 
     def test_with_optional_includes_optional_components(self):
         out = self._dry_run("--with-optional")
