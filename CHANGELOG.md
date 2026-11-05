@@ -1,3 +1,18 @@
+## v0.8.0 (2026-11-05)
+
+## What's Changed
+
+## Features
+
+- feat: transcript search and retake candidates as editorial decisions (#137)
+
+## Other changes
+
+- feat: transcript search and retake candidates as editorial decisions (#137)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.7.45 (2026-11-05)
 
 ## What's Changed
