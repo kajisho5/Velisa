@@ -1,3 +1,14 @@
+## v0.7.41 (2026-11-05)
+
+## What's Changed
+
+## Other changes
+
+- brand: GitHub social preview, share image in Manrope (#116)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.7.40 (2026-10-31)
 
 ## What's Changed
