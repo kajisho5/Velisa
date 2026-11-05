@@ -1,3 +1,25 @@
+## v0.7.43 (2026-11-05)
+
+## What's Changed
+
+## Other changes
+
+- docs: ffmpeg-skill facts current (3.x, contract 2.0, FFmpeg 6.1+) (#134)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.7.42 (2026-11-05)
+
+## What's Changed
+
+## Other changes
+
+- docs(roadmap): 2026-11 OSS survey, live streaming and restoration areas, ffmpeg-skill 3.x (#133)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.7.41 (2026-11-05)
 
 ## What's Changed
