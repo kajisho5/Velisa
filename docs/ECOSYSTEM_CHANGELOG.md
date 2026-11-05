@@ -38,6 +38,22 @@ noteworthy.
 
 ---
 
+### 2026-11-05 — ownership: transcript phrase search and retake candidates; routing-skill recipe
+
+- **Repo(s)**: `kajisho5/Velisa` (read-only reads of `kajisho5/transcription-skill` main and `kajisho5/ffmpeg-skill`
+  main)
+- **PR(s)**: this PR
+- **What changed**: `ecosystem.json` gives 文字起こしの語句検索 to `transcription-skill` and 言い直し・重複の候補提示 to
+  `video-production-agent` (marketplace files regenerated). The routing skill gains `transcript.md`: transcribe once
+  with word timings, search a phrase (exact, normalised for CJK, approximate), list retakes / repeated sentences /
+  restarts as candidates the person confirms, cut only confirmed ranges with ffmpeg-skill `cut.py --accurate`, and a
+  table of commonly claimed features that do or do not exist. `WORK_QUEUE.md` items 25 and 26 hand the
+  implementations to their owners; `scripts/tests/test_transcript_recipe.py` ties the page's named owners to
+  `ecosystem.json`.
+- **Why**: 2026-11 user voices (phrase search in long footage, retakes left in by transcript cutting, questions about
+  speaker-based multicam and Chinese filler removal); neither job had an owner, and no skill implements either.
+- **Status**: draft
+
 ### 2026-10-31 — `capability-status.json`: all 34 roster repos re-checked; `measure.audio.noise_floor` registered
 
 - **Repo(s)**: `kajisho5/Velisa` (read-only reads of every repo in `docs/ecosystem/registry.json`, and of

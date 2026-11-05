@@ -100,10 +100,10 @@ Neither vendor ships a desktop MCP server. Community servers exist. Verified on 
 
 1. **Hygiene, every repo, small PRs.** Done: version drift fixed with the agent's gates (agent #65, #84, #93); every contract in the OS shape; ffmpeg-skill 3.0.0 accepted everywhere (`>=2.0.0 <4.0.0`).
 2. **Agent: make the whole map visible.** Done in the agent: SkillSpecs for every job (#76), the contract-backed ffmpeg-skill catalog check (#75, 3.x in #102), timeline export (ADR-052), the satellites' parameters (#80-#82, #86, #87, #91, #94).
-3. **Recognition.** Done (agent PRs): diarization with speaker ids end to end (#98, #111), detection (#104), slide-sync (#106).
+3. **Recognition.** Done (agent PRs): diarization with speaker ids end to end (#98, #111), detection (#104), slide-sync (#106). Open: transcript phrase search in transcription-skill (`WORK_QUEUE.md` item 25).
 4. **Audio.** Done (agent PRs): filler removal (#87), voice-enhance (#88), the translation decision (subtitle-skill ADR-004), dubbing (#97), sound-design BGM (#107).
 5. **Delivery.** Done (agent PRs): publish-skill (CONFIRM after QC, #99; real uploads not made yet), ingest adapter and MHL (#83). Partly done: nle-bridge-skill (export / conform #101; reading the editor's timeline back is agent step 12).
-6. **Agent brain.** Done: requirements_extraction (agent #79). Open: semantic deletion, now agent step 13 (it had no step in the agent's roadmap).
+6. **Agent brain.** Done: requirements_extraction (agent #79). Open: semantic deletion, now agent step 13 (it had no step in the agent's roadmap), starting with retake and repeated-sentence candidates that the person confirms one by one (`WORK_QUEUE.md` item 26).
 7. **Governance.** Done: system-intelligence reads ownership and contracts (system-intelligence #121, #122); skillpact conformance runs weekly, non-blocking (Velisa #127).
 
 ### Second round (2026-11-05), in dependency order
