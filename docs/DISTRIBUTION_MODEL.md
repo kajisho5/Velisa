@@ -545,6 +545,11 @@ unresolved question.
 
 ## 15. Required Output — direct answers, per addendum §23
 
+> **Superseded as of 2026-11:** the answers below record the 0.9.x check. ffmpeg-skill is now released as
+> 3.x; its README documents `npx ffmpeg-skill` as the install, and the version on npm is
+> whatever `npm view ffmpeg-skill version` prints. Other Skills are on npm too
+> (see `docs/ecosystem/capability-status.json`, `distribution`).
+
 1. **Currently published npm package**: `ffmpeg-skill` exists on the public npm registry
    under that exact unscoped name.
 2. **Package name / version**: `ffmpeg-skill`; registry `dist-tags.latest` is **`0.9.0`**.

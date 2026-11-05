@@ -2,7 +2,7 @@
 
 What every repository still needs, how the pieces connect, and the order to build them in. Written from a read-only audit of all 33 components on 2026-10-30 (source, tests, CI, contracts, the agent's adapters), and reviewed again on 2026-11-05 against every repository's `ECOSYSTEM_ROADMAP.md`, with the steps from that day's OSS survey added (see "From the 2026-11 OSS survey"). Each repository carries an `ECOSYSTEM_ROADMAP.md` with PR-sized steps; this page is the map across them. `docs/ROADMAP.md` is the architecture roadmap (phases of the contract layer) and stays as it is.
 
-**ffmpeg-skill is treated as complete.** Since 3.0.0 its 42 tools (`contract_version` 2.0; FFmpeg 6.1+ and Python 3.10+; 3.0 changed `cut.py`'s defaults and added `probe`'s start `timecode`) are the engine the others delegate to; every satellite now accepts `>=2.0.0 <4.0.0`. No step below changes it: what a step needs from the engine is written under "Proposals to ffmpeg-skill" and decided in that repository. Several gaps are closed by *using* tools it already has, e.g. `render --export-timeline` (.otio / .fcpxml / .edl), `freeze`, `reverse`, `insert`, `audio --duck --voice`, `metadata` chapters.
+**ffmpeg-skill is treated as complete.** Since 3.0.0 its 42 tools (`contract_version` 2.0, with a stability promise for the whole of 3.x: [docs/contract.md](https://github.com/kajisho5/ffmpeg-skill/blob/main/docs/contract.md#stability-guarantee-3x); FFmpeg 6.1+ and Python 3.10+; 3.0 changed `cut.py`'s defaults and added `probe`'s start `timecode`) are the engine the others delegate to; every satellite now accepts `>=2.0.0 <4.0.0`. No step below changes it: what a step needs from the engine is written under "Proposals to ffmpeg-skill" and decided in that repository. Several gaps are closed by *using* tools it already has, e.g. `render --export-timeline` (.otio / .fcpxml / .edl), `freeze`, `reverse`, `insert`, `audio --duck --voice`, `metadata` chapters.
 
 ## Where things stand
 
@@ -10,7 +10,7 @@ What every repository still needs, how the pieces connect, and the order to buil
 |---|---|---|
 | Command | video-production-agent | plans, approves, renders, records; brain = rules + Claude (API or the chat app via MCP); 22 adapters, every ecosystem job has a SkillSpec (handoff when absent) |
 | Ingest | ingest-skill | active: verified single-read offload to several destinations, ASC MHL + xxHash64, card-aware inventory, `ingest fetch` (URL via yt-dlp); wired (agent #83 offload, ADR-059 fetch) |
-| Engine | ffmpeg-skill | 3.x, 42 tools, complete; agent uses 17 directly |
+| Engine | ffmpeg-skill | 3.x, 42 tools, complete (tool list: `npx ffmpeg-skill contract --json`); agent uses 17 directly (list and evidence: [capability-status.json](capability-status.json)) |
 | Visual | video-editing, color-grading, motion-graphics, subtitle, thumbnail | implemented and wired, every parameter reachable (agent #80-#82, #91, #94, #100) |
 | Visual | remotion-ffmpeg | wired (agent #108, CONFIRM) |
 | Visual | blender, hyperframes | implemented; handoff-only SkillSpecs with pinned contracts (agent #95) |
