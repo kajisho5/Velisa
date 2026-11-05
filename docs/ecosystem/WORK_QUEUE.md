@@ -976,6 +976,66 @@ failed. Verified live: `--set subtitle.generate=true` now fails at `plan` with
 a clear message naming the key; `--set subtitle=true` and `--set
 edit.concat=true` still work exactly as before. ADR-043 added.
 
+## 22. `video-production-agent`: plan-conformance checks for fps, codec and stream layout after a render
+
+**Why**: users asked whether the result is compared with the request after an export
+(duration, codec, fps) and whether a finished job can still have lost its audio or picture.
+In `ffmpeg-skill`, most writing tools check only that the output exists, decodes at its ends
+and keeps the input's streams; only export, join, loudness and `color --retag` compare
+against requested values (ffmpeg-skill `docs/contract.md`, "Verification policy"). Item 17
+found that the agent's `run_qa()` compares two dimensions against the plan (duration,
+loudness, `threshold_source == "plan"`); fps, codec, resolution and stream layout are only
+rule checks or absent. The routing skill now tells an agent to do this comparison by hand
+(`plugins/video-production-os/skills/video-production-os/review.md`, step 4).
+
+**Concretely**: after a render, add plan-derived `QAItem`s for fps, video codec, resolution
+and stream layout (video/audio stream count and audio channel layout vs the input and the
+plan), each with `threshold_source = "plan"`. A value the plan does not state is reported as
+not requested, and a value no probe could read as unknown (never PASS). A mismatch fails the
+job's "done" state the same way a duration mismatch does today.
+
+**Boundary**: compare only what the plan or the input states; no new taste judgements. Do not
+re-implement checks `qc-skill` owns for a delivery spec; this is request conformance, not
+platform compliance.
+
+## 23. `video-production-agent`: a review list with per-cut clips from silence `cut_points` and the timemap
+
+**Why**: users reviewing silence removal said a contact sheet is not enough: they want short
+clips around each cut, a cut list mapped back to the source, and a list that separates what
+was checked automatically from what a person must still watch or hear. `ffmpeg-skill`
+`silence.py` already reports `cut_points` (source and output time, level at each edge),
+`cut_warnings` (edges close to the threshold) and writes `--timemap`, and says the removed
+span's content is not verified; nothing turns these into a review list. The routing skill
+describes the list for an agent to write by hand (`review.md`, step 6).
+
+**Concretely**: after a silence step, emit a review artifact with two sections: what tools
+verified (quoting the field each came from) and what needs a person: one row per cut point
+with source time, output time and warning flag (warnings first), plus A/V sync spot checks at
+start, middle and end. Optionally render a short clip around each cut point (through
+`ffmpeg-skill`'s cut) so the reviewer can play them in order. Record the list in the
+`ProductionReceipt`.
+
+**Boundary**: the agent lists and cuts clips; it does not judge whether a cut sounds right.
+Clip rendering is opt-in so a long job does not grow a second encode by default.
+
+## 24. `video-production-agent`: re-time subtitles through a silence timemap
+
+**Why**: users reported subtitle drift after silence removal. `ffmpeg-skill` `silence.py
+--timemap` maps source time to output time for exactly this purpose, but no tool consumes it,
+and `ffmpeg-skill`'s `render.py` with a silence step and an SRT burns cues at source times onto
+the shortened video (an ffmpeg-skill bug, tracked there).
+
+**Concretely**: when a plan has a silence (or filler) removal step and subtitles made from the
+source, map every cue through the timemap before burning or delivering it: cue starts and ends
+inside a removed span move to the nearest kept edge, a cue that falls entirely inside a removed
+span is dropped and listed, and the mapped SRT is a registered Artifact derived from both the
+source SRT and the timemap. The review list (item 23) names a few cues after the longest
+removed spans for a person to check.
+
+**Boundary**: `subtitle-skill` owns subtitle generation and burn-in; this item only wires the
+timemap between steps in the plan. If `subtitle-skill` gains a timemap input, call it instead
+of re-timing in the agent.
+
 ## 25. `transcription-skill`: a `search` command (phrase → timed hits with context)
 
 **Why**: users ask to find one phrase in hours of footage and jump there (2026-11 user voices). The word-timed

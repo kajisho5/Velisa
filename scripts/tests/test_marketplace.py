@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -47,6 +48,24 @@ class MarketplaceTests(unittest.TestCase):
         for c in MANIFEST["components"]:
             if c["status"] != "planned":
                 self.assertIn(f"`{c['repo']}`", text)
+
+    def test_review_guide_ships_with_the_routing_skill(self):
+        """review.md sits next to SKILL.md (inside the meta plugin's source, so it is installed with it), SKILL.md
+        links it, and every relative link in either file resolves to a file inside the plugin."""
+        mk, _ = marketplace.build(MANIFEST)
+        plugin_dir = (ROOT / mk["plugins"][0]["source"]).resolve()
+        skill_dir = ROOT / "plugins/video-production-os/skills/video-production-os"
+        review = skill_dir / "review.md"
+        self.assertTrue(review.is_file())
+        self.assertTrue(review.resolve().is_relative_to(plugin_dir))
+        self.assertIn("](review.md)", (skill_dir / "SKILL.md").read_text(encoding="utf-8"))
+        for doc in (skill_dir / "SKILL.md", review):
+            for target in re.findall(r"\]\(([^)\s]+)\)", doc.read_text(encoding="utf-8")):
+                if re.match(r"[a-z]+:", target) or target.startswith("#"):
+                    continue
+                path = (doc.parent / target.split("#", 1)[0]).resolve()
+                self.assertTrue(path.is_file(), f"{doc.name}: broken link {target}")
+                self.assertTrue(path.is_relative_to(plugin_dir), f"{doc.name}: {target} is outside the plugin")
 
 
 class FakeAPI:
