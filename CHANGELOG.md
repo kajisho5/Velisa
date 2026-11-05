@@ -7,6 +7,47 @@
 - `dashboard/web` declares `engines.node >=22`; `.nvmrc` (22) at the root.
 - Old project names replaced with Velisa where they only described the project; what stays, and why, is listed in `docs/RENAMING.md`.
 
+## v0.8.0 (2026-11-05)
+
+## What's Changed
+
+## Features
+
+- feat: transcript search and retake candidates as editorial decisions (#137)
+
+## Other changes
+
+- feat: transcript search and retake candidates as editorial decisions (#137)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.7.45 (2026-11-05)
+
+## What's Changed
+
+## Fixes
+
+- fix(install): FFmpeg 6.1+/Python 3.10 checks, ffmpeg-full on macOS, Windows and audit notes (#135)
+
+## Other changes
+
+- fix(install): FFmpeg 6.1+/Python 3.10 checks, ffmpeg-full on macOS, Windows and audit notes (#135)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.7.44 (2026-11-05)
+
+## What's Changed
+
+## Other changes
+
+- docs(roadmap): field review: third round, delivery formats, motion graphics, new skill candidates (#138)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.7.43 (2026-11-05)
 
 ## What's Changed

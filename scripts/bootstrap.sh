@@ -26,8 +26,8 @@
 #   3. If it has a SKILL.md (at its root, or skills/<name>/SKILL.md), symlink it to
 #      ~/.claude/skills/<name from SKILL.md> (Claude Code) and ~/.agents/skills/<name> (Codex).
 #      An existing entry there that points somewhere else is reported, never replaced.
-# Then checks ffmpeg/ffprobe and Blender (never installs system packages) and runs `video-agent doctor`
-# from the agent checkout, whose sibling-directory discovery finds every Skill in DIR.
+# Then checks ffmpeg/ffprobe (6.1+), Python (3.10+) and Blender -- a missing or too old one is a note,
+# never installed or fatal -- and runs `video-agent doctor` from the agent checkout.
 #
 # Safe to interrupt and re-run: nothing is deleted, no remote is changed, nothing is forced.
 set -euo pipefail
@@ -124,6 +124,16 @@ while IFS=$'\t' read -r repo _ _; do
   fi
 done <<< "$COMPONENTS"
 
+# "MAJOR MINOR" of a version string such as "n6.1", "6.1.1-3ubuntu5" or "3.12.4", or nothing when
+# it does not start with a release number (an FFmpeg git build: "N-115000-g...", "2024-05-01-git-...").
+major_minor() {
+  printf '%s\n' "$1" | sed -n 's/^n\{0,1\}\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1 \2/p'
+}
+# True when version "$1 $2" (major minor) is older than "$3 $4".
+older_than() {
+  [ "$1" -lt "$3" ] || { [ "$1" -eq "$3" ] && [ "$2" -lt "$4" ]; }
+}
+
 echo "--- 2. Python environment ---"
 if [ -n "${VIRTUAL_ENV:-}" ]; then
   PY="$VIRTUAL_ENV/bin/python"
@@ -133,6 +143,15 @@ else
   [ -x "$VENV/bin/python" ] || run python3 -m venv "$VENV"
   PY="$VENV/bin/python"
   echo "   virtualenv: $VENV"
+fi
+# The interpreter the packages will run on: the virtualenv's once it exists, else the python3 it is made from.
+py_check="python3"; [ -x "$PY" ] && py_check="$PY"
+py_version="$("$py_check" -c 'import sys; print("%d.%d" % sys.version_info[:2])' 2>/dev/null || true)"
+# shellcheck disable=SC2046  # word splitting of "MAJOR MINOR" is the point
+if [ -n "$(major_minor "$py_version")" ] && older_than $(major_minor "$py_version") 3 10; then
+  echo "!! Python $py_version ($py_check) is older than 3.10, which ffmpeg-skill and the Python Skills require:"
+  echo "   install Python 3.10+ and re-run (or activate a 3.10+ virtualenv first)"
+  note "Python $py_version is older than 3.10 (required)"
 fi
 run "$PY" -m pip install -q --upgrade pip || true
 
@@ -203,13 +222,70 @@ else
 fi
 
 echo "--- 5. ffmpeg / ffprobe / blender ---"
-if command -v ffmpeg >/dev/null 2>&1 && command -v ffprobe >/dev/null 2>&1; then
-  echo "   OK: $(ffmpeg -version | head -1)"
-else
-  echo "!! ffmpeg/ffprobe not found. Install them yourself, e.g.:"
+# The ffmpeg ffmpeg-skill will run: what PATH gives, except that on macOS a Homebrew lean `ffmpeg`
+# is replaced by the keg-only `ffmpeg-full` of the same prefix when that is installed, as
+# ffmpeg-skill itself does (scripts/_common/runner.py there).
+find_ffmpeg() {   # $1 ffmpeg or ffprobe
+  local found real prefix formula
+  found="$(command -v "$1" 2>/dev/null)" || return 1
+  if [ "$(uname -s)" = Darwin ]; then
+    real="$(python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$found" 2>/dev/null || true)"
+    case "$real" in
+      */Cellar/*)
+        prefix="${real%%/Cellar/*}"; formula="${real#*/Cellar/}"; formula="${formula%%/*}"
+        case "$formula" in
+          ffmpeg|ffmpeg@[0-9]*) [ -x "$prefix/opt/ffmpeg-full/bin/$1" ] && found="$prefix/opt/ffmpeg-full/bin/$1" ;;
+        esac ;;
+    esac
+  fi
+  printf '%s\n' "$found"
+}
+ffmpeg_hints() {
   echo "     Debian/Ubuntu:  sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core"
-  echo "     macOS:          brew install ffmpeg"
-  note "ffmpeg/ffprobe missing"
+  echo "     macOS:          brew install ffmpeg-full   # not the plain ffmpeg formula: it lacks subtitles/drawtext/zscale"
+  # shellcheck disable=SC2016  # printed for the user to run, not expanded here
+  echo '                     (keg-only; ffmpeg-skill prefers it over a Homebrew ffmpeg on PATH. With none on PATH:'
+  # shellcheck disable=SC2016
+  echo '                      export PATH="$(brew --prefix ffmpeg-full)/bin:$PATH" in your shell profile)'
+  echo "     Windows:        winget install Gyan.FFmpeg   (see the Windows note in README.md)"
+}
+FFMPEG="$(find_ffmpeg ffmpeg || true)"
+FFPROBE="$(find_ffmpeg ffprobe || true)"
+if [ -n "$FFMPEG" ] && [ -n "$FFPROBE" ]; then
+  ff_line="$("$FFMPEG" -version 2>/dev/null | sed -n '1p' || true)"
+  ff_version="$(printf '%s\n' "$ff_line" | sed -n 's/^ffmpeg version \([^ ]*\).*/\1/p')"
+  echo "   found: ${ff_line:-no version line} ($FFMPEG)"
+  if [ "$(uname -s)" = Darwin ]; then
+    case "$(python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$FFMPEG" 2>/dev/null || true)" in
+      */Cellar/ffmpeg/*|*/Cellar/ffmpeg@[0-9]*/*)   # find_ffmpeg would have taken ffmpeg-full if it were installed
+        echo "!! this is Homebrew's lean ffmpeg, without the subtitles/drawtext/zscale filters: brew install ffmpeg-full"
+        note "Homebrew lean ffmpeg: brew install ffmpeg-full" ;;
+    esac
+  fi
+  # shellcheck disable=SC2046  # word splitting of "MAJOR MINOR" is the point
+  if [ -z "$(major_minor "$ff_version")" ]; then
+    echo "   note: ffmpeg version '${ff_version:-?}' is not a release number (a git build?), so 6.1+ was not checked;"
+    echo "         npx ffmpeg-skill doctor reports what this build can do"
+  elif older_than $(major_minor "$ff_version") 6 1; then
+    echo "!! ffmpeg $ff_version is older than 6.1, which ffmpeg-skill requires (its tools refuse it). Install a newer one:"
+    ffmpeg_hints
+    echo "   Then run: npx ffmpeg-skill doctor   (checks the filters and libass the tools need)"
+    note "ffmpeg $ff_version is older than 6.1 (required by ffmpeg-skill)"
+  fi
+else
+  missing=""
+  [ -n "$FFMPEG" ] || missing="ffmpeg"
+  [ -n "$FFPROBE" ] || missing="${missing:+$missing and }ffprobe"
+  echo "!! $missing not found on PATH: every ffmpeg-skill tool stops with exit 127 (missing_tool) until"
+  echo "   FFmpeg 6.1+ is installed. This script never installs system packages; install it yourself, e.g.:"
+  ffmpeg_hints
+  if [ "$(uname -s)" = Darwin ] && command -v brew >/dev/null 2>&1 \
+     && [ -x "$(brew --prefix 2>/dev/null)/opt/ffmpeg-full/bin/ffmpeg" ]; then
+    # shellcheck disable=SC2016  # printed for the user to run
+    echo '   ffmpeg-full is installed but keg-only, so not on PATH: add export PATH="$(brew --prefix ffmpeg-full)/bin:$PATH" to your shell profile'
+  fi
+  echo "   Then run: npx ffmpeg-skill doctor   (checks the filters and libass the tools need)"
+  note "$missing missing (FFmpeg 6.1+ needed)"
 fi
 
 if [ -d "$WORKSPACE/blender-skill" ] && ! command -v blender >/dev/null 2>&1; then

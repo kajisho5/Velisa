@@ -975,3 +975,41 @@ integration.py` (real ffmpeg + all 9 real Skills, no mocks): 48 passed, 0
 failed. Verified live: `--set subtitle.generate=true` now fails at `plan` with
 a clear message naming the key; `--set subtitle=true` and `--set
 edit.concat=true` still work exactly as before. ADR-043 added.
+
+## 25. `transcription-skill`: a `search` command (phrase → timed hits with context)
+
+**Why**: users ask to find one phrase in hours of footage and jump there (2026-11 user voices). The word-timed
+Transcript already holds everything needed; no skill exposes a search. `ecosystem.json` now gives
+文字起こしの語句検索 to `transcription-skill`: it owns the Transcript schema and its normalisation, and a search
+is a deterministic query over that document, not an interpretation, so it stays inside that repository's "no
+edit decisions" boundary. Until it ships, the routing skill's
+`plugins/velisa/skills/velisa/transcript.md` is the recipe agents follow by hand.
+
+**Concretely**: `transcription search t.json "phrase" [--fuzzy 0.8] [--context 1] --json` (and the same tool in
+`run -` and `contract --json`). Exact, then normalised matching (NFKC, casefold, no whitespace or punctuation, matched
+on the joined word texts so a CJK phrase split across words or segments still matches), then optional approximate
+matching labelled with its ratio. Every hit, never only the best: first/last word times, segment ids, the
+neighbouring text, the match kind, and whether the times are word- or segment-accurate (`words: null`). Several
+transcripts in one call report the source file name. Fixtures in Japanese, Chinese and English.
+
+**Boundary**: no margin, no cut range, no ranking by importance. Choosing a hit and turning it into a
+`cut.py --start/--end` or `--segments` range with a margin is the agent's or the person's step. Recorded in that
+repository's `ECOSYSTEM_ROADMAP.md` ("What this repository owns") and an ADR there.
+
+## 26. `video-production-agent`: retake / repeated-sentence / restart candidates as CONFIRM decisions
+
+**Why**: transcript-based cutting leaves misspeaks, repeated sentences and false starts in (2026-11 user voices).
+Which take to keep is an editorial decision: `transcription-skill` refuses edit points by design and ffmpeg-skill's
+CONTRIBUTING excludes content judgement, so `ecosystem.json` gives 言い直し・重複の候補提示 to the agent, next to the
+"semantic deletion" work in `docs/ecosystem/ROADMAP.md` step 6.
+
+**Concretely**: from a word-timed Transcript, detect near-duplicate consecutive sentences (normalised similarity),
+restart patterns (an earlier fragment that is a prefix of the next sentence) and in-sentence stutters; emit them as
+a candidate list (kind, both takes with times and text, proposal "remove the earlier take") whose every item is a
+CONFIRM decision, default not cut. Confirmed ranges, widened by a margin clamped to the neighbouring word gaps,
+become one `cut.py --remove ... --accurate` (or are subtracted from `silence.py --edl` kept ranges and cut once with
+`--segments`). Recorded in the ProductionReceipt with the person's decision per item. Test fixtures with Japanese
+and Chinese retakes.
+
+**Boundary**: fillers are not retakes; they stay with 無音・フィラー除去 (`audio-production-skill`, engine
+`silence.py --filler`, 啊 excluded unless `--filler-extra 啊`). Nothing is removed without a confirmed decision.
