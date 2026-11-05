@@ -263,7 +263,8 @@ capability Y, resolved by the registry."
 ### 4.3 What does not change between §1 (current) and §4 (target)
 
 - `ffmpeg-skill` remains the base execution layer. Nothing in the target model requires
-  rewriting its 21 tools or its contract-generation mechanism.
+  rewriting its 21 tools or its contract-generation mechanism. *(Superseded as of 2026-11: it has 42 tools
+  at contract "2.0"; the statement holds for them too — `npx ffmpeg-skill contract --json`.)*
 - The single-designated-subprocess-module pattern (§1.1) remains the correct Runtime
   shape for *how* a Skill executes a delegated call — the target model changes how a Skill
   *finds* what to call, not how it calls it once found.

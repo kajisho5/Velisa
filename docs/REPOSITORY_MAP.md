@@ -30,7 +30,7 @@ those logs could not be cross-checked against real commit-by-commit history.
 | Repo | Role | Version | Deps | MCP? | Delegates ffmpeg to |
 |---|---|---|---|---|---|
 | `video-production-agent` | Orchestrator/planner | 0.1.0 | `jsonschema>=4.17` only | No | via 9 skill adapters |
-| `ffmpeg-skill` | Typed FFmpeg execution | 0.9.1 | none (stdlib) | Yes (stdio JSON-RPC) | — (is the ffmpeg boundary) |
+| `ffmpeg-skill` | Typed FFmpeg execution | 0.9.1 (3.x as of 2026-11) | none (stdlib) | Yes (stdio JSON-RPC) | — (is the ffmpeg boundary) |
 | `video-editing-skill` | Cut/trim/concat/resize | 0.1.0 | none | No | ffmpeg-skill |
 | `audio-production-skill` | Gain/mix/normalize/dynamics | 0.1.0 | none | No | ffmpeg-skill |
 | `color-grading-skill` | HDR→SDR/LUT/color tag | 0.1.0 | none | No | ffmpeg-skill |
@@ -134,10 +134,12 @@ as a whole is unfinished.
 
 ### `ffmpeg-skill` — the FFmpeg execution boundary
 
-**Role (CURRENT):** 21 typed Python-stdlib scripts (`cut`, `fit`, `caption`, `overlay`,
-`graphics`, `sync`, `multicam`, `audio`, `loudness`, `silence`, `join`, `color`,
-`export`, `check`, `scenes`, `look`, `render`, `probe`, `batch`, `report`, `verify`),
-each a standalone `argparse` CLI. No filter string is ever accepted from a caller —
+**Role (CURRENT):** typed Python-stdlib scripts — 21 at the 2026-09 audit, 42 as of
+2026-11 (`npx ffmpeg-skill contract --json` lists them; FFmpeg/Python requirements:
+[upstream README](https://github.com/kajisho5/ffmpeg-skill#requirements)). The audited 21
+were `cut`, `fit`, `caption`, `overlay`, `graphics`, `sync`, `multicam`, `audio`,
+`loudness`, `silence`, `join`, `color`, `export`, `check`, `scenes`, `look`, `render`,
+`probe`, `batch`, `report` and `verify`, each a standalone `argparse` CLI. No filter string is ever accepted from a caller —
 typed flags (e.g. `--compress`, `--limit`, `--gate`) are individually range-checked and
 converted into filter-graph fragments internally; text/paths destined for filter graphs
 are escaped, never interpolated raw.
@@ -169,12 +171,15 @@ script, never a shell.
 
 **Security (CURRENT):** no `shell=True`/`os.system` anywhere; all subprocess calls are
 list-argv; `mutates_input: false` for every tool (enforced/declared, source files are
-never overwritten). No per-encode timeout is enforced on the main scripts (only
-`verify.py` sets one) — an honest, present gap.
+never overwritten). Every tool kills an ffmpeg/ffprobe run that exceeds `--timeout`
+(default 1800 s, or `FFMPEG_SKILL_TIMEOUT`), removes the partial output and reports
+`kind: timeout`. *(Corrected 2026-11: the 2026-09 audit found no per-encode timeout on
+the main scripts, only in `verify.py`; that gap has since been closed upstream.)*
 
 **Versioning (CURRENT):** two separate version axes — `skill.version` (npm/package.json,
-0.9.1, changes every release) and `contract_version` ("1.0", bumps only on a breaking
-`ToolSpec` shape change). This two-axis versioning is a pattern worth generalizing (see
+changes every release; 0.9.1 at the 2026-09 audit, 3.x as of 2026-11) and
+`contract_version` (bumps only on a breaking `ToolSpec` shape change; "1.0" at the audit,
+"2.0" since ffmpeg-skill 3.0.0). This two-axis versioning is a pattern worth generalizing (see
 `VERSIONING.md`).
 
 **Provenance/caching (CURRENT, partial):** every run reports the exact ffmpeg command

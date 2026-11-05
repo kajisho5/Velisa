@@ -257,6 +257,12 @@ CLI) may invoke any of these directly without going through `video-editing-skill
 | `report` | ffmpeg-skill | EXPERIMENTAL | — |
 | `verify` | ffmpeg-skill | EXPERIMENTAL | The **only** ffmpeg-skill tool with a per-run timeout enforced — the other 20 main scripts have no per-encode timeout, an honest, present gap (`REPOSITORY_MAP.md`). |
 
+> **Superseded as of 2026-11:** this table is the 2026-09 snapshot of 21 ffmpeg-skill tools at 0.9.1 /
+> contract "1.0". ffmpeg-skill is now 3.x with contract "2.0", 42 tools, and a `--timeout`
+> (default 1800 s) on every tool, so the `verify` row's timeout gap is closed. The current
+> tool list is `npx ffmpeg-skill contract --json`; requirements are in its
+> [README](https://github.com/kajisho5/ffmpeg-skill#requirements).
+
 **Cross-cutting facts about this layer (from `REPOSITORY_MAP.md`, load-bearing for the
 matrix above):**
 
