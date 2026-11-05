@@ -1,3 +1,14 @@
+## v0.8.2 (2026-11-05)
+
+## What's Changed
+
+## Other changes
+
+- docs(roadmap): internationalisation principles and regional profiles (#140)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.8.1 (2026-11-05)
 
 ## What's Changed
