@@ -1,3 +1,18 @@
+## v0.9.0 (2026-11-05)
+
+## What's Changed
+
+## Features
+
+- feat(routing): production steps and human-review checkpoints (#136)
+
+## Other changes
+
+- feat(routing): production steps and human-review checkpoints (#136)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.8.2 (2026-11-05)
 
 ## What's Changed
