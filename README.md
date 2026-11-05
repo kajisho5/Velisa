@@ -192,14 +192,37 @@ Into `~/ai-video-os` (or `--dir`), this clones every repository (or fast-forward
 existing clone to the latest), `pip install -e`s the Python ones into `~/ai-video-os/.venv`,
 links every Skill that has a `SKILL.md` into `~/.claude/skills/` (Claude Code) and
 `~/.agents/skills/` (Codex),
-checks `ffmpeg`/`ffprobe` (prints the `apt`/`brew` command if missing — it never installs
-system packages itself) and finishes with a real `video-agent doctor`. Re-running it
+checks `ffmpeg`/`ffprobe` (FFmpeg 6.1+) and Python (3.10+) — a missing or too old one is a
+note with the `apt`/`brew` command, it never installs system packages itself; on macOS the hint
+is `brew install ffmpeg-full`, because the plain `ffmpeg` formula lacks filters the Skills use, and
+`npx ffmpeg-skill doctor` lists exactly which — and finishes with a real `video-agent doctor`. Re-running it
 updates everything. It never deletes, resets or overwrites: a clone with local changes, or
 a `~/.claude/skills` entry that points elsewhere, is reported and left alone. A Skill
 repository with no package yet is cloned and reported as such. DVD/Blu-ray authoring
 (`bdmvkit`, `vtskit`, `udfkit`, `dvdcc`, `oncemore`) is optional: add `--with-optional`. From a checkout,
 `./install.sh` does the same. To add a Skill to the ecosystem, add it to `ecosystem.json`
 (and to `docs/ecosystem/registry.json`; a test checks they agree).
+
+**Before you run it.** Read what it would do first, without changing anything:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kajisho5/Velisa/main/install.sh | bash -s -- --dry-run
+```
+
+`--dry-run` prints every `git clone`/`pull`, `pip install`, `npm ci` and `ln -s` it would run and
+the environment checks, and writes nothing (piped from `curl`, `install.sh` itself still clones or
+fast-forwards this repository into the workspace first, to read `ecosystem.json`; from a checkout
+it does not). What it fetches is **not pinned**: every repository is cloned at, or fast-forwarded
+to, the latest commit of the default branch (`main`) of `github.com/kajisho5/<repo>`, so two runs a day apart can install
+different code — pin a Skill yourself (`git -C ~/ai-video-os/<repo> checkout <tag>`, then
+`--no-update`) when you need a fixed version. It writes only to the workspace (the clones and
+`.venv`), `~/.claude/skills/` and `~/.agents/skills/` (symlinks; `--no-claude-skills` /
+`--no-codex-skills` skip them) and, through `npm ci`, the npm cache.
+
+**Windows.** The installer is bash and is not tested on Windows. Use WSL (then follow the Linux
+steps) or Git Bash; native Windows support for the Skills themselves is tracked per Skill — for
+`ffmpeg-skill`, see its README's Windows notes and
+[kajisho5/ffmpeg-skill#143](https://github.com/kajisho5/ffmpeg-skill/issues/143).
 
 ### From Claude Code: the plugin marketplace
 

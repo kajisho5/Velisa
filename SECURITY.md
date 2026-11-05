@@ -11,6 +11,16 @@ flow, not a public issue:
 This opens a private advisory visible only to the maintainer, so the details aren't
 public until a fix is ready.
 
+## Before you run it
+
+`install.sh` is meant to be piped from `curl`, so read what it does before running it:
+[README → Quick start → *Before you run it*](README.md#quick-start) shows the `--dry-run`, what is
+cloned (the latest default branch, `main`, of each repository in `ecosystem.json`, unpinned) and where it writes.
+The installer's own network access is `git clone`/`pull` from `github.com/kajisho5/*`, `pip install`
+(pip itself and the cloned checkouts' dependencies, from PyPI) and `npm ci` (the npm registry); it never
+uses `sudo` or installs system packages. Its last step runs `video-agent doctor` from the cloned
+agent, which is that repository's code.
+
 ## Scope
 
 This repository (`Velisa`) is architecture, contracts, and a read-only
