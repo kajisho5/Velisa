@@ -11,7 +11,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SKILL_DIR = ROOT / "plugins/video-production-os/skills/video-production-os"
+SKILL_DIR = ROOT / "plugins/velisa/skills/velisa"
 PAGE = SKILL_DIR / "transcript.md"
 MANIFEST = json.loads((ROOT / "ecosystem.json").read_text(encoding="utf-8"))
 # The jobs the page names, each followed (within a sentence) by the repository that owns it.

@@ -34,7 +34,7 @@ class MarketplaceTests(unittest.TestCase):
         mk, meta = marketplace.build(MANIFEST)
         names = [e["name"] for e in mk["plugins"]]
         plugins = [c for c in MANIFEST["components"] if c.get("plugin") and c["status"] != "planned"]
-        self.assertEqual(names, ["video-production-os"] + [c["repo"] for c in plugins])
+        self.assertEqual(names, ["velisa"] + [c["repo"] for c in plugins])
         self.assertEqual(len(names), len(set(names)))
         for e in mk["plugins"][1:]:
             self.assertEqual(e["source"], {"source": "github", "repo": f"{MANIFEST['org']}/{e['name']}"})
@@ -43,8 +43,8 @@ class MarketplaceTests(unittest.TestCase):
         self.assertFalse(mk["name"].startswith(("claude", "anthropic")))
 
     def test_routing_skill_names_every_component(self):
-        text = (ROOT / "plugins/video-production-os/skills/video-production-os/SKILL.md").read_text(encoding="utf-8")
-        self.assertTrue(text.startswith("---\nname: video-production-os\n"))
+        text = (ROOT / "plugins/velisa/skills/velisa/SKILL.md").read_text(encoding="utf-8")
+        self.assertTrue(text.startswith("---\nname: velisa\n"))
         for c in MANIFEST["components"]:
             if c["status"] != "planned":
                 self.assertIn(f"`{c['repo']}`", text)
@@ -54,7 +54,7 @@ class MarketplaceTests(unittest.TestCase):
         links it, and every relative link in either file resolves to a file inside the plugin."""
         mk, _ = marketplace.build(MANIFEST)
         plugin_dir = (ROOT / mk["plugins"][0]["source"]).resolve()
-        skill_dir = ROOT / "plugins/video-production-os/skills/video-production-os"
+        skill_dir = ROOT / "plugins/velisa/skills/velisa"
         review = skill_dir / "review.md"
         self.assertTrue(review.is_file())
         self.assertTrue(review.resolve().is_relative_to(plugin_dir))
