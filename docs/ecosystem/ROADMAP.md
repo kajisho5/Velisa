@@ -2,7 +2,7 @@
 
 What every repository still needs, how the pieces connect, and the order to build them in. Written from a read-only audit of all 33 components on 2026-10-30 (source, tests, CI, contracts, the agent's adapters). Each repository carries an `ECOSYSTEM_ROADMAP.md` with PR-sized steps; this page is the map across them. `docs/ROADMAP.md` is the architecture roadmap (phases of the contract layer) and stays as it is.
 
-**ffmpeg-skill is treated as complete.** Its 42 tools (contract v1.0, stability promise for 2.x) are the engine the others delegate to; no step below changes it. Several gaps are closed by *using* tools it already has, e.g. `render --export-timeline` (.otio / .fcpxml / .edl), `freeze`, `reverse`, `insert`, `audio --duck --voice`, `metadata` chapters.
+**ffmpeg-skill is treated as complete.** Its tools (contract 2.0, with a stability promise for the whole of 3.x: [docs/contract.md](https://github.com/kajisho5/ffmpeg-skill/blob/main/docs/contract.md#stability-guarantee-3x)) are the engine the others delegate to; no step below changes it. Several gaps are closed by *using* tools it already has, e.g. `render --export-timeline` (.otio / .fcpxml / .edl), `freeze`, `reverse`, `insert`, `audio --duck --voice`, `metadata` chapters.
 
 ## Where things stand
 
@@ -10,7 +10,7 @@ What every repository still needs, how the pieces connect, and the order to buil
 |---|---|---|
 | Command | video-production-agent | plans, approves, renders, records; brain = rules + Claude (API or the chat app via MCP); 10 adapters |
 | Ingest | ingest-skill | active: verified single-read offload to several destinations, ASC MHL + xxHash64, card-aware inventory, `ingest fetch` (URL via yt-dlp); agent adapter wired (`video-production-agent`#83: CONFIRM-gated offload, verified copies become assets) |
-| Engine | ffmpeg-skill | 42 tools, complete; agent uses 15 directly |
+| Engine | ffmpeg-skill | complete (tool list: `npx ffmpeg-skill contract --json`); the agent's adapter registers a subset of them as `ffmpeg-skill/*` tool ids (list and evidence: [capability-status.json](capability-status.json)) |
 | Visual | video-editing, color-grading, motion-graphics, subtitle, thumbnail | implemented and wired, with unexposed parameters and version drift |
 | Visual | blender, remotion-ffmpeg, hyperframes | implemented, not wired |
 | Audio | audio-production | implemented and wired (MIX, NR, DYNAMICS not planned) |
