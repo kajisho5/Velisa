@@ -7,6 +7,43 @@
 - `dashboard/web` declares `engines.node >=22`; `.nvmrc` (22) at the root.
 - Old project names replaced with Velisa where they only described the project; what stays, and why, is listed in `docs/RENAMING.md`.
 
+## v0.9.0 (2026-11-05)
+
+## What's Changed
+
+## Features
+
+- feat(routing): production steps and human-review checkpoints (#136)
+
+## Other changes
+
+- feat(routing): production steps and human-review checkpoints (#136)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.8.2 (2026-11-05)
+
+## What's Changed
+
+## Other changes
+
+- docs(roadmap): internationalisation principles and regional profiles (#140)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.8.1 (2026-11-05)
+
+## What's Changed
+
+## Other changes
+
+- docs(roadmap): ffmpeg-skill's decisions on proposals 5-14 (#139)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.8.0 (2026-11-05)
 
 ## What's Changed

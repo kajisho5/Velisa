@@ -227,8 +227,8 @@ the environment checks, and writes nothing (piped from `curl`, `install.sh` itse
 fast-forwards this repository into the workspace first, to read `ecosystem.json`; from a checkout
 it does not). What it fetches is **not pinned**: every repository is cloned at, or fast-forwarded
 to, the latest commit of the default branch (`main`) of `github.com/kajisho5/<repo>`, so two runs a day apart can install
-different code — pin a Skill yourself (`git -C ~/ai-video-os/<repo> checkout <tag>`, then
-`--no-update`) when you need a fixed version. It writes only to the workspace (the clones and
+different code — pin a Skill yourself (`git -C <workspace>/<repo> checkout <tag>` — `~/velisa-workspace` or
+`$VELISA_HOME` unless you passed `--dir` — then `--no-update`) when you need a fixed version. It writes only to the workspace (the clones and
 `.venv`), `~/.claude/skills/` and `~/.agents/skills/` (symlinks; `--no-claude-skills` /
 `--no-codex-skills` skip them) and, through `npm ci`, the npm cache.
 
