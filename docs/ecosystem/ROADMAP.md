@@ -19,7 +19,7 @@ What every repository still needs, how the pieces connect, and the order to buil
 | Recognition | transcription, diarization, detection, slide-sync | implemented and wired; speaker ids end to end (agent #111) |
 | Verification | qc, media-analysis, artifacts | implemented and wired (artifacts: agent #110) |
 | Delivery | publish | 0.1.0, seven uploaders tested against mocks only; wired as CONFIRM after QC (agent #99); `scaffold` in ecosystem.json |
-| Delivery | nle-bridge | 0.1.0 (export / conform / diff / import); agent export / conform wired (#101), read-back open; `planned` in ecosystem.json |
+| Delivery | nle-bridge | 0.1.0 (export / conform / diff / import); agent export / conform wired (agent #101), read-back open; `planned` in ecosystem.json |
 | Delivery | 5 disc kits (optional) | implemented, standalone; oncemore named by a handoff (agent #109) |
 | Utility | imagemagick, stepcap | imagemagick wired for overlay images (agent #92); stepcap standalone by design |
 | Governance | skillpact, system-intelligence | skillpact conformance runs weekly (#127); system-intelligence reads contracts and ownership |
