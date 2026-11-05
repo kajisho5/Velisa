@@ -1,3 +1,15 @@
+## v0.9.1 (2026-11-05)
+
+## What's Changed
+
+## Other changes
+
+- docs: README facts, VELISA\_HOME (AVOS\_HOME fallback), registry tests in CI, Node 22 (#132)
+- docs(roadmap): live streaming out of scope; motion-titles-skill in place of broadcast-graphics (#141)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.9.0 (2026-11-05)
 
 ## What's Changed
