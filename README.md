@@ -147,12 +147,15 @@ this project's own principles argue against saying so prematurely
 
 ## The ecosystem today
 
-Ten independent Skill repositories plus one orchestrating Agent — every one of them
-cloned and verified directly, not taken on faith from a README:
+[`ecosystem.json`](ecosystem.json) is the authoritative list of components and their
+status (active, scaffold, optional); this README does not restate the count. The table
+below is the core that the original audit cloned and verified directly, not taken on
+faith from a README ([`REPOSITORY_MAP.md`](docs/REPOSITORY_MAP.md)), plus
+`remotion-ffmpeg-skill`, which is easy to mistake for Remotion:
 
 | Repo | Role | Depends on |
 |---|---|---|
-| [`ffmpeg-skill`](https://github.com/kajisho5/ffmpeg-skill) | Typed FFmpeg execution — the shared media-execution substrate. **The only Skill published on npm today.** | — |
+| [`ffmpeg-skill`](https://github.com/kajisho5/ffmpeg-skill) | Typed FFmpeg execution — the shared media-execution substrate. Published on npm as `ffmpeg-skill`. | — |
 | [`video-editing-skill`](https://github.com/kajisho5/video-editing-skill) | Trim / cut / concat / resize | ffmpeg-skill |
 | [`audio-production-skill`](https://github.com/kajisho5/audio-production-skill) | Gain / mix / normalize / dynamics | ffmpeg-skill |
 | [`color-grading-skill`](https://github.com/kajisho5/color-grading-skill) | HDR→SDR / LUT / color tagging | ffmpeg-skill |
@@ -163,6 +166,12 @@ cloned and verified directly, not taken on faith from a README:
 | [`media-analysis-skill`](https://github.com/kajisho5/media-analysis-skill) | Deterministic observation, never mutates media | ffmpeg/ffprobe directly |
 | [`transcription-skill`](https://github.com/kajisho5/transcription-skill) | Local ASR (faster-whisper), no cloud path | — |
 | [`video-production-agent`](https://github.com/kajisho5/video-production-agent) | Orchestrator — Observation → Inference → Decision → Plan → IR → Execution. **Usable but incomplete: the first consumer of this OS, not the OS itself.** | all of the above |
+| [`remotion-ffmpeg-skill`](https://github.com/kajisho5/remotion-ffmpeg-skill) | Motion graphics on real footage, timed from ffmpeg-skill's measurements. **Not Remotion itself:** a Skill that renders with Remotion and measures and delivers with ffmpeg-skill. npm: `remotion-ffmpeg-skill` (`npx remotion-ffmpeg-skill`). Not yet wired into the agent. | ffmpeg-skill, Remotion |
+
+What `ffmpeg-skill` adds over calling `ffmpeg` yourself: inputs are checked and every tool
+has a `--dry-run`, results report what was measured on the output rather than what was
+intended, and an existing output is refused unless `--overwrite` is passed — see its
+[README](https://github.com/kajisho5/ffmpeg-skill#readme) for the rest.
 
 `transcription-skill` is real, working, released — and was never part of this project's
 original "9 Skills" framing. That is direct, load-bearing evidence: the Skill count was
@@ -172,11 +181,12 @@ concrete gaps this audit found (a naming collision between two different meaning
 duplication mentioned above) are the reason `docs/CAPABILITY_MODEL.md` exists in the
 shape it does — not invented problems, found ones.
 
-Only current, verified repositories are listed above. Future Skills
-(`voice-production-skill`, `dubbing-skill`, and others) are discussed as *examples of
-what the architecture must support*, in [`docs/SKILL_EVOLUTION.md`](docs/SKILL_EVOLUTION.md)
-and [`docs/DELIVERY_AND_INTEROP.md`](docs/DELIVERY_AND_INTEROP.md) — none of them exist
-yet, and this README does not pretend otherwise.
+Only verified repositories are listed above; `ecosystem.json` carries the rest. Future
+Skills (`voice-production-skill`, `dubbing-skill`, and others) are discussed as *examples
+of what the architecture must support*, in [`docs/SKILL_EVOLUTION.md`](docs/SKILL_EVOLUTION.md)
+and [`docs/DELIVERY_AND_INTEROP.md`](docs/DELIVERY_AND_INTEROP.md) — where one appears in
+`ecosystem.json` at all, it is marked `scaffold` (an empty repository), and this README
+does not pretend otherwise.
 
 ## Quick start
 
@@ -252,10 +262,13 @@ If you only want one piece rather than the whole ecosystem, the Skills are also 
 standalone. `ffmpeg-skill` is genuinely published and installable on its own:
 
 ```bash
-npm install -g ffmpeg-skill
-ffmpeg-skill doctor      # check your environment's ffmpeg/ffprobe capabilities
-ffmpeg-skill contract    # machine-readable capability declaration
+npx ffmpeg-skill                    # install (or refresh) the skill into ~/.claude/skills/ffmpeg-skill
+npx ffmpeg-skill doctor             # check your environment's ffmpeg/ffprobe capabilities
+npx ffmpeg-skill contract --json    # machine-readable capability declaration
 ```
+
+It needs FFmpeg and Python at the versions in its
+[Requirements](https://github.com/kajisho5/ffmpeg-skill#requirements).
 
 (Skill packages are released independently of each other and of this repository —
 `ffmpeg-skill`'s own npm and GitHub versions can briefly differ; see

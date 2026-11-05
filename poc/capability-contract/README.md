@@ -1,5 +1,12 @@
 # PoC: Capability Contract vs. real Skill data
 
+> **Frozen historical snapshot.** `ffmpeg-skill.contract.json` here is ffmpeg-skill 0.9.1
+> at contract "1.0": its requirements (FFmpeg >=5.0, Python 3.9) and its 21 tools are
+> outdated. Superseded as of 2026-11: ffmpeg-skill is 3.x at contract "2.0"; read the
+> current requirements in its [README](https://github.com/kajisho5/ffmpeg-skill#requirements)
+> and the current tool list from `npx ffmpeg-skill contract --json`. The other Skills'
+> contract files here are equally frozen.
+
 Write-up and conclusions (three rounds, all 10 Skills): [`docs/POC_CAPABILITY_CONTRACT.md`](../../docs/POC_CAPABILITY_CONTRACT.md).
 
 **This PoC's real successor is [`registry/`](../../registry/)** (`docs/ROADMAP.md`

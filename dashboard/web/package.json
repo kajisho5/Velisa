@@ -1,7 +1,7 @@
 {
   "name": "@ecosystem-dashboard/web",
   "private": true,
-  "version": "0.7.40",
+  "version": "0.7.43",
   "type": "module",
   "engines": {
     "node": ">=22"
