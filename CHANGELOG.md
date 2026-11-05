@@ -1,3 +1,18 @@
+## v0.7.45 (2026-11-05)
+
+## What's Changed
+
+## Fixes
+
+- fix(install): FFmpeg 6.1+/Python 3.10 checks, ffmpeg-full on macOS, Windows and audit notes (#135)
+
+## Other changes
+
+- fix(install): FFmpeg 6.1+/Python 3.10 checks, ffmpeg-full on macOS, Windows and audit notes (#135)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.7.44 (2026-11-05)
 
 ## What's Changed
