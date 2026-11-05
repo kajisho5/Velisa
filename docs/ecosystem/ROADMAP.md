@@ -109,6 +109,7 @@ Neither vendor ships a desktop MCP server. Community servers exist. Verified on 
    - diarization, with speaker ids end to end.
    - detection, which owns OCR for stepcap and slide-sync too.
    - slide-sync.
+   - Transcript phrase search in transcription-skill (`WORK_QUEUE.md` item 25).
 4. **Audio.**
    - Filler removal: transcription words → audio-production FILLER_REMOVE.
    - voice-enhance.
@@ -120,7 +121,7 @@ Neither vendor ships a desktop MCP server. Community servers exist. Verified on 
    - ingest-skill adapter, MHL.
 6. **Agent brain.**
    - requirements_extraction: plain-language brief → requirements, through the chat model or the API.
-   - semantic deletion.
+   - semantic deletion, starting with retake and repeated-sentence candidates that the person confirms one by one (`WORK_QUEUE.md` item 26).
 7. **Governance.**
    - system-intelligence reads ecosystem.json ownership and the contracts.
    - skillpact conformance runs as a non-blocking OS job. Done: `skillpact-conformance.yml`, ADR-014 ([#127](https://github.com/kajisho5/Velisa/pull/127)).
