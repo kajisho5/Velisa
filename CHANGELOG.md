@@ -1,3 +1,14 @@
+## v0.7.44 (2026-11-05)
+
+## What's Changed
+
+## Other changes
+
+- docs(roadmap): field review: third round, delivery formats, motion graphics, new skill candidates (#138)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.7.43 (2026-11-05)
 
 ## What's Changed
