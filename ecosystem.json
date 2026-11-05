@@ -17,7 +17,7 @@
   "components": [
     {"repo": "video-production-agent", "plugin": true, "department": "command", "install": "pip", "status": "active",
      "role": "Orchestrator: plans a production and calls the Skills below",
-     "owns": ["制作計画", "スキルの呼び分け", "制作記録(ProductionReceipt)"]},
+     "owns": ["制作計画", "スキルの呼び分け", "制作記録(ProductionReceipt)", "言い直し・重複の候補提示"]},
 
     {"repo": "ingest-skill", "plugin": true, "department": "ingest", "install": "pip", "status": "active",
      "role": "Media offload from cards, recorders and URLs with checksum-verified copies, dual backup and a clip inventory",
@@ -71,7 +71,7 @@
 
     {"repo": "transcription-skill", "plugin": true, "department": "recognize", "install": "pip", "status": "active", "extras": ["faster-whisper"],
      "role": "Speech to timestamped transcript (local faster-whisper)",
-     "owns": ["文字起こし"],
+     "owns": ["文字起こし", "文字起こしの語句検索"],
      "engines": [{"name": "faster-whisper", "note": "ローカル"}]},
     {"repo": "diarization-skill", "plugin": true, "department": "recognize", "install": "pip", "status": "active", "optional": true,
      "role": "Speaker diarization: fills the Transcript speaker_id that transcription-skill reserves",
