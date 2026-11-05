@@ -143,7 +143,7 @@ From a review of every skill against what conference, medical-congress, corporat
    - audio-production-skill: stems and multitrack delivery, loudness versions in one run.
    - Generators: layer export (motion-graphics-skill), alpha deliveries (hyperframes-skill), alpha mode and render passes (blender-skill), style presets and layer output (remotion-ffmpeg-skill), layered output (thumbnail-skill), alpha hygiene for stills (imagemagick-skill).
 2. **Motion graphics from a sentence** (文字PV・幾何学模様; see the section below).
-   - hyperframes-skill: text animation, Japanese typesetting and text fit, shape and pattern layers, generative layer (Three.js / GLSL), audio and beat lock, IN / LOOP / OUT segments, style presets and recipe gallery.
+   - hyperframes-skill: text animation, international typesetting and text fit, shape and pattern layers, generative layer (Three.js / GLSL), audio and beat lock, IN / LOOP / OUT segments, style presets and recipe gallery.
    - remotion-ffmpeg-skill: source-less runs, KineticType, visualizers, Three.js scenes.
    - blender-skill: procedural motion scenes, 3D text and logo reveal, audio-driven animation.
    - video-production-agent: productions with no source media, motion brief slots, relative revisions and references.
@@ -202,6 +202,51 @@ What was taken from the survey, and where it landed. A project's licence decides
   - **Remotion** is free for individuals and for companies with up to 3 employees; larger companies need a Remotion company licence (remotion-ffmpeg-skill README). The skill's MIT licence does not change that.
   - **OBS** is GPL-2.0. The live area talks to it only over the obs-websocket protocol, from its own client; no OBS code or plugin code is used.
 
+## Internationalisation principles
+
+Velisa is built for use worldwide, not for one country. Each roadmap and pull request from 2026-11-05 on follows these rules. Earlier text that does not is brought in line by the re-profiling steps below.
+
+1. **International defaults.** Defaults are English and international standards: ITU-R BT.709 / BT.2020 / BT.2100, EBU R128, ATSC A/85, SMPTE timecode, W3C TTML / IMSC 1.1 and WebVTT, Unicode (UAX #14 line breaking, UAX #29 grapheme clusters, UAX #9 bidirectional text). National standards and conventions are **regional profiles** the caller picks: ARIB TR-B32 and ARIB caption rules, Japanese vertical writing, ruby and kinsoku are examples. A regional profile is never a default, and no default value comes from one region.
+2. **Examples in English first.** Example requests and sample text in documents are written in English. Another language is shown beside it only when the example is about that language.
+3. **Many languages in speech and text.** Transcription, dubbing and subtitles assume many languages:
+   - The spoken language is detected per file or per segment (with a confidence), unless the caller states it.
+   - Every transcript, cue, audio track and subtitle track carries a BCP 47 language tag.
+   - Layout covers right-to-left and bidirectional scripts, CJK, complex scripts (Indic, Thai) and combining marks.
+   - Line and character limits are per language, not one fixed number.
+4. **Loudness targets side by side.** EBU R128 (-23 LUFS, -1 dBTP), ATSC A/85 (-24 LKFS, -2 dBTP) and the streaming platforms' own values (YouTube, Spotify, Apple, Netflix and others, from ffmpeg-skill's platform table) are listed together. A regional broadcast target such as ARIB TR-B32 (-24 LKFS, Japan) is one more profile in the same list.
+5. **Engines chosen for many languages.** An engine that is strong in one language is an option for that language. The default is the engine that covers the most languages under a licence that allows commercial use of both code and weights.
+
+### Re-profiling steps (Japan-specific text → regional profiles)
+
+Each line becomes a step in that repository's `ECOSYSTEM_ROADMAP.md` with its next roadmap PR. Until then, this list is the record.
+
+| Repository | What is Japan-specific today | Step |
+|---|---|---|
+| video-production-agent | requirements_extraction keywords and the examples in steps 18-21 are mostly Japanese | keyword sets per language (English first, Japanese as one set); examples in English with Japanese alongside |
+| subtitle-skill | ja / zh / ko locale profiles | step 10 is already "regional caption profiles", with `ja-broadcast` as the first ([subtitle-skill#28](https://github.com/kajisho5/subtitle-skill/pull/28)); still to do: per-language limits for every locale |
+| transcription-skill | optional engines tuned for Japanese (`haas_ja`, `speechcpp` models) | language detection by default; an engine table per language; English and multilingual candidates below |
+| dubbing-skill | VOICEVOX and Style-Bert-VITS2 (Japanese); pronunciation dictionary examples | the default engine chosen for language coverage; Japanese engines as options for Japanese |
+| motion-graphics-skill | — | done: step 9 is "name fit for lower thirds, any language" ([motion-graphics-skill#36](https://github.com/kajisho5/motion-graphics-skill/pull/36)) |
+| hyperframes-skill | (written international from the start: typesetting with RTL and CJK; vertical and ruby as profiles) | none |
+| qc-skill | (written with `ebu-r128`, `atsc-a85` and `stream` first; `arib-tr-b32` as a regional profile) | none |
+| audio-production-skill | — | done: step 9 lists EBU R128, ATSC A/85 and streaming first, ARIB TR-B32 as a regional profile ([audio-production-skill#29](https://github.com/kajisho5/audio-production-skill/pull/29)) |
+| detection-skill | OCR languages `jpn` / `jpn_vert` / `eng`; PII patterns | OCR language packs chosen per job (any Tesseract language); PII patterns per locale, none by default |
+| diarization-skill, artifacts-skill, publish-skill | examples and checks written for Japanese events (honorifics, variant kanji) | the same checks as per-language rules; Japanese as one rule set |
+| thumbnail-skill, remotion-ffmpeg-skill, blender-skill | CJK font handling described for Japanese | font fallback for every script (Noto by default); examples in English |
+
+### Engines for English and other languages (candidates, survey on hold)
+
+Engines to look at when the survey is done. None of them is checked yet: each repository's ADR checks the licences of the code and the weights and the measured quality before one is used.
+
+| Task | Candidates (licence as published; to be checked) |
+|---|---|
+| Speech recognition | Whisper large-v3 / large-v3-turbo through faster-whisper (MIT); NVIDIA Parakeet TDT (CC-BY-4.0 weights); Distil-Whisper (MIT, English) |
+| Word alignment | wav2vec2 alignment models via whisperX (Apache-2.0 models checked in transcription ADR-038); MMS alignment is CC-BY-NC, so not for commercial use |
+| Text to speech | Kokoro-82M (Apache-2.0, strong in English); Piper (MIT code, each voice's own licence); Chatterbox Multilingual (MIT, already the default) |
+| Machine translation | OPUS-MT on CTranslate2 (already optional; licence per model); Argos Translate (already the default) |
+| OCR | Tesseract language packs (Apache-2.0); PaddleOCR (Apache-2.0) |
+| Voice isolation | DeepFilterNet3 (already chosen; check on English and other languages too) |
+
 ## Field requirements across every skill (2026-11-05 review)
 
 What every skill was checked against, and where each gap landed. "Step" means a step added to that repository's `ECOSYSTEM_ROADMAP.md`.
@@ -209,7 +254,7 @@ What every skill was checked against, and where each gap landed. "Step" means a 
 | Viewpoint | What is there | Gap and where it landed |
 |---|---|---|
 | On-site work: 撮って出し, short deadlines, 2-8 h recordings, multicam, multi-mic, sync (timecode, waveform), recordings in progress, live → archive | ingest verified offload; ffmpeg-skill `multicam` / `sync` / `proxy`; agent `render --resume` | growing files (ingest, transcription, slide-sync, media-analysis); chunked long jobs and deadline mode (agent); multicam sets at ingest; active speaker (detection); camera matching (color); automixer (audio) |
-| Quality: EBU R128, ARIB TR-B32, BT.709 / BT.2020, SRT / VTT / TTML / ARIB, QC | qc loudness, flash, cut accuracy, legibility; ffmpeg-skill `broadcast` platform at -23 LUFS | ARIB TR-B32 (-24 LKFS) and named profiles (qc); legal range (color); TTML / IMSC and EBU-TT-D (subtitle); ARIB STD-B24 / B36 binary captions declined by ffmpeg-skill (proposal 14, #426: FFmpeg has no ARIB writer), TTML in their place |
+| Quality: EBU R128, ATSC A/85, BT.709 / BT.2020, SRT / VTT / TTML, regional profiles (e.g. ARIB), QC | qc loudness, flash, cut accuracy, legibility; ffmpeg-skill `broadcast` platform at -23 LUFS | named profiles with ATSC A/85 and streaming targets, ARIB TR-B32 as a regional one (qc); legal range (color); TTML / IMSC and EBU-TT-D (subtitle); ARIB STD-B24 / B36 binary captions declined by ffmpeg-skill (proposal 14, #426: FFmpeg has no ARIB writer), TTML in their place |
 | Speed: proxies, GPU (NVENC / VideoToolbox / QSV), parallel, cache, incremental | ffmpeg-skill hardware encoders and `proxy`; media-analysis cache | segment cache and partial re-render (video-editing); incremental QC (qc); chunked parallel transcription; proxies at ingest |
 | Recovery: resume, partial re-render, idempotency, logs | agent `--resume`; ingest resumable; hyperframes `bit_exact` | resumable blocks (voice-enhance, transcription, diarization); idempotency conformance (skillpact); series uploads never sent twice (publish) |
 | Natural-language control: vague requests, confirmation gates, preview and revise, "さっきの" | requirements_extraction (unambiguous phrases), CONFIRM floors, `revise --feedback` | motion brief slots, relative revisions and references, delivery presets from a sentence (agent) |
@@ -231,7 +276,7 @@ Owner split: the files are written by ffmpeg-skill (proposals 5-9 below, since i
 
 ## Motion graphics from a sentence (文字PV・幾何学模様)
 
-The request: "make a cool text-only PV, or a piece finished with geometric patterns, from a sentence" (例：「ネオンで、120BPM、15秒、縦型」).
+The request: "make a cool text-only PV, or a piece finished with geometric patterns, from a sentence" (for example "neon, 120 BPM, 15 s, vertical"; 例：「ネオンで、120BPM、15秒、縦型」).
 
 **What works today** (checked against each skill's README, SKILL.md and contract on 2026-11-05):
 
@@ -241,9 +286,9 @@ The request: "make a cool text-only PV, or a piece finished with geometric patte
 - **blender-skill**: declarative `scene.json` (assets, lights, camera, background), turntables, transparent sequences. No text objects, no Geometry Nodes presets, no audio drive.
 - **video-production-agent**: `plan` needs input media; `html_scene_render` is a handoff, so a text-only PV is not planned yet.
 
-Today's working path, in the chat: Claude writes a hyperframes scene request (or fills a template) and renders it, e.g. 「黒背景に白の明朝体で『未来をつくる』を中央、0.5秒ずつ下からスライドイン、縦型 1080x1920、6秒、30fps」 → `scene` → `preview` → `render --codec prores` for alpha. For music sync, ffmpeg-skill `background` + `audio --replace` with the track gives a source for remotion `analyze --beats`, then PeakPulse or a custom composition.
+Today's working path, in the chat: Claude writes a hyperframes scene request (or fills a template) and renders it, e.g. "white serif 'Build the future' centred on black, each line sliding up over 0.5 s, vertical 1080x1920, 6 s, 30 fps" → `scene` → `preview` → `render --codec prores` for alpha. For music sync, ffmpeg-skill `background` + `audio --replace` with the track gives a source for remotion `analyze --beats`, then PeakPulse or a custom composition.
 
-**Steps added** (names as in each repository's roadmap): hyperframes-skill — text animation, Japanese typesetting and text fit, shape and pattern layers, generative layer (Three.js / GLSL), audio and beat lock, IN / LOOP / OUT segments, alpha deliveries, style presets and recipe gallery; remotion-ffmpeg-skill — source-less runs, KineticType, visualizers, Three.js scenes, emphasis captions, style presets and layer output; blender-skill — procedural motion scenes, 3D text and logo reveal, alpha and passes, audio-driven animation; motion-graphics-skill — style presets, rendered-layer element, layer export, Japanese name fit, end-screen areas; video-production-agent — productions with no source media, motion brief slots, relative revisions; sound-design-skill — tempo-targeted generation and a tempo map.
+**Steps added** (names as in each repository's roadmap): hyperframes-skill — text animation, international typesetting and text fit, shape and pattern layers, generative layer (Three.js / GLSL), audio and beat lock, IN / LOOP / OUT segments, alpha deliveries, style presets and recipe gallery; remotion-ffmpeg-skill — source-less runs, KineticType, visualizers, Three.js scenes, emphasis captions, style presets and layer output; blender-skill — procedural motion scenes, 3D text and logo reveal, alpha and passes, audio-driven animation; motion-graphics-skill — style presets, rendered-layer element, layer export, Japanese name fit, end-screen areas; video-production-agent — productions with no source media, motion brief slots, relative revisions; sound-design-skill — tempo-targeted generation and a tempo map.
 
 **Three.js: where it goes.** Both engines can render Three.js deterministically, so no new skill.
 - HyperFrames seeks every frame through frame adapters (GSAP, Lottie, CSS or a custom one; `@hyperframes/core`, Apache-2.0), and hyperframes-skill already forces SwiftShader (no GPU capture), which is what makes WebGL output repeatable. A custom adapter that sets the program's time from the frame number is the whole integration: hyperframes-skill, generative layer.
@@ -294,10 +339,10 @@ None of these is created here. Each needs the owner's decision: repository name,
 - **Role.** Graphics made to be played out live, not burned in: lower thirds (name and title), session titles, breaking-news straps, score and number count-ups, social-comment cards, stingers, standby loops, and the playout package for OBS, vMix and CasparCG.
 - **Why a new skill.** It is one job family with its own rules: every graphic in IN / LOOP / OUT segments so an operator can take IN and OUT separately; stingers with a cut point (the frame where the picture is fully covered) delivered as metadata; key / fill or alpha in the format the player takes; a player configuration written beside the files (OBS / vMix stinger transition point in ms). motion-graphics-skill burns titles into programme video and hyperframes-skill renders whatever scene it is given and decides nothing; neither owns a playout package.
 - **Contract (draft).** `bgfx template --list`; `bgfx make <template> --values v.json|--csv rows.csv --kit kit.json --duration 1.2 --cut-point 0.5 --format prores4444|webm-alpha|png|key-fill [--alpha straight|premultiplied]` → one directory per graphic: `in.mov`, `loop.mov`, `out.mov` (or the single stinger file with its audio), `graphic.json` (`broadcast-graphics/graphic@1`: segments with frame counts, cut point in frames and ms, alpha mode, safe area, the text as drawn and the font size used), and `obs-stinger.json` / `vmix-stinger.txt` with the transition point; `bgfx playlist` → a CasparCG / vMix playlist of the files. Errors in the OS classes; `--dry-run` writes the plan only.
-- **Templates.** Lower third, session title, speaker introduction, break screen, end roll, breaking strap, count-up, comment card; stingers: geometric, particles, brush, glitch, logo reveal. Japanese typesetting (vertical, ruby, kinsoku, variable fonts, auto shrink and line break) comes from hyperframes-skill's typesetting step.
+- **Templates.** Lower third, session title, speaker introduction, break screen, end roll, breaking strap, count-up, comment card; stingers: geometric, particles, brush, glitch, logo reveal. Typesetting (RTL and CJK, per-language line breaks, variable fonts, auto shrink and line break; vertical writing and ruby as regional profiles) comes from hyperframes-skill's typesetting step.
 - **Boundaries.** Rendering through hyperframes-skill (HTML scenes, segments, alpha), remotion-ffmpeg-skill or blender-skill; files written through ffmpeg-skill; brand values from design-system-skill when present; checks by qc-skill (key / fill, alpha edges, loop seam, stinger cut point); natural-language requests and the delivery preset by the agent. Live control of the switcher or OBS belongs to the live-streaming area (above).
 - **Licence.** Own code (MIT like the rest). CasparCG is GPL-3.0: only its documented playlist and AMCP formats are written, no code used. OBS (GPL-2.0) and vMix (commercial): only their documented settings. Stinger designs: 参考：Remotion / HyperFrames 公式テンプレート、video-shotcraft（Apache-2.0）、motion-video-kit（MIT）（考え方のみ。コードは使わない）.
-- **Example requests.** 「登壇者テロップを10人分、CSV から、企業カラーで、IN/OUT 別で」「ロゴ入りのスティンガー、1.2秒、カット点 0.5秒、WebM と OBS 設定も」「休憩画面のループ、5分、BGM 付き」.
+- **Example requests.** "Lower thirds for 10 speakers from this CSV, in our brand colours, with IN and OUT separate"; "A logo stinger, 1.2 s, cut point at 0.5 s, as WebM with the OBS setting"; "A 5-minute looping break screen with music" (例：「登壇者テロップを10人分、CSV から、企業カラーで」).
 
 ### design-system-skill (ブランドキット・デザイン規則) — priority: high
 
@@ -370,7 +415,7 @@ ffmpeg-skill is not changed from here. Each item is a hand-over for its maintain
 6. **Key / fill pair.** One call that writes the fill and the key (the alpha as a full-range luma matte, `alphaextract`) from one source with alpha: same frame count, fps, size and start timecode, straight or premultiplied fill as asked, both hashed. For switcher DSKs (ATEM, Roland). qc-skill's key and fill pair check reads the result. **Decision: accepted** ([ffmpeg-skill#418](https://github.com/kajisho5/ffmpeg-skill/issues/418), after [#417](https://github.com/kajisho5/ffmpeg-skill/issues/417)).
 7. **Intermediate presets.** DNxHR LB / SQ / HQ / HQX / 444 and DNxHD at the broadcast sizes and rates, beside the existing ProRes 422 HQ (`export --preset prores`). **Decision: accepted** ([ffmpeg-skill#419](https://github.com/kajisho5/ffmpeg-skill/issues/419)).
 8. **Multitrack audio.** Several audio inputs into one file as separate tracks with names and language tags: multitrack WAV (or BWF with the start timecode) and MOV / MXF with one track per stem. Asked for by audio-production-skill's stems step and nle-bridge-skill's package. **Decision: accepted** ([ffmpeg-skill#420](https://github.com/kajisho5/ffmpeg-skill/issues/420), done together with [#401](https://github.com/kajisho5/ffmpeg-skill/issues/401)).
-9. **Loudness versions in one pass.** One master, several targets: -14 LUFS (streaming), -23 LUFS / -1 dBTP (EBU R128, the `broadcast` platform has it), -24 LKFS / -1 dBTP (ARIB TR-B32, a `broadcast-jp` target), each measured after. **Decision: accepted** ([ffmpeg-skill#421](https://github.com/kajisho5/ffmpeg-skill/issues/421)).
+9. **Loudness versions in one pass.** One master, several targets: -14 LUFS (streaming), -23 LUFS / -1 dBTP (EBU R128, the `broadcast` platform has it), -24 LKFS / -2 dBTP (ATSC A/85), and regional profiles such as ARIB TR-B32 (-24 LKFS / -1 dBTP, Japan), each measured after. ATSC A/85 was added to this list after the decision, on the internationalisation principles. **Decision: accepted** ([ffmpeg-skill#421](https://github.com/kajisho5/ffmpeg-skill/issues/421)).
 10. **Seamless loop.** `loop --crossfade S` (picture and sound across the seam) and a measurement of the seam; `loop.py` says today that it does not smooth the loop point. **Decision: accepted, top priority** ([ffmpeg-skill#422](https://github.com/kajisho5/ffmpeg-skill/issues/422)).
 11. **Safe-area guide.** A guide overlay (title safe / action safe for 16:9 and 4:3 centre cut, and the platform safe zones `_platforms.py` already has) as a preview file, never burned into a delivery. **Decision: accepted, for previews only** ([ffmpeg-skill#423](https://github.com/kajisho5/ffmpeg-skill/issues/423)).
 12. **Growing files and LTC.** `probe` and `cut` on a file still being written (fragmented MP4 / MOV, MXF) reporting the duration that is readable so far; and LTC decoded from an audio channel as a sync source for `sync` / `multicam`. Asked for by ingest-skill's growing-files and sync-facts steps. **Decision: on hold** ([ffmpeg-skill#424](https://github.com/kajisho5/ffmpeg-skill/issues/424): the guarantee for a partial read has to be designed first. ingest-skill's growing-files step copies bytes and does not wait for it; transcription / slide-sync / media-analysis follow modes read only the closed part until then).
