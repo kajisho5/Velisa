@@ -72,7 +72,7 @@ jobs:
           sudo apt-get install -y -q $APT_PACKAGES
       - id: skillpact
         continue-on-error: true
-        uses: kajisho5/skillpact@90895aa3920b503e77c29fa5ff231aeba8251a32 # skillpact #33 merge commit
+        uses: kajisho5/skillpact@9386b0317e8c3f290a1523ce9c036ce71d157afc # skillpact #33 merge commit
         with:
           path: ${{ matrix.repo }}
           min-level: L1
