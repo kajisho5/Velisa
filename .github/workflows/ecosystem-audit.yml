@@ -34,7 +34,7 @@ jobs:
       - name: Job summary
         if: always()
         run: '[ -f ecosystem-audit.md ] && cat ecosystem-audit.md >> "$GITHUB_STEP_SUMMARY" || true'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: ecosystem-audit

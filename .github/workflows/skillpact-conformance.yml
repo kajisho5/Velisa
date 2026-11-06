@@ -90,7 +90,7 @@ jobs:
           if [ "$OUTCOME" != "success" ]; then
             echo "::warning title=SkillPact ($REPO)::level ${LEVEL:-none}, below L1 or the check failed (non-blocking)"
           fi
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: skillpact-${{ matrix.repo }}
