@@ -986,7 +986,7 @@ against requested values (ffmpeg-skill `docs/contract.md`, "Verification policy"
 found that the agent's `run_qa()` compares two dimensions against the plan (duration,
 loudness, `threshold_source == "plan"`); fps, codec, resolution and stream layout are only
 rule checks or absent. The routing skill now tells an agent to do this comparison by hand
-(`plugins/velisa/skills/velisa/review.md`, step 4).
+(`plugins/velisa/skills/wakeup/review.md`, step 4).
 
 **Concretely**: after a render, add plan-derived `QAItem`s for fps, video codec, resolution
 and stream layout (video/audio stream count and audio channel layout vs the input and the
@@ -1043,7 +1043,7 @@ Transcript already holds everything needed; no skill exposes a search. `ecosyste
 文字起こしの語句検索 to `transcription-skill`: it owns the Transcript schema and its normalisation, and a search
 is a deterministic query over that document, not an interpretation, so it stays inside that repository's "no
 edit decisions" boundary. Until it ships, the routing skill's
-`plugins/velisa/skills/velisa/transcript.md` is the recipe agents follow by hand.
+`plugins/velisa/skills/wakeup/transcript.md` is the recipe agents follow by hand.
 
 **Concretely**: `transcription search t.json "phrase" [--fuzzy 0.8] [--context 1] --json` (and the same tool in
 `run -` and `contract --json`). Exact, then normalised matching (NFKC, casefold, no whitespace or punctuation, matched

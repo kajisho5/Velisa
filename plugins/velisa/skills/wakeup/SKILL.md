@@ -1,9 +1,11 @@
 ---
-name: velisa
-description: Route any video, audio, subtitle, QC or delivery task to the right Velisa skill - prefer the OS skills that are installed, fall back to other installed skills or plain tools, and say so when you do. Use when asked to edit, finish, clean up, subtitle, grade, mix, check or deliver a video or recording, or to ingest or back up footage.
+name: wakeup
+description: Route any video, audio, subtitle, QC or delivery task to the right Velisa skill - prefer the OS skills that are installed, fall back to other installed skills or plain tools, and say so when you do. Use when asked to edit, finish, clean up, subtitle, grade, mix, check or deliver a video or recording, or to ingest or back up footage. Also use whenever the user addresses Velisa by name ("Velisa, ...", "Hey Velisa", "ベリサ", "ヴェリサ"), even when the rest of the request is vague.
 ---
 
 # Velisa: which skill to use
+
+**Called by name.** When the user starts with "Velisa" (or ベリサ / ヴェリサ), treat the rest as a production request: if it names media and a goal, route it as below; if it is vague ("Velisa, make this nicer"), ask once for the input file and the delivery (where it will be shown, length, language), then route.
 
 Every OS skill also works on its own, so any of them may be missing. Decide per task, in this order, and tell the user which level you used.
 
