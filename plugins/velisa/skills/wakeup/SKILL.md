@@ -1,5 +1,5 @@
 ---
-name: velisa
+name: wakeup
 description: Route any video, audio, subtitle, QC or delivery task to the right Velisa skill - prefer the OS skills that are installed, fall back to other installed skills or plain tools, and say so when you do. Use when asked to edit, finish, clean up, subtitle, grade, mix, check or deliver a video or recording, or to ingest or back up footage. Also use whenever the user addresses Velisa by name ("Velisa, ...", "Hey Velisa", "ベリサ", "ヴェリサ"), even when the rest of the request is vague.
 ---
 
