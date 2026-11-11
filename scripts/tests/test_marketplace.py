@@ -43,8 +43,8 @@ class MarketplaceTests(unittest.TestCase):
         self.assertFalse(mk["name"].startswith(("claude", "anthropic")))
 
     def test_routing_skill_names_every_component(self):
-        text = (ROOT / "plugins/velisa/skills/velisa/SKILL.md").read_text(encoding="utf-8")
-        self.assertTrue(text.startswith("---\nname: velisa\n"))
+        text = (ROOT / "plugins/velisa/skills/wakeup/SKILL.md").read_text(encoding="utf-8")
+        self.assertTrue(text.startswith("---\nname: wakeup\n"))
         for c in MANIFEST["components"]:
             if c["status"] != "planned":
                 self.assertIn(f"`{c['repo']}`", text)
@@ -54,7 +54,7 @@ class MarketplaceTests(unittest.TestCase):
         links it, and every relative link in either file resolves to a file inside the plugin."""
         mk, _ = marketplace.build(MANIFEST)
         plugin_dir = (ROOT / mk["plugins"][0]["source"]).resolve()
-        skill_dir = ROOT / "plugins/velisa/skills/velisa"
+        skill_dir = ROOT / "plugins/velisa/skills/wakeup"
         review = skill_dir / "review.md"
         self.assertTrue(review.is_file())
         self.assertTrue(review.resolve().is_relative_to(plugin_dir))

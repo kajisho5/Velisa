@@ -8,7 +8,7 @@ Writes two files, both generated (edit ecosystem.json, not them):
                                                         plus the meta plugin below
   plugins/velisa/.claude-plugin/plugin.json             the meta plugin: depends on every non-optional plugin,
                                                         so installing it installs the whole OS; its own skill
-                                                        (skills/velisa/SKILL.md, hand-written)
+                                                        (skills/wakeup/SKILL.md, hand-written)
                                                         says which skill to use for what; its "who owns
                                                         what" table is regenerated here too
 
@@ -27,6 +27,7 @@ from typing import Any, Dict, List, Tuple
 ROOT = Path(__file__).resolve().parents[1]
 MARKETPLACE_NAME = "velisa"
 META = "velisa"
+ROUTING_SKILL = "wakeup"  # invoked as /velisa:wakeup
 META_DIR = f"plugins/{META}"
 
 
@@ -97,7 +98,7 @@ def main(argv: List[str]) -> int:
     a = ap.parse_args(argv)
     manifest = json.loads((ROOT / "ecosystem.json").read_text(encoding="utf-8"))
     marketplace, meta = build(manifest)
-    skill = ROOT / META_DIR / "skills" / META / "SKILL.md"
+    skill = ROOT / META_DIR / "skills" / ROUTING_SKILL / "SKILL.md"
     targets = [(ROOT / ".claude-plugin" / "marketplace.json", render(marketplace)),
                (ROOT / META_DIR / ".claude-plugin" / "plugin.json", render(meta)),
                (skill, owner_table(manifest, skill.read_text(encoding="utf-8")))]

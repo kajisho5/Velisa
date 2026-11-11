@@ -249,7 +249,7 @@ This repository is also a Claude Code plugin marketplace, generated from `ecosys
 ```
 
 `velisa` depends on every non-optional Skill, so it installs them all; its routing
-skill (`/velisa:velisa`) prefers the OS Skills that are installed and says so when it falls back to another skill,
+skill (`/velisa:wakeup`, or just say "Velisa, ...") prefers the OS Skills that are installed and says so when it falls back to another skill,
 a plain tool or the model itself. Plugins carry the skills (`SKILL.md`); the Python packages and
 CLIs behind them still come from `install.sh` — run it with `--no-claude-skills` so Claude Code
 does not see each skill twice. Updates: turn on **auto-update** for `velisa`
