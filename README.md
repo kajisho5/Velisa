@@ -128,7 +128,7 @@ this table follows the same rule:
 | Area | Status |
 |---|---|
 | 11-repository audit, evidence base | **Implemented** — [`REPOSITORY_MAP.md`](docs/REPOSITORY_MAP.md) |
-| Architecture, contracts, 44 design docs, 15 ADRs | **Implemented** (as documentation — see [Documentation](#documentation)) |
+| Architecture, contracts, 45 design docs, 15 ADRs | **Implemented** (as documentation — see [Documentation](#documentation)) |
 | `video-production-agent` (Observation→Decision→Plan→Execution pipeline) | **Implemented, incomplete** — real, tested, no LLM wired in yet ([`NullProvider`](docs/REPOSITORY_MAP.md) only) |
 | 10 Skill repos (editing, audio, color, subtitle, motion graphics, thumbnail, QC, analysis, transcription, ffmpeg execution) | **Implemented** — independently, each with real tests and CI |
 | Capability Contract format | **Implemented** — JSON Schema [`registry/capability_contract.schema.json`](registry/capability_contract.schema.json), read by [`registry/contract.py`](registry/contract.py) / [`registry/schema.py`](registry/schema.py) ([`docs/ROADMAP.md`](docs/ROADMAP.md) Phase 1) |
@@ -263,6 +263,13 @@ posts what changed (new commits with their subjects, new version tags) on the is
 `skill-updates`, mentioning the owner, so GitHub notifies by mail and in the app. Locally:
 `python3 scripts/skill-updates.py --state ~/.velisa/updates.json` (any path; it is only where
 the last-seen state is kept).
+
+**Ecosystem health.** `.github/workflows/ecosystem-health.yml` checks every repository daily: a
+workflow that is red on a default branch (and since when), a repository without automatic CI, pull
+requests open for two weeks, duplicated and slow pull-request runs. The report is the body of the issue
+labelled `ecosystem-health`; a comment mentioning the owner is added only when something turns red.
+Locally: `python3 scripts/ecosystem-health.py`. The launch gates built on it are in
+[`docs/LAUNCH_READINESS.md`](docs/LAUNCH_READINESS.md).
 
 **SkillPact conformance.** `.github/workflows/skillpact-conformance.yml` checks, weekly, every
 repository in `ecosystem.json` that has a `skill.contract.json` with

@@ -1,0 +1,31 @@
+name: Ecosystem health
+
+# Every day: is any workflow red on a default branch, is any repository without automatic CI, which pull
+# requests have been open for two weeks. The answer lives in one issue (label `ecosystem-health`); a comment
+# is added only when something turns red, so a failure is seen the next morning instead of days later.
+
+on:
+  schedule:
+    - cron: "43 21 * * *" # daily, 06:43 JST
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: ecosystem-health
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check every repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/ecosystem-health.py --issue --report ecosystem-health.md
+      - name: Job summary
+        if: always()
+        run: '[ -f ecosystem-health.md ] && cat ecosystem-health.md >> "$GITHUB_STEP_SUMMARY" || true'
