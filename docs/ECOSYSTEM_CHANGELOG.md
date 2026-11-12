@@ -38,6 +38,18 @@ noteworthy.
 
 ---
 
+### 2026-11-12 — `CAPABILITY_MATRIX.md`: `audio.loudness_set`, `audio.stems`, `measure.audio.speech_regions`
+
+- **Repo(s)**: `kajisho5/Velisa` (read-only reads of the release tags of `kajisho5/audio-production-skill` v1.1.0 / v1.2.0
+  and `kajisho5/media-analysis-skill` v0.1.16)
+- **PR(s)**: this PR
+- **What changed**: three rows, each the `provides[].id` the Skill's own contract now publishes: §2 gains
+  `audio.loudness_set` (`LOUDNESS_SET`) and `audio.stems` (`STEMS`), §8c gains `measure.audio.speech_regions`
+  (`media-analysis/vad`). The summary counts follow (75 rows).
+- **Why**: audio-production-skill#32 / #33 and media-analysis-skill#30; video-production-agent re-pins those contracts
+  without planning the new operations (its ADR-107 addendum 12).
+- **Status**: draft
+
 ### 2026-11-05 — ownership: transcript phrase search and retake candidates; routing-skill recipe
 
 - **Repo(s)**: `kajisho5/Velisa` (read-only reads of `kajisho5/transcription-skill` main and `kajisho5/ffmpeg-skill`
