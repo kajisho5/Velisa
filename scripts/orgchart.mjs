@@ -26,7 +26,8 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&l
 const members = (id) => components.filter((c) => c.department === id);
 const badges = (c) =>
   `<span class="badge ${STATUS[c.status].cls}">${STATUS[c.status].label}</span>` +
-  (c.optional ? `<span class="badge optional">オプション</span>` : "");
+  (c.optional ? `<span class="badge optional">オプション</span>` : "") +
+  (c.kind === "app" ? `<span class="badge app">単体アプリ</span>` : "");
 
 const CSS = `
 :root { --ink:#1b2430; --sub:#5b6675; --line:#c9d1dc; --bg:#f6f8fb; --card:#fff; --accent:#2f5bea; }
@@ -37,6 +38,7 @@ h1 { font-size:30px; letter-spacing:.02em; } h1 small { font-size:15px; color:va
 .badge { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; margin-left:6px; vertical-align:2px; white-space:nowrap; }
 .badge.active { background:#e3f6ea; color:#17733a; } .badge.scaffold { background:#fff3d6; color:#8a5a00; }
 .badge.planned { background:#eceff3; color:#5b6675; } .badge.optional { background:#e6edff; color:#2f5bea; }
+.badge.app { background:#f3e8ff; color:#6b2fb3; }
 .node { background:var(--card); border:1.5px solid var(--line); border-radius:12px; padding:12px 16px; }
 .node.planned { border-style:dashed; background:#fbfcfd; }
 .node .repo { font-weight:700; font-size:15px; }
@@ -91,7 +93,7 @@ ${members(d.id).map((c) => `<div class="node ${c.status === "planned" ? "planned
 <div class="base" style="width:${cols.length * colW + (cols.length - 1) * gap}px"><div class="dept-label">実行基盤 ENGINE</div>
   <div class="repo">${esc(engine.repo)}${badges(engine)}</div><div class="owns">${engine.owns.map(esc).join(" ・ ")}</div></div>
 ${onHold.length ? `<div class="hold"><b>保留(採否未決)</b>: ${onHold.map((h) => `${esc(h.repo)}(${esc(h.note)})`).join(" / ")}</div>` : ""}
-<p class="legend">稼働 = 実装あり / 骨組みのみ = リポジトリはあるが中身未実装 / 未作成 = リポジトリ未作成(インストール対象外) / オプション = --with-optional で導入</p>`;
+<p class="legend">稼働 = 契約どおりに動く操作がある(リリースの有無は問わない) / 骨組みのみ = リポジトリはあるが動く操作がまだない / 未作成 = リポジトリ未作成(インストール対象外) / オプション = --with-optional で導入 / 単体アプリ = スキルではなく単体で使うアプリ</p>`;
   return page("組織図", body);
 }
 

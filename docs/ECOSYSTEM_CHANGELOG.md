@@ -38,6 +38,27 @@ noteworthy.
 
 ---
 
+### 2026-11-12 — Owner decisions from the ownership audit applied
+
+- **Repo(s)**: `kajisho5/Velisa` (read-only reads of `origin/main` of video-editing-skill, motion-graphics-skill,
+  qc-skill, video-production-agent, hyperframes-skill, ffmpeg-skill, remotion-ffmpeg-skill, thumbnail-skill,
+  imagemagick-skill, sound-design-skill and artifacts-skill for the specs; no other repository changed)
+- **PR(s)**: this PR (includes the audit itself, `docs/ecosystem/ownership-audit/`)
+- **What changed**: `ecosystem.json`: one definition of `status` in `$comment`; voice-enhance, dubbing, sound-design
+  and publish `active`; `owns` and `role` changes for titles, overlays, animated subtitles, compliance, measurement,
+  retake candidates, cut-list export, speaker ids, kinetic type and visualizers; `"kind": "app"` for stepcap and
+  oncemore (accepted by the manifest test, the marketplace generator and the org-chart generator; marketplace files
+  and org charts regenerated). `DECISION_LOG.md` D12-D32. `ROADMAP.md`: "Decided by the owner (2026-11-12)", ffmpeg-skill
+  proposals 5-7 and 9-11 done, #425 not needed, nle-bridge's stale `planned` fixed, new skill candidates replaced by
+  the decisions. New specs `docs/specs/title-and-stinger.md`, `kit.md`, `licence-record.md`; ADR-016 (generative
+  media) and ADR-017 (restoration), both Proposed. HANDOFF, CROSS_REPO_STATUS and CURRENT_STATE marked as frozen
+  2026-09 records; `registry.json`'s publish-skill row and eight "no package yet" notes corrected; WORK_QUEUE item 27
+  (generate CAPABILITY_MATRIX.md and REPOSITORY_MAP.md from pinned contracts). `VERSION` set to 0.9.2: tag v0.9.1
+  exists but its release commit is not on main, so with `VERSION` at 0.9.0 every release run read a manual bump to an
+  existing tag and released nothing.
+- **Why**: the owner accepted every recommendation of the ownership audit on 2026-11-12 (DECISION_LOG D12-D32).
+- **Status**: open
+
 ### 2026-11-12 — `CAPABILITY_MATRIX.md`: `image.alpha`, `image.brandkit`
 
 - **Repo(s)**: `kajisho5/Velisa` (read-only reads of the release tags of `kajisho5/imagemagick-skill` v0.9.0 / v0.10.0)

@@ -334,3 +334,323 @@ text, evidence strings, System Intelligence findings). It mirrors the project's 
 (ADR-011), the same scope `lib/labels.ts` already drew.
 
 **Why**: one site, one language rule; a link shared in Japanese opens in Japanese.
+
+## D12 — Animated overlays: hyperframes-skill makes the material, motion-graphics-skill places it
+
+**Context**: the ownership audit (2026-11-12, `docs/ecosystem/ownership-audit/`) found no owner for animated
+overlays. ffmpeg-skill#425 (typed keyframes on `overlay`) was on hold until one was named.
+
+**Decision** (owner, 2026-11-12): the material is made by `hyperframes-skill` (IN / LOOP / OUT segments, alpha) and
+placed by `motion-graphics-skill`'s `rendered_layer` element. ffmpeg-skill#425 is not needed for this.
+
+**Why**: both ends already ship (hyperframes-skill 0.8.0 segments and alpha, motion-graphics-skill ADR-25, agent
+ADR-102). Keyframes in the engine would widen `overlay`'s responsibility, and the Remotion route carries licence
+conditions.
+
+**Evidence**: `ownership-audit/A-visual.md` §8 O1, §9(b).
+
+**What follows**: video-production-agent needs one path that RUNS hyperframes-skill (today a handoff-only
+SkillSpec) and passes its output to `motion.layer`. That output must be ProRes 4444 or another yuva format:
+`rendered_layer` refuses a VP9 alpha WebM.
+
+## D13 — One definition of `status`; voice-enhance, dubbing, sound-design and publish are `active`
+
+**Context**: the four said `scaffold` while each has working operations wired into the agent. `scaffold` had three
+meanings (README "an empty repository", MATURITY_MODEL "Scaffolded", the agent's "no package").
+
+**Decision** (owner, 2026-11-12): the four become `active`. `status` has one definition, written in
+`ecosystem.json`'s `$comment` and used everywhere: `active` = the repository ships working operations behind its
+contract, released or not; `scaffold` = the repository exists, but no operation works yet; `planned` = the
+repository does not exist yet. Release state (git tags, GitHub Releases) is tracked separately.
+
+**Why**: the old label described none of the four, and three definitions meant every reader picked a different one.
+
+**Evidence**: `ownership-audit/B-audio-recognition.md` §9(h); `ownership-audit/D-delivery-utility-governance-docs.md`
+§5 (rows 1-2), §6.2, §9(f).
+
+**What follows**: done in `ecosystem.json`, the routing skill's owner table and the org charts (both regenerated),
+and README's sentence on `scaffold`. A release step goes on each of the four repositories' roadmaps. Their
+`plugin` flag (each has a root SKILL.md) was not part of this decision and is unchanged.
+
+## D14 — Platform duration and file-size limits: publish-skill's values are authoritative
+
+**Context**: the limits live in ffmpeg-skill `_platforms.py` and in publish-skill `limits.py`, with different values
+(X: 140 s against 1200 s). The 2026-10-30 decision gave the upload-side limits to publish-skill but left
+ffmpeg-skill's table unchanged.
+
+**Decision** (owner, 2026-11-12): publish-skill's values are authoritative (it owns アップロード制限). ffmpeg-skill
+`check`'s duration and size rows are guidance only, and `publish plan` does not use them for its verdict.
+
+**Why**: publish-skill's values carry a source URL and a date; ffmpeg-skill's are constants without one. This
+extends the 2026-10-30 split instead of reopening it.
+
+**Evidence**: `ownership-audit/D-delivery-utility-governance-docs.md` §3 O1, §8 O1, §9(b).
+
+**What follows**: ffmpeg-skill is asked, in an issue there, to label those rows as guidance. Pending until they land:
+publish-skill's `plan` stops using those rows for its verdict (at the audited revision it still includes every
+ffmpeg-skill check row), and video-production-agent's QA, which copies the same rows into its own verdict, does the
+same, so an X delivery over 140 s is not failed against publish-skill's 1200 s limit. `docs/ecosystem/registry.json` no longer calls publish-skill the owner of platform
+delivery specs (D32).
+
+## D15 — No motion-titles-skill; title and stinger material go to hyperframes-skill, the metadata to a Velisa spec
+
+**Context**: the 2026-11-05 field review proposed `motion-titles-skill` for animated title and stinger files.
+
+**Decision** (owner, 2026-11-12): not created. Folded into `hyperframes-skill` (stinger templates and
+`stinger.json`, typesetting, brand input), which gains `テロップ・スティンガー・ループ素材`. The metadata shapes
+`title.json` and `stinger.json` become a Velisa spec: [docs/specs/title-and-stinger.md](../specs/title-and-stinger.md).
+
+**Why**: most of the draft already exists in hyperframes-skill 0.8.0 (templates, CSV batch, segments, alpha) and in
+ffmpeg-skill `export`; the draft itself said the pictures are drawn by hyperframes-skill. A new repository would be
+a thin layer over it.
+
+**Evidence**: `ownership-audit/A-visual.md` §9(c).
+
+**What follows**: the spec documents the fields video-editing-skill, motion-graphics-skill, qc-skill and the agent
+already read (`cut_point`, `cover`, segments), and marks the rest as proposed. hyperframes-skill steps 15, 8 and 14
+carry the work.
+
+## D16 — No design-system-skill; `kit@1` is a Velisa spec
+
+**Context**: three brand formats exist side by side (ffmpeg-skill `brand.json`, motion-graphics `theme@1` and
+`brand_kit`); only motion-graphics-skill and remotion-ffmpeg-skill read one.
+
+**Decision** (owner, 2026-11-12): not created. A Velisa spec only: `kit@1`, a superset of ffmpeg-skill `brand.json`,
+with a mapping table to each renderer's existing input: [docs/specs/kit.md](../specs/kit.md). Revisit as a skill once
+three or more renderers read `kit@1`.
+
+**Why**: with two readers, deriving per-renderer files has few places to go; the spec costs nothing and keeps the
+door open.
+
+**Evidence**: `ownership-audit/A-visual.md` §9(d).
+
+**What follows**: the agent can expand a kit into the inputs each skill already takes. hyperframes-skill step 14 and
+thumbnail-skill are the next readers to watch.
+
+## D17 — No asset-library-skill; the licence record is a Velisa spec
+
+**Context**: fetching (ingest-skill `fetch`), the audio ledger (sound-design-skill library), indexing
+(media-analysis-skill `library`) and credit checking (artifacts-skill `credits_attribution`) exist. Missing: a licence
+record for video and images, and API search.
+
+**Decision** (owner, 2026-11-12): not created. A Velisa spec only: the shared licence-record shape (licence, author,
+source URL, attribution line, sha256, content_id) that sound-design-skill already writes, extended to video and
+images: [docs/specs/licence-record.md](../specs/licence-record.md). Project credits keep using artifacts-skill
+`credits_attribution`.
+
+**Why**: the shape is the missing part; API search needs each service's terms checked first.
+
+**Evidence**: `ownership-audit/C-command-ingest-engine-verification.md` §9(f);
+`ownership-audit/B-audio-recognition.md` §8 D16, §9(g).
+
+**What follows**: a stock API is not wired until its terms are read and recorded.
+
+## D18 — No generative-media-skill; an ADR first
+
+**Context**: the only generator today is thumbnail-skill's background (FLUX.2 [klein] 4B). No video generation exists.
+
+**Decision** (owner, 2026-11-12): not created. An ADR in Velisa comes first: candidate engines, code and weight
+licences, VRAM, commercial terms, and whether thumbnail-skill's `BackgroundProvider` can be reused.
+[ADR-016](../adr/ADR-016-generative-media.md) is that ADR, status Proposed.
+
+**Why**: weight licences decide what is possible, and the audit could not confirm them from primary sources.
+
+**Evidence**: `ownership-audit/A-visual.md` §9(e).
+
+**What follows**: no wiring or engine request until ADR-016 is accepted.
+
+## D19 — Restoration: the no-weights baseline first; a skill only after an ADR on weight licences
+
+**Context**: super-resolution and frame interpolation were proposed as a new area.
+
+**Decision** (owner, 2026-11-12): no new skill. Wire the no-weights baseline first (ffmpeg-skill scaling,
+`minterpolate`, `denoise`). A skill comes only after an ADR records the weights' licences:
+[ADR-017](../adr/ADR-017-restoration.md), status Proposed.
+
+**Why**: the baseline needs no new dependency and stays deterministic; the candidate weights' licences are unverified.
+
+**Evidence**: `ownership-audit/C-command-ingest-engine-verification.md` §9(g).
+
+**What follows**: an archive-preparation path in the agent (`deinterlace` → `denoise` → `stabilize` → `fit`), which
+needs a `denoise` SkillSpec there.
+
+## D20 — Titles: three makers, three roles
+
+**Decision** (owner, 2026-11-12): `motion-graphics-skill` keeps `タイトル・テロップ` (burned into a programme);
+`hyperframes-skill` gains `テロップ・スティンガー・ループ素材` (title and stinger material files);
+`remotion-ffmpeg-skill`'s titles stay inside its own compositions.
+
+**Why**: titles could be made in three places; the split follows what each output is, not which tool draws it.
+Moving hyperframes' templates into motion-graphics-skill would add Node and Chromium to a dependency-free skill.
+
+**Evidence**: `ownership-audit/A-visual.md` §8 O2, §9(a).
+
+**What follows**: `ecosystem.json` updated. The agent defaults to motion-graphics-skill and uses D12's path when
+motion is needed.
+
+## D21 — Overlays: still compositing, graphics placement and the engine
+
+**Decision** (owner, 2026-11-12): `video-editing-skill` keeps `静止画オーバーレイ` (plain still compositing as part of
+an edit). `motion-graphics-skill` gains `ロゴ・PiP・クロマキー合成` and `動くグラフィックの配置`. ffmpeg-skill's
+`Bロール・画面合成` becomes `Bロール合成`; ffmpeg-skill stays the engine underneath.
+
+**Why**: the jobs were split by name only; PiP and chroma key had no stated owner although motion-graphics-skill's
+`video_overlay` does them.
+
+**Evidence**: `ownership-audit/A-visual.md` §8 O3, §9(g).
+
+**What follows**: wiring unchanged. The agent's SkillSpec descriptions can say when `edit.overlay` and `motion.image`
+apply.
+
+## D22 — Animated subtitles: from cues to subtitle-skill, word-timed effects to remotion-ffmpeg-skill
+
+**Decision** (owner, 2026-11-12): everything generated from subtitle cues belongs to `subtitle-skill`, which gains
+`動く字幕(字幕キュー由来)` and passes ffmpeg-skill `caption --animate/--karaoke` through. Word-timed effects belong to
+`remotion-ffmpeg-skill`, which gains `語の時刻に合わせた字幕演出`.
+
+**Why**: splitting by input keeps animated captions available without Node; the engine flags already exist.
+
+**Evidence**: `ownership-audit/A-visual.md` §8 O4, §9(h).
+
+**What follows**: a subtitle-skill step to expose the flags, then a re-pin in the agent.
+
+## D23 — Loudness: audio-production-skill owns it; the agent's routing is not changed now
+
+**Decision** (owner, 2026-11-12): `audio-production-skill` owns loudness (`音量・ラウドネス`, unchanged); ffmpeg-skill
+is the engine. The agent's video path keeps `ffmpeg-skill/loudness`.
+
+**Why**: the audit's two halves disagreed (move the route, or record it). Changing it needs evidence first.
+
+**Evidence**: `ownership-audit/B-audio-recognition.md` §8 D1; `ownership-audit/C-command-ingest-engine-verification.md`
+§8 S2; the README's "where the recommendations split".
+
+**What follows**: a later change of routing needs a measured comparison of `loudnorm` against `ebur128` on the same
+files.
+
+## D24 — Compliance checking: the split is recorded, the wiring is not changed
+
+**Decision** (owner, 2026-11-12): ffmpeg-skill `check` is the engine's preflight, so its `owns`
+`書き出し規格の検査` becomes `書き出し前の規格点検`; `qc-skill` is judgement against the plan or spec.
+
+**Why**: the two looked like a collision but do different jobs: fixed thresholds with fix commands, against rules
+the caller supplies with UNKNOWN as a result.
+
+**Evidence**: `ownership-audit/C-command-ingest-engine-verification.md` §8 S1, §9(c).
+
+**What follows**: Velisa issue #36 can be closed with this record.
+
+## D25 — Measurement and cut detection are layers, not collisions
+
+**Decision** (owner, 2026-11-12): fast list = ffmpeg-skill `scenes`; observation = `media-analysis-skill`, which gains
+`発話区間` (speech_regions); frame-accurate shot table = `detection-skill` `shots`, which gains `ショット検出`;
+judgement only = `qc-skill`; slides = `slide-sync-skill`. Default providers stay as the agent has them.
+
+**Why**: five scene detectors and three measurement paths serve different uses; the agent's `DEFAULT_PROVIDERS`
+already has this shape.
+
+**Evidence**: `ownership-audit/C-command-ingest-engine-verification.md` §8 S2, S3, §9(d);
+`ownership-audit/B-audio-recognition.md` §8 D8/D9, D12.
+
+**What follows**: `ecosystem.json` updated. Wiring `detection/shots` or `speech_regions` into the agent is a separate
+step there.
+
+## D26 — `owns` brought in line with what each repository does
+
+**Decision** (owner, 2026-11-12):
+- `video-editing-skill` gains `言い直し・重複の候補計算`; the agent's `言い直し・重複の候補提示` becomes
+  `言い直し・重複の候補の提示と承認`.
+- `transcription-skill` keeps `文字起こしの語句検索` and implements it (`find` / `search`).
+- ffmpeg-skill keeps `納品レポート` (the tool exists; no consumer yet).
+- ffmpeg-skill gains `カットリスト書き出し` (FCPXML / EDL / OTIO); `nle-bridge-skill` keeps the NLE round trip.
+
+**Why**: the candidate computation already lives in video-editing-skill; the search was owned but not built; the
+timeline export existed in two places with no stated split.
+
+**Evidence**: `ownership-audit/C-command-ingest-engine-verification.md` §5, §8 S4, S6, S7;
+`ownership-audit/D-delivery-utility-governance-docs.md` §3 O3, §8 O3.
+
+**What follows**: WORK_QUEUE item 26 records the moved half; item 25 (the search) stands. The routing skill's
+transcript recipe and its test follow the new names. Velisa issue #34 can be closed with the timeline split.
+
+## D27 — Speaker ids: diarization-skill owns the assignment rule
+
+**Decision** (owner, 2026-11-12): `diarization-skill` owns the rule that assigns speaker ids and gains
+`話者IDの付与規則`. transcription-skill's merge is a copy of the same rule; both share conformance fixtures.
+
+**Why**: two implementations of one rule drift unless one is named the source and a shared test holds them together.
+Removing either would break a pinned contract.
+
+**Evidence**: `ownership-audit/B-audio-recognition.md` §8 D10, §9(d).
+
+**What follows**: the shared fixtures, in both repositories; the agent's wiring is unchanged.
+
+## D28 — Kinetic typography, visualizers and Three.js: one owner each
+
+**Decision** (owner, 2026-11-12): `hyperframes-skill` gains `キネティックタイポ・幾何学モーション`.
+`remotion-ffmpeg-skill` gains `オーディオビジュアライザー` and keeps the measured (beat / lyric) versions. `blender-skill`
+stays 3D only; its overlapping roadmap steps are deferred to these two.
+
+**Why**: three roadmaps planned the same work while almost none of it is built; deciding before anyone starts avoids
+building it twice.
+
+**Evidence**: `ownership-audit/A-visual.md` §9(f).
+
+**What follows**: remotion-ffmpeg-skill's Three.js step waits for hyperframes-skill's generative layer; blender-skill's
+overlapping steps are marked deferred in its roadmap.
+
+## D29 — Disc family: five entries, one agent SkillSpec
+
+**Decision** (owner, 2026-11-12): `ecosystem.json` keeps the five (bdmvkit, vtskit, udfkit, dvdcc, oncemore). The agent
+keeps ONE disc SkillSpec (`disc_author` via oncemore) and drops the four kit SkillSpecs, which name tool ids that do not
+exist.
+
+**Why**: five is right for installation and licences (the kits ship separately on PyPI); for the agent only
+`disc_author` means anything.
+
+**Evidence**: `ownership-audit/D-delivery-utility-governance-docs.md` §5 row 6, §8 O4, §9(a).
+
+**What follows**: the SkillSpec change is in video-production-agent; nothing changes in `ecosystem.json`.
+
+## D30 — stepcap and oncemore are listed as stand-alone apps
+
+**Decision** (owner, 2026-11-12): add `"kind": "app"` to both. Other components need no `kind`; the default is
+skill.
+
+**Why**: neither is a production step the agent calls; both are applications with their own contract.
+
+**Evidence**: `ownership-audit/D-delivery-utility-governance-docs.md` §9(d).
+
+**What follows**: `scripts/tests/test_ecosystem_manifest.py` accepts `kind` (`skill` or `app`); the marketplace tags
+stepcap `app`; the routing skill's owner table and the org charts show both as apps.
+
+## D31 — Contract checks: one role each
+
+**Decision** (owner, 2026-11-12):
+- OS contract shape = `system-intelligence` (Velisa CI calls it).
+- Side effects, signatures and isolation tests = `skillpact`.
+- Runtime version gates = the agent.
+- Velisa `registry/` = the reference definition of the collision policy.
+
+**Why**: the same checks ran in three or four places under the same names with different content.
+
+**Evidence**: `ownership-audit/D-delivery-utility-governance-docs.md` §8 O5, §9(e).
+
+**What follows**: no wiring change; this entry is the written record.
+
+## D32 — Stale documents are frozen; two maps are to be generated
+
+**Decision** (owner, 2026-11-12):
+- `HANDOFF.md`, `CROSS_REPO_STATUS.md` and `CURRENT_STATE.md` carry a header "2026-09 record, frozen; the current
+  state is docs/ecosystem/ROADMAP.md".
+- `docs/CAPABILITY_MATRIX.md` and `docs/REPOSITORY_MAP.md` are to be generated from the pinned contracts; only factual
+  errors are fixed now.
+
+**Why**: the three files still say 9 to 12 repositories and 21 tools; correcting them by hand would drift again.
+
+**Evidence**: `ownership-audit/D-delivery-utility-governance-docs.md` §6 (54 rows), §8 O7;
+`ownership-audit/A-visual.md` §8 O9.
+
+**What follows**: headers added. Fixed now: `docs/ecosystem/registry.json` publish-skill row (not the owner of platform
+delivery specs) and the "no package yet" notes on eight repositories that have packages; nle-bridge's `planned` in
+ROADMAP.md; ROADMAP proposals 5-7 and 9-11 marked done (ffmpeg-skill #417, #418, #419, #421, #422, #423 closed
+completed on 2026-11-06). The generator is WORK_QUEUE item 27.

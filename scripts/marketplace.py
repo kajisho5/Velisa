@@ -48,7 +48,7 @@ def build(manifest: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
             "source": {"source": "github", "repo": f"{org}/{c['repo']}"},
             "description": c["role"],
             "category": dep["en"].lower(),
-            "tags": [dep["en"].lower(), dep["name"]] + (["optional"] if c.get("optional") else []) + (["scaffold"] if c["status"] == "scaffold" else []),
+            "tags": [dep["en"].lower(), dep["name"]] + (["optional"] if c.get("optional") else []) + (["scaffold"] if c["status"] == "scaffold" else []) + (["app"] if c.get("kind") == "app" else []),
         })
     marketplace = {
         "name": MARKETPLACE_NAME,
@@ -81,7 +81,8 @@ def owner_table(manifest: Dict[str, Any], skill_text: str) -> str:
         if c.get("status") == "planned":
             continue
         note = " (optional)" if c.get("optional") else (" (scaffold)" if c["status"] == "scaffold" else "")
-        how = "" if c.get("plugin") else " -- CLI only, no skill yet"
+        note += " (app)" if c.get("kind") == "app" else ""
+        how = "" if c.get("plugin") else (" -- stand-alone app" if c.get("kind") == "app" else " -- CLI only, no skill yet")
         rows.append(f"| `{c['repo']}`{note}{how} | {departments[c['department']]['name']} | {', '.join(c['owns'])} |")
     head, rest = skill_text.split(BEGIN, 1)
     _, tail = rest.split(END, 1)

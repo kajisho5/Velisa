@@ -44,7 +44,7 @@
         "source": "github",
         "repo": "kajisho5/ffmpeg-skill"
       },
-      "description": "Execution engine: typed FFmpeg/ffprobe tools every delegating Skill runs on",
+      "description": "Execution engine: typed FFmpeg/ffprobe tools every delegating Skill runs on (the owners above it decide; it runs), plus preflight checks and cut-list export",
       "category": "engine",
       "tags": [
         "engine",
@@ -57,7 +57,7 @@
         "source": "github",
         "repo": "kajisho5/video-editing-skill"
       },
-      "description": "Cut, trim, concat, fit, overlay",
+      "description": "Cut, trim, concat, fit, still overlay as part of an edit; computes retake and duplicate candidates",
       "category": "visual",
       "tags": [
         "visual",
@@ -83,7 +83,7 @@
         "source": "github",
         "repo": "kajisho5/motion-graphics-skill"
       },
-      "description": "Title cards, lower thirds, overlays",
+      "description": "Titles and lower thirds burned into a programme, logos, PiP and chroma key, and placement of pre-rendered animated layers",
       "category": "visual",
       "tags": [
         "visual",
@@ -96,7 +96,7 @@
         "source": "github",
         "repo": "kajisho5/subtitle-skill"
       },
-      "description": "Subtitle validation, SRT/WebVTT generation, burn-in",
+      "description": "Subtitle validation, SRT/WebVTT generation, burn-in, and animated captions generated from subtitle cues",
       "category": "visual",
       "tags": [
         "visual",
@@ -135,7 +135,7 @@
         "source": "github",
         "repo": "kajisho5/remotion-ffmpeg-skill"
       },
-      "description": "Remotion motion graphics on real footage, timed from ffmpeg-skill measurements (captions, jump cuts, beat-synced motion)",
+      "description": "Remotion motion graphics on real footage, timed from ffmpeg-skill measurements (word-timed caption effects, jump cuts, beat-synced motion, audio visualizers)",
       "category": "visual",
       "tags": [
         "visual",
@@ -148,7 +148,7 @@
         "source": "github",
         "repo": "kajisho5/hyperframes-skill"
       },
-      "description": "Renders HTML scenes to verified video with HyperFrames (needs Node.js 22+ and a headless Chromium)",
+      "description": "Renders HTML scenes to verified video with HyperFrames: title, stinger and loop material files, kinetic type and geometric motion (needs Node.js 22+ and a headless Chromium)",
       "category": "visual",
       "tags": [
         "visual",
@@ -161,7 +161,7 @@
         "source": "github",
         "repo": "kajisho5/audio-production-skill"
       },
-      "description": "Gain, mix, normalize, dynamics, denoise, filler and silence removal",
+      "description": "Gain, mix, loudness normalization (ffmpeg-skill is the engine), dynamics, denoise, filler and silence removal",
       "category": "audio",
       "tags": [
         "audio",
@@ -187,7 +187,7 @@
         "source": "github",
         "repo": "kajisho5/diarization-skill"
       },
-      "description": "Speaker diarization: fills the Transcript speaker_id that transcription-skill reserves",
+      "description": "Speaker diarization: fills the Transcript speaker_id that transcription-skill reserves, and owns the rule that assigns it",
       "category": "recognition",
       "tags": [
         "recognition",
@@ -201,7 +201,7 @@
         "source": "github",
         "repo": "kajisho5/detection-skill"
       },
-      "description": "Face, text (OCR) and object detection",
+      "description": "Face, text (OCR) and object detection, and the frame-accurate shot table",
       "category": "recognition",
       "tags": [
         "recognition",
@@ -228,7 +228,7 @@
         "source": "github",
         "repo": "kajisho5/qc-skill"
       },
-      "description": "Rule-based QC: PASS/WARN/FAIL/UNKNOWN",
+      "description": "Rule-based QC: PASS/WARN/FAIL/UNKNOWN judgement against the plan or spec",
       "category": "verification",
       "tags": [
         "verification",
@@ -241,7 +241,7 @@
         "source": "github",
         "repo": "kajisho5/media-analysis-skill"
       },
-      "description": "Observation only: measures facts about a media file",
+      "description": "Observation only: measures facts about a media file, including speech regions",
       "category": "verification",
       "tags": [
         "verification",
@@ -297,7 +297,8 @@
       "category": "utility",
       "tags": [
         "utility",
-        "補助"
+        "補助",
+        "app"
       ]
     }
   ]

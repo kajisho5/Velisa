@@ -185,8 +185,10 @@ Only verified repositories are listed above; `ecosystem.json` carries the rest. 
 Skills (`voice-production-skill`, `dubbing-skill`, and others) are discussed as *examples
 of what the architecture must support*, in [`docs/SKILL_EVOLUTION.md`](docs/SKILL_EVOLUTION.md)
 and [`docs/DELIVERY_AND_INTEROP.md`](docs/DELIVERY_AND_INTEROP.md) — where one appears in
-`ecosystem.json` at all, it is marked `scaffold` (an empty repository), and this README
-does not pretend otherwise.
+`ecosystem.json` at all, its `status` follows the one definition in that file's `$comment`
+(`active`: working operations behind its contract, released or not; `scaffold`: the repository
+exists but no operation works yet; `planned`: no repository yet), and this README does not
+pretend otherwise.
 
 ## Quick start
 

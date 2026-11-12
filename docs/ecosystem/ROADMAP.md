@@ -1,6 +1,6 @@
 # Ecosystem build roadmap
 
-What every repository still needs, how the pieces connect, and the order to build them in. Written from a read-only audit of all 33 components on 2026-10-30 (source, tests, CI, contracts, the agent's adapters), and reviewed again on 2026-11-05 against every repository's `ECOSYSTEM_ROADMAP.md`, with the steps from that day's OSS survey added (see "From the 2026-11 OSS survey"). The same day every skill was also reviewed against field requirements (on-site work, broadcast quality, speed, recovery, natural-language control, the agent contract, live and broadcast delivery formats, motion graphics from a sentence, YouTube editing); the result is the third round below, "Field requirements across every skill", "New skill candidates" and proposals 5-14 to ffmpeg-skill. Each repository carries an `ECOSYSTEM_ROADMAP.md` with PR-sized steps; this page is the map across them. `docs/ROADMAP.md` is the architecture roadmap (phases of the contract layer) and stays as it is.
+What every repository still needs, how the pieces connect, and the order to build them in. Written from a read-only audit of all 33 components on 2026-10-30 (source, tests, CI, contracts, the agent's adapters), and reviewed again on 2026-11-05 against every repository's `ECOSYSTEM_ROADMAP.md`, with the steps from that day's OSS survey added (see "From the 2026-11 OSS survey"). The same day every skill was also reviewed against field requirements (on-site work, broadcast quality, speed, recovery, natural-language control, the agent contract, live and broadcast delivery formats, motion graphics from a sentence, YouTube editing); the result is the third round below, "Field requirements across every skill", "New skill candidates" and proposals 5-14 to ffmpeg-skill. Each repository carries an `ECOSYSTEM_ROADMAP.md` with PR-sized steps; this page is the map across them. `docs/ROADMAP.md` is the architecture roadmap (phases of the contract layer) and stays as it is. On 2026-11-12 the owner answered the questions of the [ownership audit](ownership-audit/README.md); see "Decided by the owner (2026-11-12)".
 
 **ffmpeg-skill is treated as complete.** Since 3.0.0 its 42 tools (`contract_version` 2.0, with a stability promise for the whole of 3.x: [docs/contract.md](https://github.com/kajisho5/ffmpeg-skill/blob/main/docs/contract.md#stability-guarantee-3x); FFmpeg 6.1+ and Python 3.10+; 3.0 changed `cut.py`'s defaults and added `probe`'s start `timecode`) are the engine the others delegate to; every satellite now accepts `>=2.0.0 <4.0.0`. No step below changes it: what a step needs from the engine is written under "Proposals to ffmpeg-skill" and decided in that repository. Several gaps are closed by *using* tools it already has, e.g. `render --export-timeline` (.otio / .fcpxml / .edl), `freeze`, `reverse`, `insert`, `audio --duck --voice`, `metadata` chapters.
 
@@ -15,11 +15,11 @@ What every repository still needs, how the pieces connect, and the order to buil
 | Visual | remotion-ffmpeg | wired (agent #108, CONFIRM) |
 | Visual | blender, hyperframes | implemented; handoff-only SkillSpecs with pinned contracts (agent #95) |
 | Audio | audio-production | implemented and wired (MIX / NR / DYNAMICS / FILLER_REMOVE / duck) |
-| Audio | voice-enhance, dubbing, sound-design | 0.1.0, experimental ops, wired (agent #88, #97, #107); `scaffold` in ecosystem.json |
+| Audio | voice-enhance, dubbing, sound-design | 0.1.0, experimental ops, wired (agent #88, #97, #107); `active` in ecosystem.json since 2026-11-12 (no tags or GitHub Releases yet) |
 | Recognition | transcription, diarization, detection, slide-sync | implemented and wired; speaker ids end to end (agent #111) |
 | Verification | qc, media-analysis, artifacts | implemented and wired (artifacts: agent #110) |
-| Delivery | publish | 0.1.0, seven uploaders tested against mocks only; wired as CONFIRM after QC (agent #99); `scaffold` in ecosystem.json |
-| Delivery | nle-bridge | 0.1.0 (export / conform / diff / import); agent export / conform wired (agent #101), read-back open; `planned` in ecosystem.json |
+| Delivery | publish | 0.1.0, seven uploaders tested against mocks only; wired as CONFIRM after QC (agent #99); `active` in ecosystem.json since 2026-11-12 (no tags or GitHub Releases yet) |
+| Delivery | nle-bridge | 0.1.0 (export / conform / diff / import); agent export / conform wired (agent #101), read-back open; `active` in ecosystem.json (since 2026-10-31, #129) |
 | Delivery | 5 disc kits (optional) | implemented, standalone; oncemore named by a handoff (agent #109) |
 | Utility | imagemagick, stepcap | imagemagick wired for overlay images (agent #92); stepcap standalone by design |
 | Governance | skillpact, system-intelligence | skillpact conformance runs weekly (#127); system-intelligence reads contracts and ownership |
@@ -76,7 +76,7 @@ Neither vendor ships a desktop MCP server. Community servers exist. Verified on 
 **Build vs reuse.** Neither NLE is available yet (see Decided), so the interchange files come first and live control waits.
 - **Later, reuse:** live NLE control. Don't fork the community servers. Pin a version, keep eval and script tools off, and opt out of telemetry where it exists.
 - **Build, first in the agent:** `timeline_export` through ffmpeg-skill `render --export-timeline` (agent step 4, done: ADR-052).
-- **Built as `nle-bridge-skill`:** round-trip diff, FCP7 XML for Premiere, relink manifests and conform packages (0.1.0, nle-bridge #1-#5; the pinned community servers are documented in its `docs/live-control.md`, #2). The agent hands it the executed IR (agent #101); reading the editor's timeline back is agent step 12. Still `planned` in `ecosystem.json` (see the owner's decisions).
+- **Built as `nle-bridge-skill`:** round-trip diff, FCP7 XML for Premiere, relink manifests and conform packages (0.1.0, nle-bridge #1-#5; the pinned community servers are documented in its `docs/live-control.md`, #2). The agent hands it the executed IR (agent #101); reading the editor's timeline back is agent step 12. `active` in `ecosystem.json` since 2026-10-31 (#129).
 
 **Risks.**
 - **Resolve:** automation needs Studio.
@@ -130,14 +130,14 @@ Each line is a step in that repository's `ECOSYSTEM_ROADMAP.md`. A line that nee
    - nle-bridge 13: auto-editor XML.
    - dubbing 11: translate → dub → subtitles with speech-rate fit (needs subtitle 5, transcription 8 for the source timing).
    - audio-production 7: reference mastering.
-6. **New area** (owner decision first, below): restoration. (Live streaming was dropped on 2026-11-05: out of scope.)
+6. **New area:** restoration. Decided 2026-11-12: no new skill yet; the no-weights baseline is wired first and a skill waits for ADR-017 (see "New areas"). (Live streaming was dropped on 2026-11-05: out of scope.)
 
 ### Third round (2026-11-05, field review), in priority order
 
 From a review of every skill against what conference, medical-congress, corporate-event and hybrid-event recording work needs (see "Field requirements across every skill" below). Each line is a step added that day to that repository's `ECOSYSTEM_ROADMAP.md`, named by its title; numbers are in each file.
 
 1. **Delivery for broadcast and NLE** (highest: it decides whether a file can be used at all).
-   - The engine side is proposals 5-11 to ffmpeg-skill, all accepted on 2026-11-05: alpha masters #417, key / fill #418 (after #417), intermediates #419, multitrack audio #420 (with #401), loudness versions #421, seamless loop #422 (top priority), safe-area guide #423 (previews only). Steps that wait for them say so; until each lands, the agent reports that delivery as a handoff.
+   - The engine side is proposals 5-11 to ffmpeg-skill, all accepted on 2026-11-05. Done (closed completed 2026-11-06): alpha masters #417, key / fill #418, intermediates #419, loudness versions #421, seamless loop #422, safe-area guide #423 (previews only). Open: multitrack audio #420 (with #401). Steps that wait for them say so; until each lands, the agent reports that delivery as a handoff.
    - qc-skill: key and fill pair check, alpha edge check, loop seam check, stinger cut-point check, broadcast and delivery profiles.
    - video-production-agent: delivery presets for broadcast and NLE ("key and fill as two files", "one file per layer"; 「キーフィルで2本」「レイヤー別で」).
    - audio-production-skill: stems and multitrack delivery, loudness versions in one run.
@@ -169,7 +169,7 @@ From a review of every skill against what conference, medical-congress, corporat
    - subtitle-skill: TTML / IMSC 1.1 and EBU-TT-D, regional caption profiles.
    - Disc kits: proceedings discs (bdmvkit), bitrate planner (vtskit), checksum manifest (udfkit), 608 limits (dvdcc), build from the agent and batch discs (oncemore).
 8. **Governance.** skillpact: progress events and error classes in the contract, idempotency conformance. system-intelligence: field-readiness audit, roadmap drift check.
-9. **New skills** (owner decision first): motion-titles-skill, design-system-skill, asset-library-skill, generative-media-skill (see "New skill candidates").
+9. **New skills:** none created (owner decision 2026-11-12, see "New skill candidates"). Instead: title / stinger material in hyperframes-skill with the [`title.json` / `stinger.json` spec](../specs/title-and-stinger.md), the [`kit@1` spec](../specs/kit.md), the [licence record spec](../specs/licence-record.md), and [ADR-016](../adr/ADR-016-generative-media.md) before any generative media.
 
 ## From the 2026-11 OSS survey
 
@@ -258,7 +258,7 @@ What every skill was checked against, and where each gap landed. "Step" means a 
 | Recovery: resume, partial re-render, idempotency, logs | agent `--resume`; ingest resumable; hyperframes `bit_exact` | resumable blocks (voice-enhance, transcription, diarization); idempotency conformance (skillpact); series uploads never sent twice (publish) |
 | Natural-language control: vague requests, confirmation gates, preview and revise, "さっきの" | requirements_extraction (unambiguous phrases), CONFIRM floors, `revise --feedback` | motion brief slots, relative revisions and references, delivery presets from a sentence (agent) |
 | Agent contract: inputs and outputs, error classes, progress | per-skill error codes with `retryable` | one error-class vocabulary and progress events (skillpact; agent over MCP) |
-| Future: generated video, many languages, AI voice, vertical shorts, clips from long recordings | dubbing, subtitle translate, remotion `--aspect` | Shorts set and highlight signals (agent, media-analysis); AI clips in an edit (video-editing); AI voice disclosure (dubbing); generative-media-skill (candidate) |
+| Future: generated video, many languages, AI voice, vertical shorts, clips from long recordings | dubbing, subtitle translate, remotion `--aspect` | Shorts set and highlight signals (agent, media-analysis); AI clips in an edit (video-editing); AI voice disclosure (dubbing); generative media: [ADR-016](../adr/ADR-016-generative-media.md) first, no skill yet |
 
 ### Delivery formats for broadcast and NLE (all skills)
 
@@ -266,11 +266,11 @@ Owner split: the files are written by ffmpeg-skill (proposals 5-9 below, since i
 
 | Need | Engine (ffmpeg-skill) | Generators | Check (qc-skill) | Request (agent) |
 |---|---|---|---|---|
-| Layers as separate alpha files for After Effects / NLE | alpha masters (proposal 5, accepted: ffmpeg-skill#417) | layer export (motion-graphics), alpha deliveries (hyperframes), passes (blender), `--layers` (remotion), layered output (thumbnail); placed on upper tracks by nle-bridge | alpha edge check | `nle-layers` preset, "レイヤー別で" |
-| Key and fill as two files (same length, same frames), premultiplied or straight | key / fill pair (proposal 6, accepted: #418, after #417) | the alpha mode (straight or premultiplied) recorded by every generator; still key / fill (imagemagick) | key and fill pair check | `key-fill` preset, "key and fill as two files"（「キーフィルで2本」） |
-| ProRes 4444 / 4444 XQ, HAP Alpha, QuickTime Animation, PNG / EXR sequence; DNxHR / DNxHD, ProRes 422 HQ | proposals 5 and 7 (accepted: #417, #419; ProRes 422 HQ exists as `export --preset prores`) | — | profile per codec | `alpha-master`, `intermediate` |
-| Stems, multitrack WAV, loudness versions (-14 / -23 / -24) | multitrack audio, loudness versions (proposals 8, 9, accepted: #420 with #401, #421) | stems and loudness set (audio-production) | broadcast and delivery profiles | `loudness-set` |
-| Batch in several sizes, fps and aspects; loops; safe-area guides; file naming; checksums | export per preset exists; seamless loop (proposal 10, accepted, top priority: #422); a safe-area guide overlay for previews (proposal 11, accepted: #423) | one edit in several aspects (video-editing); IN / LOOP / OUT (hyperframes) | loop seam check | `aspect-set`, a naming rule and a checksum manifest per delivery |
+| Layers as separate alpha files for After Effects / NLE | alpha masters (proposal 5, done: ffmpeg-skill#417) | layer export (motion-graphics), alpha deliveries (hyperframes), passes (blender), `--layers` (remotion), layered output (thumbnail); placed on upper tracks by nle-bridge | alpha edge check | `nle-layers` preset, "レイヤー別で" |
+| Key and fill as two files (same length, same frames), premultiplied or straight | key / fill pair (proposal 6, done: #418) | the alpha mode (straight or premultiplied) recorded by every generator; still key / fill (imagemagick) | key and fill pair check | `key-fill` preset, "key and fill as two files"（「キーフィルで2本」） |
+| ProRes 4444 / 4444 XQ, HAP Alpha, QuickTime Animation, PNG / EXR sequence; DNxHR / DNxHD, ProRes 422 HQ | proposals 5 and 7 (done: #417, #419; ProRes 422 HQ exists as `export --preset prores`) | — | profile per codec | `alpha-master`, `intermediate` |
+| Stems, multitrack WAV, loudness versions (-14 / -23 / -24) | multitrack audio, loudness versions (proposals 8, 9: #420 with #401 open, #421 done) | stems and loudness set (audio-production) | broadcast and delivery profiles | `loudness-set` |
+| Batch in several sizes, fps and aspects; loops; safe-area guides; file naming; checksums | export per preset exists; seamless loop (proposal 10, done: #422); a safe-area guide overlay for previews (proposal 11, done: #423) | one edit in several aspects (video-editing); IN / LOOP / OUT (hyperframes) | loop seam check | `aspect-set`, a naming rule and a checksum manifest per delivery |
 | Stingers (transitions inside an edit) and loops | alpha masters (proposal 5) | stinger templates with a cut point (hyperframes; remotion, blender) | stinger cut-point check, loop seam check | the stinger transition in video-editing-skill |
 
 ## Motion graphics from a sentence (文字PV・幾何学模様)
@@ -305,16 +305,16 @@ Velisa is an editing, finishing and delivery tool. Planning, idea generation, wr
 |---|---|---|
 | Script as input | script alignment, paper edit in script order, misread lines | transcription-skill script alignment (round 2); agent: paper edit from a script |
 | Edit | jump cuts, silence / filler removal, pacing | audio-production SILENCE_REMOVE / FILLER_REMOVE, remotion Jumpcut, agent semantic deletion (round 2) |
-| | B-roll inserted automatically | ffmpeg-skill `broll`; picking the clip: asset-library-skill (candidate) |
+| | B-roll inserted automatically | ffmpeg-skill `broll`; picking the clip: the agent, with licence records in the [shared shape](../specs/licence-record.md) (no new skill) |
 | | zoom / punch-in on the speaker | video-editing-skill: punch-in on the speaker |
 | | sound effects placed (pop, whoosh) | sound-design-skill: sound-effect cue sheet → audio-production MIX |
 | | emphasis captions, speech bubbles | remotion-ffmpeg-skill: emphasis captions |
 | | chapters | slide-sync chapters; agent: chapters from the transcript |
 | | end screen and cards kept clear | motion-graphics-skill: end-screen and card areas |
-| Assets | stock footage and images with licence lines | asset-library-skill (candidate) |
+| Assets | stock footage and images with licence lines | ingest-skill `fetch` plus a licence record in the [shared shape](../specs/licence-record.md); no new skill (2026-11-12) |
 | | royalty-free BGM, loops | sound-design-skill library mode; stock music with licence records; loopable beds |
-| | AI images and video | thumbnail-skill FLUX backgrounds; video-editing-skill: AI-generated clips in an edit; generative-media-skill (candidate) |
-| | meme inserts | motion-graphics `meme`; clips: asset-library-skill (candidate) |
+| | AI images and video | thumbnail-skill FLUX backgrounds; video-editing-skill: AI-generated clips in an edit; generative media: [ADR-016](../adr/ADR-016-generative-media.md) first, no skill yet |
+| | meme inserts | motion-graphics `meme`; clips: ingest-skill `fetch` with a licence record |
 | Sound | voice cleanup | audio-production VOICE_CLEANUP, voice-enhance ISOLATE / DEREVERB |
 | | BGM ducking | audio-production MIX duck |
 | | -14 LUFS | ffmpeg-skill `export --normalize`, audio-production NORMALIZE; loudness versions |
@@ -325,65 +325,38 @@ Velisa is an editing, finishing and delivery tool. Planning, idea generation, wr
 | | captions, many languages | subtitle-skill generate / translate / mux; Shorts captions |
 | Derived | Shorts / Reels / TikTok: vertical reframe, highlights, burned captions | agent: long video → Shorts set; detection subject path (round 2); media-analysis: highlight signals |
 | Publish | upload, metadata, chapters | publish-skill (existing uploaders; first real uploads; clips as a series) |
-| Rights and safety | BGM and asset licences | sound-design licence records; artifacts-skill: credits and licence lines; asset-library-skill (candidate) |
+| Rights and safety | BGM and asset licences | sound-design licence records; artifacts-skill: credits and licence lines (`credits_attribution`); the [licence record spec](../specs/licence-record.md) |
 | | faces and personal data blurred | detection-skill faces / tracks → ffmpeg-skill `redact`; personal and patient data |
 | | Content ID risk | sound-design-skill: stock music with licence records (a source's Content ID flag); a real check is not possible offline |
 
 ## New skill candidates
 
-None of these is created here. Each needs the owner's decision: repository name, `owns` entries in `ecosystem.json` (status `planned`), department. Priority is for the field work this ecosystem serves.
+**Decided by the owner on 2026-11-12: none of the four is created.** The drafts below are kept as history; the decision for each is in [DECISION_LOG.md](DECISION_LOG.md) (D15-D18) and the evidence in [ownership-audit/](ownership-audit/).
 
-### motion-titles-skill (テロップとスティンガーの映像ファイル) — priority: high
+| Candidate | Decision | What exists instead |
+|---|---|---|
+| motion-titles-skill | Not created. Folded into hyperframes-skill: stinger templates and `stinger.json`, typesetting, brand input. Its `owns` gains テロップ・スティンガー・ループ素材. | [`title.json` / `stinger.json` spec](../specs/title-and-stinger.md): the shape video-editing-skill, motion-graphics-skill, qc-skill and the agent already read |
+| design-system-skill | Not created. Revisit as a skill once three or more renderers read `kit@1`. | [`kit@1` spec](../specs/kit.md): a superset of ffmpeg-skill `brand.json`, with a mapping to each renderer's existing input |
+| asset-library-skill | Not created. Project credits keep using artifacts-skill `credits_attribution`. | [Licence record spec](../specs/licence-record.md): the record sound-design-skill already writes, extended to video and images |
+| generative-media-skill | Not created. An ADR comes first. | [ADR-016](../adr/ADR-016-generative-media.md) (Proposed): engines, code and weight licences, VRAM, commercial terms, reuse of thumbnail-skill's `BackgroundProvider` |
 
-Name proposed: `motion-titles-skill` (an editing name; `titles-and-stingers-skill` is the alternative). It replaces the earlier "broadcast-graphics-skill" proposal. It makes files for an edit, and nothing else: no playout package, no player settings, no live control.
+### Drafts (2026-11-05, history)
 
-- **Role.** Animated title and stinger files for editing: lower thirds (name and title), session titles, news-style straps, number count-ups, comment cards, and stingers (a transition whose graphic covers the whole frame while the edit cuts underneath it), plus loops. Each file comes with alpha, or as key and fill, and with a metadata file the editing skills read.
-- **Why a new skill.** Several rules belong together. Titles come in IN / LOOP / OUT segments, so an edit can hold a title for any length. A stinger carries its cut point (the frame where the picture is fully covered) as data, so video-editing-skill switches the clips exactly there. Alpha mode and key / fill are stated. Typesetting fits long names in any language. motion-graphics-skill burns typed elements into a programme, and hyperframes-skill renders whatever scene it is given and decides nothing. Neither owns these templates.
-- **Contract (draft).** `motion-titles template --list`. `motion-titles make <template> --values v.json|--csv rows.csv --kit kit.json --duration 1.2 --cut-point 0.5 --format prores4444|webm-alpha|png|key-fill [--alpha straight|premultiplied]` writes one directory per graphic:
-  - `in.mov`, `loop.mov` and `out.mov`, or the single stinger file with its audio
-  - `title.json` (`motion-titles/title@1`): segments with frame counts, the cut point in frames and seconds, the alpha mode, the safe area, the text as drawn and the font size used
-
-  Errors use the OS classes. `--dry-run` writes the plan only.
-- **Templates.** Lower third, session title, speaker introduction, break card, end roll, strap, count-up, comment card. Stingers: geometric, particles, brush, glitch, logo reveal. Typesetting comes from hyperframes-skill's typesetting step: RTL and CJK, per-language line breaks, variable fonts, auto shrink and line break, and vertical writing and ruby as regional profiles.
-- **Boundaries.**
-  - The pictures are rendered by hyperframes-skill (HTML scenes, segments, alpha), remotion-ffmpeg-skill or blender-skill, and the files are written through ffmpeg-skill.
-  - The stinger is placed in the timeline by video-editing-skill's stinger transition, which cuts at the stinger's cut point.
-  - Titles are placed over a clip by motion-graphics-skill's rendered-layer element.
-  - qc-skill checks the result: full cover at the cut point, alpha edges, loop seam, key / fill match.
-  - The agent reads the request and picks the delivery preset.
-- **Licence.** Own code (MIT, like the rest). Template designs: 参考：Remotion / HyperFrames 公式テンプレート、video-shotcraft（Apache-2.0）、motion-video-kit（MIT）（考え方のみ。コードは使わない）.
-- **Example requests.** "Lower thirds for 10 speakers from this CSV, in our brand colours, with IN and OUT separate"; "A logo stinger, 1.2 s, cut point at 0.5 s, between these two clips"; "A 5-minute looping break card with music" (例：「登壇者テロップを10人分、CSV から、企業カラーで」).
-
-### design-system-skill (ブランドキット・デザイン規則) — priority: high
-
-- **Role.** One brand kit for every renderer: colours, fonts (with their licences), logos (variants and clear space), spacing and a layout grid, type rules (sizes, weights, line lengths per aspect), and palettes generated from a logo or one colour with contrast checked.
-- **Why a new skill.** At least six renderers read colours and fonts (motion-graphics, hyperframes, remotion, thumbnail, subtitle, blender), each in its own way; ffmpeg-skill's `brand.json` is one of these formats and ffmpeg-skill is not changed from here. Checking a kit (WCAG contrast of every text / background pair, font licence allows video embedding, logo sizes) has no owner today.
-- **Contract (draft).** `design kit validate kit.json` → `design-system/kit@1` with findings; `design kit derive --for hyperframes|motion-graphics|remotion|thumbnail|subtitle|ffmpeg-brand` → each renderer's own options file; `design palette --from logo.png|#hex [--count N]` → a palette with contrast pairs; `design event-pack sessions.csv --kit kit.json` → the render requests for one event (opening, session title, speaker introduction, break, end roll) for hyperframes-skill `batch` or motion-titles-skill. It never renders.
-- **Boundaries.** Rendering stays with each renderer; thumbnails with thumbnail-skill; legibility judged by qc-skill; logo variants made through imagemagick-skill.
-- **Licence.** Own code. Palette generation may use Material Color Utilities (Apache-2.0) as a dependency; font licences read from the font files' name tables (OFL, Apache, commercial) and recorded.
-
-### asset-library-skill (ストック素材の取得とライセンス台帳) — priority: medium
-
-- **Role.** Find and fetch stock footage, photos, illustrations and meme clips from sources with a documented licence and an API (for example Pexels, Pixabay, Openverse, Wikimedia Commons), record each asset's licence, author, source URL and attribution line, and keep a project ledger the credits are built from. B-roll picking (a query from the transcript's nouns) is the agent's; this skill searches, fetches and records.
-- **Boundaries.** URL download stays with ingest-skill (`ingest fetch`); music and sound effects stay with sound-design-skill (library mode); attribution text is checked by artifacts-skill.
-- **Contract (draft).** `assets search "<query>" --kind video|image --orientation portrait --licence cc0|cc-by|platform` → candidates with licence facts; `assets fetch <id> --dest DIR` → the file plus `asset-library/asset@1` (licence, author, attribution, sha256); `assets ledger` → the project's credits. API keys from the environment or keychain, never printed.
-- **Licence.** Own code; each source's terms are recorded per asset, and a source without stated terms is refused.
-
-### generative-media-skill (AI 画像・動画の生成) — priority: low, start with an ADR
-
-- **Role.** Generated stills and video clips as edit material (inserts, backgrounds, establishing shots), behind swappable local engines, every output marked AI_GENERATED with the engine, the weights and their licence. thumbnail-skill keeps its own background generator.
-- **Why later.** Weight licences decide what is possible (for example LTX-2: Apache-2.0 code, weights under a community licence that limits commercial use by revenue). The ADR checks code and weights first; video-editing-skill's "AI-generated clips in an edit" step already makes inserted clips safe.
+- **motion-titles-skill** (priority was high): animated title and stinger files for editing (lower thirds, session titles, straps, count-ups, comment cards, stingers, loops) in IN / LOOP / OUT segments, with alpha or key / fill and a metadata file (`title.json`, then named `motion-titles/title@1`: segments, cut point, alpha mode, safe area, text as drawn, font size). Draft contract `motion-titles make <template> --values|--csv --kit --duration --cut-point --format`. The pictures were to be rendered by hyperframes-skill, which is why it was folded there.
+- **design-system-skill** (priority was high): one brand kit for every renderer (colours, fonts with licences, logos with clear space, spacing, type rules, generated palettes with contrast checked). Draft contract `design kit validate`, `design kit derive --for <renderer>`, `design palette`, `design event-pack`.
+- **asset-library-skill** (priority was medium): search and fetch stock footage and images from sources with a documented licence and an API, record each asset's licence, author, source URL and attribution line, and keep a project ledger. Draft contract `assets search`, `assets fetch` (writing `asset-library/asset@1`), `assets ledger`.
+- **generative-media-skill** (priority was low, ADR first): generated stills and clips as edit material behind swappable local engines, each output marked AI_GENERATED with the engine, the weights and their licence.
 
 ### Judged not to need a new skill
 
-- **Three.js / GLSL renderer:** hyperframes-skill (generative layer) and remotion-ffmpeg-skill (Three.js scenes), see above.
-- **Audio visualizer:** remotion-ffmpeg-skill, blender-skill and ffmpeg-skill `waveform`, see above.
+- **Three.js / GLSL renderer:** hyperframes-skill (generative layer) and remotion-ffmpeg-skill (Three.js scenes), see above. remotion-ffmpeg-skill's Three.js step waits for hyperframes-skill's, so it is not built twice.
+- **Audio visualizer:** remotion-ffmpeg-skill owns it (オーディオビジュアライザー, 2026-11-12) and keeps the measured (beat / lyric) versions; ffmpeg-skill `waveform` stays the engine's simple one. blender-skill stays 3D only.
 - **TTS narration:** dubbing-skill NARRATE owns AIナレーション.
-- **Kinetic typography / geometric PV:** hyperframes-skill's owned job (HTMLシーンの動画化), with the agent planning it.
+- **Kinetic typography / geometric PV:** hyperframes-skill owns it (キネティックタイポ・幾何学モーション, 2026-11-12), with the agent planning it.
 
 ## New areas (proposed)
 
-Restoration needs an owner decision first: a repository name, its `owns` entries in `ecosystem.json` (status `planned`), and its department. Until then it is written here, not in `ecosystem.json`. Live streaming was proposed here as well; it is out of scope since 2026-11-05 (owner decision: Velisa is an editing tool).
+**Restoration, decided by the owner on 2026-11-12: no new skill yet.** The no-weights baseline is wired first (ffmpeg-skill scaling, `minterpolate`, `denoise`). A skill comes only after [ADR-017](../adr/ADR-017-restoration.md) records the weights' licences. The steps below are the plan for that skill and stay as written; step 1 is that ADR. Live streaming was proposed here as well; it is out of scope since 2026-11-05 (owner decision: Velisa is an editing tool).
 
 ### Restoration (復元)
 
@@ -402,16 +375,40 @@ ffmpeg-skill is not changed from here. Each item is a hand-over for its maintain
 2. **A time-varying crop.** detection 9 produces a list of crop windows over time, and nothing in the engine applies a moving crop yet (`crop.py` takes one rectangle, `fit.py --fit crop` one position). Proposal: `crop.py --path windows.json` with a stated interpolation. Until then, reframing uses one window per shot through video-editing CROP.
 3. **Audio-only tempo and pad.** Asked for by dubbing-skill (ADR-007, ADR-013). dubbing 11's speech-rate fit renders only at tempo 1.0 until it exists.
 4. **`audio --sample-rate` and `audio --channel N`.** Asked for by voice-enhance-skill (ADR-003, ADR-005).
-5. **Alpha masters.** `export` presets that keep alpha and verify it on an output frame: ProRes 4444 and 4444 XQ (`prores_ks` profiles 4 / 5, `yuva444p10le`), QuickTime Animation (`qtrle`), PNG and EXR sequences, HAP Alpha (FFmpeg's `hap` encoder, needs a build with snappy; reported by `doctor` when missing), WebM VP9 alpha. The alpha mode (straight or premultiplied) is a flag and is written to the result. Asked for by the generators' layer and alpha steps (motion-graphics, hyperframes, blender, remotion, thumbnail) and the agent's delivery presets (2026-11-05 field review). **Decision (ffmpeg-skill, 2026-11-05): accepted** ([ffmpeg-skill#417](https://github.com/kajisho5/ffmpeg-skill/issues/417)).
-6. **Key / fill pair.** One call that writes the fill and the key (the alpha as a full-range luma matte, `alphaextract`) from one source with alpha: same frame count, fps, size and start timecode, straight or premultiplied fill as asked, both hashed. qc-skill's key and fill pair check reads the result. **Decision: accepted** ([ffmpeg-skill#418](https://github.com/kajisho5/ffmpeg-skill/issues/418), after [#417](https://github.com/kajisho5/ffmpeg-skill/issues/417)).
-7. **Intermediate presets.** DNxHR LB / SQ / HQ / HQX / 444 and DNxHD at the broadcast sizes and rates, beside the existing ProRes 422 HQ (`export --preset prores`). **Decision: accepted** ([ffmpeg-skill#419](https://github.com/kajisho5/ffmpeg-skill/issues/419)).
-8. **Multitrack audio.** Several audio inputs into one file as separate tracks with names and language tags: multitrack WAV (or BWF with the start timecode) and MOV / MXF with one track per stem. Asked for by audio-production-skill's stems step and nle-bridge-skill's package. **Decision: accepted** ([ffmpeg-skill#420](https://github.com/kajisho5/ffmpeg-skill/issues/420), done together with [#401](https://github.com/kajisho5/ffmpeg-skill/issues/401)).
-9. **Loudness versions in one pass.** One master, several targets: -14 LUFS (streaming), -23 LUFS / -1 dBTP (EBU R128, the `broadcast` platform has it), -24 LKFS / -2 dBTP (ATSC A/85), and regional profiles such as ARIB TR-B32 (-24 LKFS / -1 dBTP, Japan), each measured after. ATSC A/85 was added to this list after the decision, on the internationalisation principles. **Decision: accepted** ([ffmpeg-skill#421](https://github.com/kajisho5/ffmpeg-skill/issues/421)).
-10. **Seamless loop.** `loop --crossfade S` (picture and sound across the seam) and a measurement of the seam; `loop.py` says today that it does not smooth the loop point. **Decision: accepted, top priority** ([ffmpeg-skill#422](https://github.com/kajisho5/ffmpeg-skill/issues/422)).
-11. **Safe-area guide.** A guide overlay (title safe / action safe for 16:9 and 4:3 centre cut, and the platform safe zones `_platforms.py` already has) as a preview file, never burned into a delivery. **Decision: accepted, for previews only** ([ffmpeg-skill#423](https://github.com/kajisho5/ffmpeg-skill/issues/423)).
+5. **Alpha masters.** `export` presets that keep alpha and verify it on an output frame: ProRes 4444 and 4444 XQ (`prores_ks` profiles 4 / 5, `yuva444p10le`), QuickTime Animation (`qtrle`), PNG and EXR sequences, HAP Alpha (FFmpeg's `hap` encoder, needs a build with snappy; reported by `doctor` when missing), WebM VP9 alpha. The alpha mode (straight or premultiplied) is a flag and is written to the result. Asked for by the generators' layer and alpha steps (motion-graphics, hyperframes, blender, remotion, thumbnail) and the agent's delivery presets (2026-11-05 field review). **Decision (ffmpeg-skill, 2026-11-05): accepted** ([ffmpeg-skill#417](https://github.com/kajisho5/ffmpeg-skill/issues/417)). **Done:** ffmpeg-skill#417 closed completed on 2026-11-06.
+6. **Key / fill pair.** One call that writes the fill and the key (the alpha as a full-range luma matte, `alphaextract`) from one source with alpha: same frame count, fps, size and start timecode, straight or premultiplied fill as asked, both hashed. qc-skill's key and fill pair check reads the result. **Decision: accepted** ([ffmpeg-skill#418](https://github.com/kajisho5/ffmpeg-skill/issues/418), after [#417](https://github.com/kajisho5/ffmpeg-skill/issues/417)). **Done:** ffmpeg-skill#418 closed completed on 2026-11-06.
+7. **Intermediate presets.** DNxHR LB / SQ / HQ / HQX / 444 and DNxHD at the broadcast sizes and rates, beside the existing ProRes 422 HQ (`export --preset prores`). **Decision: accepted** ([ffmpeg-skill#419](https://github.com/kajisho5/ffmpeg-skill/issues/419)). **Done:** ffmpeg-skill#419 closed completed on 2026-11-06.
+8. **Multitrack audio.** Several audio inputs into one file as separate tracks with names and language tags: multitrack WAV (or BWF with the start timecode) and MOV / MXF with one track per stem. Asked for by audio-production-skill's stems step and nle-bridge-skill's package. **Decision: accepted** ([ffmpeg-skill#420](https://github.com/kajisho5/ffmpeg-skill/issues/420), done together with [#401](https://github.com/kajisho5/ffmpeg-skill/issues/401); still open on 2026-11-12).
+9. **Loudness versions in one pass.** One master, several targets: -14 LUFS (streaming), -23 LUFS / -1 dBTP (EBU R128, the `broadcast` platform has it), -24 LKFS / -2 dBTP (ATSC A/85), and regional profiles such as ARIB TR-B32 (-24 LKFS / -1 dBTP, Japan), each measured after. ATSC A/85 was added to this list after the decision, on the internationalisation principles. **Decision: accepted** ([ffmpeg-skill#421](https://github.com/kajisho5/ffmpeg-skill/issues/421)). **Done:** ffmpeg-skill#421 closed completed on 2026-11-06.
+10. **Seamless loop.** `loop --crossfade S` (picture and sound across the seam) and a measurement of the seam; `loop.py` says today that it does not smooth the loop point. **Decision: accepted, top priority** ([ffmpeg-skill#422](https://github.com/kajisho5/ffmpeg-skill/issues/422)). **Done:** ffmpeg-skill#422 closed completed on 2026-11-06.
+11. **Safe-area guide.** A guide overlay (title safe / action safe for 16:9 and 4:3 centre cut, and the platform safe zones `_platforms.py` already has) as a preview file, never burned into a delivery. **Decision: accepted, for previews only** ([ffmpeg-skill#423](https://github.com/kajisho5/ffmpeg-skill/issues/423)). **Done:** ffmpeg-skill#423 closed completed on 2026-11-06.
 12. **Growing files and LTC.** `probe` and `cut` on a file still being written (fragmented MP4 / MOV, MXF) reporting the duration that is readable so far; and LTC decoded from an audio channel as a sync source for `sync` / `multicam`. Asked for by ingest-skill's growing-files and sync-facts steps. **Decision: on hold** ([ffmpeg-skill#424](https://github.com/kajisho5/ffmpeg-skill/issues/424): the guarantee for a partial read has to be designed first. ingest-skill's growing-files step copies bytes and does not wait for it; transcription / slide-sync / media-analysis follow modes read only the closed part until then).
-13. **Typed keyframes on overlay.** Position, scale and opacity keyframes with stated easing on `overlay`, so motion-graphics-skill can offer slide / move / scale (today in its `unsupported_animations`). Until then animated graphics come pre-rendered from hyperframes-skill and are placed by motion-graphics-skill's rendered-layer element. **Decision: on hold** ([ffmpeg-skill#425](https://github.com/kajisho5/ffmpeg-skill/issues/425): who owns animated overlays has to be decided first; the pre-rendered path above stays the way until then).
+13. **Typed keyframes on overlay.** Position, scale and opacity keyframes with stated easing on `overlay`, so motion-graphics-skill can offer slide / move / scale (today in its `unsupported_animations`). Until then animated graphics come pre-rendered from hyperframes-skill and are placed by motion-graphics-skill's rendered-layer element. **Decision: on hold** ([ffmpeg-skill#425](https://github.com/kajisho5/ffmpeg-skill/issues/425): who owns animated overlays has to be decided first; the pre-rendered path above stays the way until then). **Not needed (owner decision 2026-11-12):** animated overlays are made by hyperframes-skill and placed by motion-graphics-skill's `rendered_layer`; what is missing is the agent's path that runs hyperframes-skill (DECISION_LOG D12).
 14. **ARIB captions.** ARIB STD-B24 caption streams for Japanese broadcast deliveries; a large format decision, so it is a proposal only. subtitle-skill writes TTML with ruby and vertical text meanwhile. **Decision: declined** ([ffmpeg-skill#426](https://github.com/kajisho5/ffmpeg-skill/issues/426): FFmpeg has no ARIB caption writer. subtitle-skill's TTML (IMSC 1.1, with ruby and vertical text) is the replacement).
+
+## Decided by the owner (2026-11-12)
+
+From the [ownership audit](ownership-audit/README.md). Each row is an entry in [DECISION_LOG.md](DECISION_LOG.md) (D12-D32), with its evidence.
+
+| Question | Decision |
+|---|---|
+| Animated overlays (ffmpeg-skill #425 waited for it) | Material by hyperframes-skill (segments, alpha), placement by motion-graphics-skill's `rendered_layer`. #425 is not needed for this. Missing: the agent's path that runs hyperframes-skill and passes its output to `motion.layer`. |
+| Status in `ecosystem.json` | voice-enhance, dubbing, sound-design and publish are `active`. One definition of `status`, in `ecosystem.json`'s `$comment`: `active` = working operations behind the contract, released or not; `scaffold` = the repository exists, no operation works yet; `planned` = no repository yet. Release state is a roadmap step in each of the four. nle-bridge was already `active`. |
+| Platform duration and file-size limits | publish-skill's values are authoritative; ffmpeg-skill `check`'s rows are guidance only and `publish plan` does not use them for its verdict. |
+| New skill candidates (2026-11-05 field review) | None created; specs and an ADR instead (see "New skill candidates"). |
+| New area: restoration | No skill yet; the no-weights baseline first, then ADR-017 on the weights' licences. |
+| Overlay / PiP / titles | Titles: motion-graphics burns them into a programme, hyperframes makes the material files, remotion's stay inside its compositions. Overlays: video-editing = still overlay as part of an edit, motion-graphics = logos, PiP, chroma key and placing animated graphics, ffmpeg-skill = B-roll and the engine. |
+| Animated subtitles | Generated from subtitle cues: subtitle-skill (passing ffmpeg-skill `caption --animate/--karaoke` through). Word-timed effects: remotion-ffmpeg-skill. |
+| Loudness | audio-production-skill owns it, ffmpeg-skill is the engine. The agent's routing is not changed until `loudnorm` and `ebur128` are compared on measurements. |
+| Compliance checking | Recorded, no wiring change: ffmpeg-skill `check` = the engine's preflight, qc-skill = judgement against the plan or spec. |
+| Measurement and cut detection | Layers, not collisions: fast list = ffmpeg-skill `scenes`, observation = media-analysis (gains 発話区間), frame-accurate shots = detection-skill `shots` (gains ショット検出), judgement = qc-skill, slides = slide-sync. Default providers unchanged. |
+| `owns` against reality | video-editing computes retake / duplicate candidates, the agent presents and approves them; transcription-skill implements its phrase search; ffmpeg-skill keeps 納品レポート and gains カットリスト書き出し, nle-bridge keeps the NLE round trip. |
+| Speaker ids | diarization-skill owns the assignment rule; transcription-skill's merge is a copy with shared conformance fixtures. |
+| Kinetic typography and geometric motion | hyperframes-skill; audio visualizers to remotion-ffmpeg-skill, which keeps the measured versions; blender-skill 3D only. |
+| Disc family | Five entries in `ecosystem.json`; the agent keeps one disc SkillSpec (`disc_author` via oncemore). |
+| stepcap and oncemore | Listed as stand-alone apps (`"kind": "app"`). |
+| Contract checks | OS contract shape = system-intelligence; side effects, signatures and isolation = skillpact; runtime version gates = the agent; Velisa `registry/` = the reference definition of the collision policy. |
+| Stale documents | HANDOFF, CROSS_REPO_STATUS and CURRENT_STATE are frozen 2026-09 records; this page is the current state. CAPABILITY_MATRIX and REPOSITORY_MAP are to be generated from the pinned contracts (WORK_QUEUE). |
 
 ## Decided by the owner (2026-10-30)
 
@@ -426,15 +423,8 @@ ffmpeg-skill is not changed from here. Each item is a hand-over for its maintain
 
 | Question | Options |
 |---|---|
-| Compliance checking | Recommendation: qc-skill judges against the spec, and ffmpeg-skill `check` is the engine's preflight. Record that split. |
-| Overlay / PiP / titles | The jobs are split by name. video-editing owns still overlay, motion-graphics owns titles, and ffmpeg-skill owns B-roll and screen compositing. Templates in remotion and hyperframes stay inside their own compositions. |
 | Engines for voice-enhance, diarization, detection, SFX | Each gets an ADR in its repo. The candidates listed there are unverified until that ADR checks the licences of both code and weights. |
-| New area: restoration (live streaming dropped, out of scope) | Repository name, `owns` and departments in `ecosystem.json` (see "New areas (proposed)"). |
 | qc-skill 1.0.0 | Its release workflow made 1.0.0 out of a dependabot bump. Keep 1.0.0 and widen the agent's gate (agent 11), or treat it as a mistake and release the next one as 0.2.x. |
-| Status in `ecosystem.json` | voice-enhance, dubbing, sound-design and publish say `scaffold` and nle-bridge says `planned`, though each has a 0.1.0 with working ops. Not changed here while Velisa #132 edits that file. |
-| New skill candidates (2026-11-05 field review) | motion-titles-skill and design-system-skill (high), asset-library-skill (medium), generative-media-skill (low, ADR first): repository names, `owns` and departments (see "New skill candidates"). Recommended `owns`: アニメーションテロップ / スティンガー素材 / ループ素材; ブランドキット / 配色・レイアウト規則; ストック素材取得 / 素材ライセンス台帳; AI映像生成 |
-| Kinetic typography and geometric motion | Recommendation: hyperframes-skill's `owns` gains キネティックタイポ・幾何学モーション (its HTML scenes are the renderer); remotion-ffmpeg-skill keeps the measured (beat / lyric) versions and gains オーディオビジュアライザー |
-| Delivery formats (alpha, key / fill, intermediates, multitrack, loudness versions) | Proposals 5-11 were accepted by ffmpeg-skill on 2026-11-05 (#417-#423); 12 and 13 are on hold (#424, #425) and 14 is declined (#426). Still open for the owner: who owns animated overlays (#425 waits for it) |
 
 ## Tracking in the GitHub Project
 
