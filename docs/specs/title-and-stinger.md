@@ -31,6 +31,15 @@ one: `t * frame_rate` within 1/1000 of a whole frame (qc-skill; video-editing-sk
 `cut_point_not_on_frame`). The frame at `t` is `round(t * frame_rate)` with the exact rate from
 ffprobe's `r_frame_rate`.
 
+**Precision.** The 1/1000-of-a-frame rule needs more than millisecond precision: at 24 fps, frame
+25 is 1.041666... s, and 1.042 s is 25.008 frames, which video-editing-skill refuses
+(`cut_point_not_on_frame`) and qc-skill reports UNKNOWN. A maker writes `cut_point` and `cover`
+with at least 6 decimals (or as `frame / frame_rate` exactly), and a caller passes them on
+unrounded. Known gap: video-production-agent stores `edit.concat.stinger.cut_point` rounded to 3
+decimals (`editing.py`), so a cut point that is not on a whole millisecond can be refused; that
+is a follow-up in the agent. Carrying `cut_point_frame` and `frame_rate` **(PROPOSED, below)**
+lets a caller recompute the exact time.
+
 ## `stinger.json`
 
 A stinger is a graphic with alpha that covers the whole picture for a moment; the edit cuts
@@ -38,7 +47,7 @@ underneath it at the cut point.
 
 | Field | Type | Read by | Meaning |
 |---|---|---|---|
-| `cut_point` | seconds | video-editing-skill (required), qc-skill (required), agent (required, 0-60, stored rounded to 3 decimals) | the frame the clips switch at; the stinger starts `cut_point` before each join |
+| `cut_point` | seconds | video-editing-skill (required), qc-skill (required), agent (required, 0-60, stored rounded to 3 decimals: see Precision) | the frame the clips switch at; the stinger starts `cut_point` before each join |
 | `cover` | `{start, end}` seconds | video-editing-skill (required), qc-skill (optional), agent (required; also accepts `"S-E"`) | the window the maker states is fully covered: frames at `start <= t < end`; must contain `cut_point` |
 
 How each receiver takes them:

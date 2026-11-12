@@ -386,8 +386,10 @@ extends the 2026-10-30 split instead of reopening it.
 
 **Evidence**: `ownership-audit/D-delivery-utility-governance-docs.md` §3 O1, §8 O1, §9(b).
 
-**What follows**: ffmpeg-skill is asked, in an issue there, to label those rows as guidance; publish-skill's `plan`
-stops using them for its verdict. `docs/ecosystem/registry.json` no longer calls publish-skill the owner of platform
+**What follows**: ffmpeg-skill is asked, in an issue there, to label those rows as guidance. Pending until they land:
+publish-skill's `plan` stops using those rows for its verdict (at the audited revision it still includes every
+ffmpeg-skill check row), and video-production-agent's QA, which copies the same rows into its own verdict, does the
+same, so an X delivery over 140 s is not failed against publish-skill's 1200 s limit. `docs/ecosystem/registry.json` no longer calls publish-skill the owner of platform
 delivery specs (D32).
 
 ## D15 — No motion-titles-skill; title and stinger material go to hyperframes-skill, the metadata to a Velisa spec
