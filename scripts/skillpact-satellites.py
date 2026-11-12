@@ -11,8 +11,12 @@
         is left to SkillPact, which names it as unmet on the runner.
 
     python3 scripts/skillpact-satellites.py summary DIR
-        Reads the result-*.json files the matrix jobs wrote ({"repo", "level", "outcome"}) and prints a
-        Markdown table for the job summary. It always exits 0: the job reports, it never blocks.
+        Reads the result-*.json files the matrix jobs wrote ({"repo", "level", "outcome", "declares"}) and
+        prints a Markdown table for the job summary: the level, and which Skills declare progress events
+        and error classes (the Action's `declares` output, skillpact 0.8.1). It always exits 0: the job
+        reports, it never blocks.
+        "declares" is the Action's output as the job got it: a compact JSON string, empty when the
+        contract is invalid or tests are off. Anything that is not a JSON object reads as "not reported".
 
 Standard library only.
 """
@@ -83,6 +87,32 @@ def satellites(manifest: dict, get=fetch) -> list[dict]:
     return out
 
 
+def parse_declares(raw) -> dict | None:
+    """The Action's `declares` output (a JSON string, or already an object) as a dict, or None if absent or broken."""
+    if isinstance(raw, str):
+        try:
+            raw = json.loads(raw) if raw.strip() else None
+        except ValueError:
+            raw = None
+    return raw if isinstance(raw, dict) else None
+
+
+def _declared(dec) -> tuple[str, str]:
+    """(progress events, error classes) cells for one row of the table."""
+    if not isinstance(dec, dict):
+        return "not reported", "not reported"
+    progress = dec.get("progress") or []
+    caps = dec.get("capabilities")
+    classes = dec.get("error_classes") or {}
+    p = f"{len(progress)} of {caps}" if isinstance(caps, int) else str(len(progress))
+    if not classes:
+        return p, "none"
+    by_class: dict[str, int] = {}
+    for c in classes.values():
+        by_class[c] = by_class.get(c, 0) + 1
+    return p, f"{len(classes)} code(s): " + ", ".join(f"{k} {v}" for k, v in sorted(by_class.items()))
+
+
 def summary(results_dir: Path) -> str:
     rows = []
     for f in sorted(results_dir.glob("**/result-*.json")):
@@ -94,12 +124,29 @@ def summary(results_dir: Path) -> str:
     if not rows:
         lines.append("No repository in ecosystem.json has a `skill.contract.json` yet, or no job reported a result.")
         return "\n".join(lines) + "\n"
-    lines += ["| repository | level | result |", "|---|---|---|"]
-    for r in sorted(rows, key=lambda r: r.get("repo", "")):
+    lines += ["| repository | level | result | progress events | error classes |", "|---|---|---|---|---|"]
+    rows.sort(key=lambda r: r.get("repo", ""))
+    for r in rows:
+        r["declares"] = parse_declares(r.get("declares"))
+    for r in rows:
         level = r.get("level") or "none"
         ok = level in LEVELS and r.get("outcome") == "success"
-        lines.append(f"| `{r.get('repo')}` | `{level}` | {'pass (L1 or better)' if ok else 'below L1 or failed'} |")
-    lines += ["", "Each repository's own job summary lists the findings and the test cases."]
+        prog, errs = _declared(r.get("declares"))
+        lines.append(f"| `{r.get('repo')}` | `{level}` | {'pass (L1 or better)' if ok else 'below L1 or failed'} "
+                     f"| {prog} | {errs} |")
+    declaring = [r for r in rows if r["declares"] and (r["declares"].get("progress") or r["declares"].get("error_classes"))]
+    lines += ["", "### What the contracts declare (`x.runtime`, skillpact 0.8.1)", ""]
+    if declaring:
+        for r in declaring:
+            d = r["declares"]
+            prog = ", ".join(f"`{c}`" for c in d.get("progress") or []) or "none"
+            errs = ", ".join(f"`{k}` {v}" for k, v in sorted((d.get("error_classes") or {}).items())) or "none"
+            lines.append(f"- `{r.get('repo')}`: progress events from {prog}; error classes {errs}")
+    else:
+        lines.append("No Skill declares progress events or error classes yet.")
+    lines += ["", "\"progress events\" counts the capabilities that declare them; \"not reported\" means the Action gave no "
+              "`declares` output (invalid contract or tests off). Each repository's own job summary lists the findings "
+              "and the test cases."]
     return "\n".join(lines) + "\n"
 
 

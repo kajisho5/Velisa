@@ -274,7 +274,8 @@ Locally: `python3 scripts/ecosystem-health.py`. The launch gates built on it are
 **SkillPact conformance.** `.github/workflows/skillpact-conformance.yml` checks, weekly, every
 repository in `ecosystem.json` that has a `skill.contract.json` with
 [SkillPact](https://github.com/kajisho5/skillpact)'s Action and reports the level (L1 / L2 / L3)
-in the run's summary. It never blocks anything (ADR-014).
+in the run's summary, with which Skills declare progress events and error classes. It never blocks
+anything (ADR-014).
 
 **GitHub Project.** `.github/workflows/project-sync.yml` adds the issues and pull requests of
 every repository in `ecosystem.json` to the project *AI Video Production Ecosystem* (kajisho5 #1)

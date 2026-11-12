@@ -80,8 +80,40 @@ class SatellitesTests(unittest.TestCase):
             (p / "result-broken-skill.json").write_text(
                 json.dumps({"repo": "broken-skill", "level": "none", "outcome": "failure"}))
             out = sat.summary(p)
-        self.assertIn("| `imagemagick-skill` | `L2-tested` | pass (L1 or better) |", out)
-        self.assertIn("| `broken-skill` | `none` | below L1 or failed |", out)
+        self.assertIn("| `imagemagick-skill` | `L2-tested` | pass (L1 or better) | not reported | not reported |", out)
+        self.assertIn("| `broken-skill` | `none` | below L1 or failed | not reported | not reported |", out)
+        self.assertIn("No Skill declares progress events or error classes yet.", out)
+
+    def test_summary_reports_what_each_skill_declares(self):
+        # The Action's `declares` output (skillpact 0.8.1), as the matrix job records it: a compact JSON string.
+        dec = {"capabilities": 3, "progress": ["image.resize", "video.encode"],
+               "error_classes": {"BAD_INPUT": "input", "NO_BINARY": "environment", "TIMEOUT": "transient",
+                                 "UNSUPPORTED": "input"},
+               "idempotency": {"bit_exact": ["image.resize"], "content_equivalent": [], "none": []}}
+        none = {"capabilities": 2, "progress": [], "error_classes": {},
+                "idempotency": {"bit_exact": [], "content_equivalent": [], "none": []}}
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d)
+            for repo, raw in (("imagemagick-skill", json.dumps(dec, separators=(",", ":"))),
+                              ("qc-skill", json.dumps(none)), ("ingest-skill", ""), ("odd-skill", "[1, 2]"),
+                              ("broken-skill", "{not json")):
+                (p / f"result-{repo}.json").write_text(
+                    json.dumps({"repo": repo, "level": "L2-tested", "outcome": "success", "declares": raw}))
+            out = sat.summary(p)
+        self.assertIn("| `imagemagick-skill` | `L2-tested` | pass (L1 or better) | 2 of 3 "
+                      "| 4 code(s): environment 1, input 2, transient 1 |", out)
+        self.assertIn("| `qc-skill` | `L2-tested` | pass (L1 or better) | 0 of 2 | none |", out)
+        for repo in ("ingest-skill", "odd-skill", "broken-skill"):
+            self.assertIn(f"| `{repo}` | `L2-tested` | pass (L1 or better) | not reported | not reported |", out)
+        self.assertIn("- `imagemagick-skill`: progress events from `image.resize`, `video.encode`; error classes "
+                      "`BAD_INPUT` input, `NO_BINARY` environment, `TIMEOUT` transient, `UNSUPPORTED` input", out)
+        self.assertNotIn("- `qc-skill`", out)
+
+    def test_parse_declares(self):
+        self.assertEqual(sat.parse_declares('{"progress":["a"]}'), {"progress": ["a"]})
+        self.assertEqual(sat.parse_declares({"progress": []}), {"progress": []})
+        for bad in ("", "   ", None, "{x", "[]", "3"):
+            self.assertIsNone(sat.parse_declares(bad))
 
     def test_summary_with_no_results(self):
         with tempfile.TemporaryDirectory() as d:
