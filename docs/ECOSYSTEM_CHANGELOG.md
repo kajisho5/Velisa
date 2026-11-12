@@ -38,6 +38,17 @@ noteworthy.
 
 ---
 
+### 2026-11-12 — `CAPABILITY_MATRIX.md`: `image.alpha`, `image.brandkit`
+
+- **Repo(s)**: `kajisho5/Velisa` (read-only reads of the release tags of `kajisho5/imagemagick-skill` v0.9.0 / v0.10.0)
+- **PR(s)**: this PR
+- **What changed**: two rows in §11, each the `provides[].id` the Skill's own contract now publishes: `image.alpha`
+  (`imagemagick-skill/alpha`) and `image.brandkit` (`imagemagick-skill/brandkit`). §11 is not part of the summary count,
+  so the counts are unchanged.
+- **Why**: imagemagick-skill#39 / #40; video-production-agent re-pins that contract without planning the new tools (its
+  ADR-107 addendum 12 / 13).
+- **Status**: draft
+
 ### 2026-11-12 — `CAPABILITY_MATRIX.md`: `audio.loudness_set`, `audio.stems`, `measure.audio.speech_regions`
 
 - **Repo(s)**: `kajisho5/Velisa` (read-only reads of the release tags of `kajisho5/audio-production-skill` v1.1.0 / v1.2.0
