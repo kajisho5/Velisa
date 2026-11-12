@@ -1,3 +1,21 @@
+## v0.9.2 (2026-11-12)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): apply the owner's ownership decisions (D12-D32) (#157)
+- ci(skillpact): pin v0.8.1 and report what each Skill declares (#155)
+- CAPABILITY\_MATRIX: image.alpha, image.brandkit (#154)
+- CAPABILITY\_MATRIX: audio.loudness\_set, audio.stems, measure.audio.speech\_regions (#153)
+- Daily ecosystem health report and launch gates (#151)
+- Routing skill: start on "Velisa, ..." and run as /velisa:wakeup (#150)
+- docs: README facts, VELISA\_HOME (AVOS\_HOME fallback), registry tests in CI, Node 22 (#132)
+- docs(roadmap): live streaming out of scope; motion-titles-skill in place of broadcast-graphics (#141)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## Unreleased
 
 - **Ownership decisions applied (2026-11-12).** `ecosystem.json` has one definition of `status`; voice-enhance, dubbing, sound-design and publish are `active`; `owns` follow the owner's decisions (DECISION_LOG D12-D32); stepcap and oncemore carry `"kind": "app"`. New specs under `docs/specs/` (`title.json` / `stinger.json`, `kit@1`, licence record) and ADR-016 / ADR-017 (Proposed). Marketplace files and org charts regenerated.
