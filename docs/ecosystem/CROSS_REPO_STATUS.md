@@ -1,5 +1,8 @@
 # Cross-Repository Status
 
+> **2026-09 record, frozen; the current state is [docs/ecosystem/ROADMAP.md](ROADMAP.md).** Kept as written for its history
+> (owner decision 2026-11-12, [DECISION_LOG.md](DECISION_LOG.md) D32); counts and statuses below are not updated.
+
 **Status: CURRENT / IMPLEMENTED** (this document; a snapshot re-verified against live
 GitHub state at the time noted per section — not carried forward from memory). PR
 states change continuously; treat the `Live tracker` link in each row as more current

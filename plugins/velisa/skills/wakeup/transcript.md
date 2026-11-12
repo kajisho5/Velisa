@@ -2,8 +2,8 @@
 
 Recipes for jobs no skill does in one command yet. Searching and proposing are safe (they only read a transcript);
 cutting is not, so every range below goes to a person before anything is cut. Owners (from `ecosystem.json`):
-文字起こし and 文字起こしの語句検索 are `transcription-skill`'s, 言い直し・重複の候補提示 is `video-production-agent`'s,
-cutting runs on `ffmpeg-skill`. Until those owners ship the commands, do these steps yourself and say so (level 3).
+文字起こし and 文字起こしの語句検索 are `transcription-skill`'s, 言い直し・重複の候補計算 is `video-editing-skill`'s,
+言い直し・重複の候補の提示と承認 is `video-production-agent`'s, cutting runs on `ffmpeg-skill`. Until those owners ship the commands, do these steps yourself and say so (level 3).
 
 ## 1. Transcribe once, keep the word-timed JSON
 

@@ -37,6 +37,7 @@ class ManifestTests(unittest.TestCase):
                 self.assertIn(c["install"], {"pip", "npm", "checkout"})
                 self.assertIn(c["department"], departments)
                 self.assertIn(c["status"], {"active", "scaffold", "planned"})
+                self.assertIn(c.get("kind", "skill"), {"skill", "app"})  # "app": a stand-alone application; default skill
                 self.assertTrue(c["role"].strip())
                 self.assertTrue(c["owns"])
                 self.assertIsInstance(c.get("extras", []), list)

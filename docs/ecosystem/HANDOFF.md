@@ -1,5 +1,8 @@
 # Handoff
 
+> **2026-09 record, frozen; the current state is [docs/ecosystem/ROADMAP.md](ROADMAP.md).** Kept as written for its history
+> (owner decision 2026-11-12, [DECISION_LOG.md](DECISION_LOG.md) D32); counts and statuses below are not updated.
+
 **Read this first.** One page, so a fresh session (or a human returning after a break) can
 pick up without chat history. Details and evidence live in the other four files in this
 directory; this page only orients and points.
