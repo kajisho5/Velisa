@@ -1,0 +1,77 @@
+name: Contract shape
+
+# The OS contract-shape check (decision D31 in docs/ecosystem/DECISION_LOG.md; ADR-018). Every
+# component's Capability Contract is checked against the reference schema,
+# registry/capability_contract.schema.json, by kajisho5/system-intelligence (`si contract-check`,
+# its ADR-017). The contracts are the copies video-production-agent pins
+# (src/video_agent/tools/<name>/contract_<version>.json); each is matched to its component in
+# ecosystem.json by its own identity. A component with no pinned contract is listed, not checked.
+#
+# It fails when a contract breaks the schema or is not JSON, except a violation
+# registry/contract-shape-baseline.json lists, with its reason, for that component. A baseline
+# entry that no longer matches anything is listed as stale in the summary; delete it then.
+# Side effects, signatures and isolation tests are skillpact's (skillpact-conformance.yml);
+# runtime version gates are the agent's.
+#
+# System Intelligence is pinned to a full commit SHA (the tag in the comment), like the skillpact
+# Action in skillpact-conformance.yml.
+
+on:
+  pull_request:
+    paths:
+      - "ecosystem.json"
+      - "registry/capability_contract.schema.json"
+      - "registry/contract-shape-baseline.json"
+      - ".github/workflows/contract-shape.yml"
+  push:
+    branches: [main]
+    paths:
+      - "ecosystem.json"
+      - "registry/capability_contract.schema.json"
+      - "registry/contract-shape-baseline.json"
+      - ".github/workflows/contract-shape.yml"
+  schedule:
+    - cron: "37 5 * * 2" # weekly -- the agent re-pins contracts without any change here
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  contract-shape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check out the agent's pinned contracts
+        uses: actions/checkout@v7
+        with:
+          repository: kajisho5/video-production-agent
+          path: .agent
+          sparse-checkout: src/video_agent/tools
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install System Intelligence
+        run: python -m pip install -q "git+https://github.com/kajisho5/system-intelligence@7d0d1d2b99d2683835714af714a4ded6f6682887" # v0.5.0
+      - name: Check every contract against the OS schema
+        shell: bash
+        env:
+          SI_READ_ONLY: "1" # system-intelligence ADR-013
+        run: |
+          si contract-check ecosystem.json \
+            --contracts .agent/src/video_agent/tools \
+            --contract-schema registry/capability_contract.schema.json \
+            --baseline registry/contract-shape-baseline.json \
+            --out "$RUNNER_TEMP/contract-shape.json" | tee contract-shape.md
+      - name: Job summary
+        if: always()
+        run: '[ -f contract-shape.md ] && cat contract-shape.md >> "$GITHUB_STEP_SUMMARY" || true'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: contract-shape
+          path: |
+            contract-shape.md
+            ${{ runner.temp }}/contract-shape.json
+          if-no-files-found: ignore

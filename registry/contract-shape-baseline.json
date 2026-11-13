@@ -1,0 +1,65 @@
+{
+  "$comment": "Contract-shape violations known on 2026-11-13, each accepted until its contract or the schema changes (ADR-018). .github/workflows/contract-shape.yml fails on any violation not listed here and lists an entry that matches nothing as stale; delete it then. Pointers cover everything below them.",
+  "known_violations": [
+    {
+      "repo": "detection-skill",
+      "pointer": "/dependencies",
+      "reason": "pinned detection/contract_0.2.2.json: dependencies[] name each dependency under 'id' (skills, packages and binaries alike); the schema wants skill dependencies with 'skill_id' and 'version_range'"
+    },
+    {
+      "repo": "detection-skill",
+      "pointer": "/skill",
+      "reason": "pinned detection/contract_0.2.2.json: 'skill' is the skill's name as a string; the schema wants an object"
+    },
+    {
+      "repo": "diarization-skill",
+      "pointer": "/dependencies",
+      "reason": "pinned diarization/contract_0.3.0.json: dependencies[] name each dependency under 'id' (skills, packages and binaries alike); the schema wants skill dependencies with 'skill_id' and 'version_range'"
+    },
+    {
+      "repo": "diarization-skill",
+      "pointer": "/skill",
+      "reason": "pinned diarization/contract_0.3.0.json: 'skill' is the skill's name as a string; the schema wants an object"
+    },
+    {
+      "repo": "dubbing-skill",
+      "pointer": "/dependencies",
+      "reason": "pinned dubbing/contract_0.2.1.json: dependencies[] name each dependency under 'id' (skills, packages and binaries alike); the schema wants skill dependencies with 'skill_id' and 'version_range'"
+    },
+    {
+      "repo": "dubbing-skill",
+      "pointer": "/skill",
+      "reason": "pinned dubbing/contract_0.2.1.json: 'skill' is the skill's name as a string; the schema wants an object"
+    },
+    {
+      "repo": "slide-sync-skill",
+      "pointer": "/dependencies",
+      "reason": "pinned slide_sync/contract_0.1.0.json: dependencies[] name each dependency under 'id' (skills, packages and binaries alike); the schema wants skill dependencies with 'skill_id' and 'version_range'"
+    },
+    {
+      "repo": "slide-sync-skill",
+      "pointer": "/skill",
+      "reason": "pinned slide_sync/contract_0.1.0.json: 'skill' is the skill's name as a string; the schema wants an object"
+    },
+    {
+      "repo": "sound-design-skill",
+      "pointer": "/dependencies",
+      "reason": "pinned sound_design/contract_0.3.0.json: dependencies[] name each dependency under 'id' (skills, packages and binaries alike); the schema wants skill dependencies with 'skill_id' and 'version_range'"
+    },
+    {
+      "repo": "sound-design-skill",
+      "pointer": "/skill",
+      "reason": "pinned sound_design/contract_0.3.0.json: 'skill' is the skill's name as a string; the schema wants an object"
+    },
+    {
+      "repo": "voice-enhance-skill",
+      "pointer": "/dependencies",
+      "reason": "pinned voice_enhance/contract_0.1.0.json: dependencies[] name each dependency under 'id' (skills, packages and binaries alike); the schema wants skill dependencies with 'skill_id' and 'version_range'"
+    },
+    {
+      "repo": "voice-enhance-skill",
+      "pointer": "/skill",
+      "reason": "pinned voice_enhance/contract_0.1.0.json: 'skill' is the skill's name as a string; the schema wants an object"
+    }
+  ]
+}
