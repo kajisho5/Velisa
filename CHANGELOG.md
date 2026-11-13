@@ -1,3 +1,14 @@
+## v0.9.4 (2026-11-13)
+
+## What's Changed
+
+## Other changes
+
+- ci: OS contract-shape check and weekly roadmap-drift / field-readiness reports (#163)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.9.3 (2026-11-13)
 
 ## What's Changed
