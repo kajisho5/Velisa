@@ -4,6 +4,15 @@ name: Ecosystem audit
 # (scripts/ecosystem-audit.sh, `si watch`). The watch history is carried between runs in the
 # Actions cache, so each run reports what changed since the previous one; the report is the
 # run's job summary and an artifact. It reports, it never fails the build on findings.
+#
+# Two more read-only reports follow, from the same clones (ADR-018; system-intelligence
+# ECOSYSTEM_ROADMAP.md step 8):
+#   - `si roadmap-drift`: every repository's ECOSYSTEM_ROADMAP.md steps against its merged pull
+#     requests (system-intelligence ADR-015). It reads them through the GitHub REST API, GET only.
+#   - `si diagnose --field`: one row per skill for field readiness (system-intelligence ADR-016),
+#     from the clones' CI config and the contracts video-production-agent pins.
+# System Intelligence is pinned to a full commit SHA (the tag in the comment), as in
+# contract-shape.yml.
 
 on:
   schedule:
@@ -22,7 +31,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install System Intelligence
-        run: python -m pip install -q "git+https://github.com/kajisho5/system-intelligence"
+        run: python -m pip install -q "git+https://github.com/kajisho5/system-intelligence@7d0d1d2b99d2683835714af714a4ded6f6682887" # v0.5.0
       - name: Restore previous watch history
         uses: actions/cache@v6
         with:
@@ -31,12 +40,53 @@ jobs:
           restore-keys: si-watch-
       - name: Audit every repository
         run: scripts/ecosystem-audit.sh .si-state ecosystem-audit.md .si-repos
+      - name: Check out the agent's pinned contracts
+        if: always()
+        uses: actions/checkout@v7
+        with:
+          repository: kajisho5/video-production-agent
+          path: .agent
+          sparse-checkout: src/video_agent/tools
+          persist-credentials: false
+      - name: Roadmap drift
+        if: always()
+        continue-on-error: true
+        shell: bash
+        env:
+          SI_READ_ONLY: "1" # system-intelligence ADR-013
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            echo "## Roadmap drift"
+            echo
+            si roadmap-drift ecosystem.json --github --out "$RUNNER_TEMP/si-reports/roadmap-drift.json"
+          } > roadmap-drift.md
+      - name: Field readiness
+        if: always()
+        continue-on-error: true
+        shell: bash
+        env:
+          SI_READ_ONLY: "1"
+        run: |
+          {
+            echo "## Field readiness"
+            echo
+            si diagnose --field --ownership-map ecosystem.json --checkouts .si-repos \
+              --contracts .agent/src/video_agent/tools --out "$RUNNER_TEMP/si-reports"
+          } > field-readiness.md
       - name: Job summary
         if: always()
-        run: '[ -f ecosystem-audit.md ] && cat ecosystem-audit.md >> "$GITHUB_STEP_SUMMARY" || true'
+        run: |
+          for f in ecosystem-audit.md roadmap-drift.md field-readiness.md; do
+            if [ -f "$f" ]; then cat "$f" >> "$GITHUB_STEP_SUMMARY"; echo >> "$GITHUB_STEP_SUMMARY"; fi
+          done
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ecosystem-audit
-          path: ecosystem-audit.md
+          path: |
+            ecosystem-audit.md
+            roadmap-drift.md
+            field-readiness.md
+            ${{ runner.temp }}/si-reports/
           if-no-files-found: ignore

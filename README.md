@@ -279,6 +279,14 @@ repository in `ecosystem.json` that has a `skill.contract.json` with
 in the run's summary, with which Skills declare progress events and error classes. It never blocks
 anything (ADR-014).
 
+**Contract shape.** `.github/workflows/contract-shape.yml` checks every Capability Contract that
+video-production-agent pins against [`registry/capability_contract.schema.json`](registry/capability_contract.schema.json)
+with [System Intelligence](https://github.com/kajisho5/system-intelligence)'s `si contract-check`
+(decision D31). It fails on a contract that breaks the schema, except the violations
+[`registry/contract-shape-baseline.json`](registry/contract-shape-baseline.json) lists with a reason
+(ADR-018). The weekly ecosystem audit (`ecosystem-audit.yml`) also reports roadmap drift
+(`si roadmap-drift`) and field readiness (`si diagnose --field`), read-only.
+
 **GitHub Project.** `.github/workflows/project-sync.yml` adds the issues and pull requests of
 every repository in `ecosystem.json` to the project *AI Video Production Ecosystem* (kajisho5 #1)
 every hour, from this repository alone. It needs one secret here, `PROJECT_TOKEN`: a classic token
