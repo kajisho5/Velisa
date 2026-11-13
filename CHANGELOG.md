@@ -1,3 +1,14 @@
+## v0.9.3 (2026-11-13)
+
+## What's Changed
+
+## Other changes
+
+- docs(specs): link licence-record spec to sound-design-skill schema (#162)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.9.2 (2026-11-12)
 
 ## What's Changed
