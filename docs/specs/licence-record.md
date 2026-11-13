@@ -11,6 +11,10 @@ Read from (each repository's `origin/main`, 2026-11-12): sound-design-skill `d97
 `src/sound_design_skill/contract.py` `provenance.library_fields`; `SKILL.md`), artifacts-skill `ae039d3`
 (`SKILL.md`, `licence_records`).
 
+Machine-readable schema: sound-design-skill [`schemas/licence-record.schema.json`](https://github.com/kajisho5/sound-design-skill/blob/main/schemas/licence-record.schema.json)
+(the stored entry and the record a reader gets), checked against `library-import` output by its
+`tests/test_licence_schema.py` (sound-design-skill PR #26).
+
 ## Principles (as sound-design-skill applies them)
 
 - A licence is recorded exactly as declared, with `verified: false`. No skill checks or clears a
