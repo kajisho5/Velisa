@@ -19,7 +19,7 @@ Never claim a result is verified, measured or approved unless a skill or the age
 
 ## Production steps and review
 
-For any job that writes media: probe the inputs, show the plan (`--dry-run --json`) and what a dry run does not check, trial a long job on a short excerpt and run the full encode in the background, then compare the probed result with the request yourself. A tool's `verified: true` is not that comparison; `unverified` items are unknown. End with a review list that separates what a tool checked from where a person must look or listen. Steps and checkpoints: [review.md](review.md).
+For any job that writes media: probe the inputs, show the plan (`--dry-run --json`) and what a dry run does not check, trial a long job on a short excerpt and run the full encode in the background, then compare the probed result with the request yourself. A tool's `verified: true` is not that comparison; `unverified` items are unknown. End with a review list that separates what a tool checked from where a person must look or listen. Steps and checkpoints: [review.md](review.md). For a production with several stages (transcript, rough cut, picture, captions, graphics, sound), follow the default stage order and go through the before-export list in [stages.md](stages.md); a passed check is not an acceptance of the finished piece.
 
 ## Who owns what
 

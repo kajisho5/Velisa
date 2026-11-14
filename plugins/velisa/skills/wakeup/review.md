@@ -36,7 +36,8 @@ and tell the user about any of these before going on:
 
 Before any write, show the user:
 
-- the steps in order and which skill does each one;
+- the steps in order and which skill does each one (the default order of the editorial stages,
+  and what to say when a plan departs from it: [stages.md](stages.md));
 - the planned commands and encoder from `--dry-run --json` (`commands`, `encoder`), or the owning
   skill's own plan output;
 - the requested output: duration, resolution, fps, codec, audio layout, loudness, destination.
@@ -113,5 +114,8 @@ platform format rows from `check` / `qc-skill`, the step-4 comparison items that
 - **Burned-in subtitles in the source**: they cannot be removed (blur or delogo is not inpainting).
   Offer the options: crop the band, cover it with a box, or get a clean master
   ([ffmpeg-skill FAQ](https://github.com/kajisho5/ffmpeg-skill#can-it-remove-burned-in-subtitles-or-logos)).
+- **Caption and transcript text**: no tool checks that the words are right. Speech-to-text is
+  evidence with errors (names, numbers, terms, homophones), so a person reads the caption text
+  before it is burned or delivered. The before-export list: [stages.md](stages.md).
 - Anything in `notes`, every `unverified` item, and every step that ran outside the OS (level 2 or 3
   in [SKILL.md](SKILL.md)).
