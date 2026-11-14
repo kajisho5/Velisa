@@ -102,7 +102,8 @@ platform format rows from `check` / `qc-skill`, the step-4 comparison items that
   After silence removal the timing shifts: subtitles made from the source must go through the
   silence step's timemap (source time to output time) before they are burned or delivered; check a
   few cues after long removed spans.
-- **Consonant clipping at silence cuts** (`audio-production-skill`): list every cut from
+- **Consonant clipping at silence cuts** (`audio-production-skill`; the list-and-approve steps
+  that come before the cut are in [silence.md](silence.md)): list every cut from
   `cut_points`, put the ones in `cut_warnings` first, and offer a short clip around each
   ([design decisions: silence.py says where it cut](https://github.com/kajisho5/ffmpeg-skill/blob/main/docs/design-decisions.md)).
   What was removed is not verified.
