@@ -1,3 +1,14 @@
+## v0.12.2 (2026-11-19)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): ADR-022 rollout results and the release methods changed today (#178)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.12.1 (2026-11-19)
 
 ## What's Changed
