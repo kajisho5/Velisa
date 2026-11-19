@@ -1,0 +1,63 @@
+{
+  "schema": "velisa/kit@1",
+  "name": "Example Studio",
+  "font": "Inter",
+  "font_file": "fonts/Inter-Regular.ttf",
+  "colors": {
+    "primary": "1E6F8E",
+    "secondary": "F2A900",
+    "text": "FFFFFF",
+    "outline": "000000",
+    "background": "101418",
+    "accent": "E4572E"
+  },
+  "logo": "logo.png",
+  "logo_position": "bottom-right",
+  "logo_scale": 200,
+  "logo_opacity": 1,
+  "safe_margin": 64,
+  "lang": "en",
+  "styles": {
+    "caption": {
+      "font": "Inter",
+      "size": 30,
+      "colour": "FFFFFF",
+      "box": true,
+      "position": "bottom"
+    }
+  },
+  "caption": {
+    "size": 26,
+    "position": "bottom",
+    "animate": "pop",
+    "karaoke": false,
+    "bold": true,
+    "outline": 2
+  },
+  "loudness": {
+    "lufs": -14,
+    "tp": -1
+  },
+  "fonts": [
+    {
+      "family": "Inter",
+      "file": "fonts/Inter-Regular.ttf",
+      "licence": "OFL-1.1",
+      "embedding": true
+    }
+  ],
+  "logo_variants": {
+    "color": "logo/color.png",
+    "mono": "logo/mono.png",
+    "white": "logo/white.png",
+    "black": "logo/black.png",
+    "clear_space": "logo/clear-space.png"
+  },
+  "contrast": [
+    {
+      "fg": "FFFFFF",
+      "bg": "101418",
+      "ratio": 17.9
+    }
+  ]
+}

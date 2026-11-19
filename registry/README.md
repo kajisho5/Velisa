@@ -72,6 +72,65 @@ python3 -m unittest discover -s registry/tests -t .
   it actually rejects broken documents (a missing identity, a missing/invalid
   `lifecycle`, a missing `tool_id`) rather than accepting anything handed to it.
 
+## Shared data-format specs: schemas and conformance fixtures
+
+ADR-024 (decision D38) and ADR-025 (D39). The specs in `docs/specs/` that one Skill writes
+and another reads, as JSON Schemas (draft 2020-12) and examples:
+
+| Spec | Schema | Fixtures |
+|---|---|---|
+| `kit@1` ([kit.md](../docs/specs/kit.md)) | `schemas/kit.schema.json` | `conformance/kit/` |
+| `title.json` ([title-and-stinger.md](../docs/specs/title-and-stinger.md)) | `schemas/title.schema.json` | `conformance/title/` |
+| `stinger.json` (same page) | `schemas/stinger.schema.json` | `conformance/stinger/` |
+| licence record ([licence-record.md](../docs/specs/licence-record.md)) | `schemas/licence-record.schema.json` | `conformance/licence-record/` |
+| sidecar envelope ([sidecar-envelope.md](../docs/specs/sidecar-envelope.md)) | `schemas/sidecar-envelope.schema.json` | `conformance/sidecar-envelope/` |
+
+- `conformance/<spec>/valid/*.json` must pass; `invalid/*.json` must fail, each for the one
+  reason its file name gives.
+- A fixture fails by `schema`, or by `rules`: what JSON Schema cannot state (a time on a
+  frame, `cut_point` inside `cover`, frame numbers agreeing with seconds), checked by
+  `spec_conformance.py` `rules()`.
+- `conformance/manifest.json` lists every schema and fixture with its sha256 and how it
+  fails. It is generated; do not edit it.
+
+```
+python3 -m pip install 'jsonschema>=4.18'          # only for this check; registry/ stays dependency-free
+python3 -m registry.spec_conformance --check        # what CI (spec-conformance.yml) runs
+python3 -m registry.spec_conformance --write-manifest   # after adding or changing a schema or fixture
+```
+
+**Changing a spec**: change the page in `docs/specs/`, its schema and its fixtures in the
+same pull request (one valid fixture for what is new, one invalid fixture per new way to be
+wrong), then `--write-manifest`.
+
+### Using them from a Skill's tests
+
+The owner of a spec is the Skill that writes it; its readers test against the same files.
+A Skill copies what it needs into its own tests, so they run offline and are pinned:
+
+1. In a Velisa checkout at the commit to pin (normally `main`):
+
+   ```
+   python3 -m registry.spec_conformance --export title stinger --to <skill>/tests/fixtures/velisa
+   ```
+
+   This writes `schemas/<spec>.schema.json`, `conformance/<spec>/{valid,invalid}/` and a
+   `manifest.json` with `source.commit`. A spec exported earlier and not named again is kept.
+2. In the Skill, one test file that:
+   - checks every copied file's sha256 against `manifest.json` (a hand edit fails);
+   - **a writer**: validates what its code writes against the schema (Python: `jsonschema`
+     `Draft202012Validator`; Node: `ajv/dist/2020.js`), and, for a closed schema, checks that
+     its own field list equals the schema's `properties`;
+   - **a reader**: reads every `valid` fixture and checks what it maps it to; for every
+     `invalid` fixture, either refuses it or names it in a list with the reason it does not
+     (a field it does not read, a check made later against the media). A new invalid fixture
+     then fails the test until someone decides.
+3. To update, export again and commit the diff in a pull request.
+
+Trial (2026-11-19): hyperframes-skill `tests/velisa-conformance.test.mjs` (writer of
+`title.json` / `stinger.json`) and motion-graphics-skill
+`tests/test_velisa_title_conformance.py` (reader of `title.json`).
+
 ## What this deliberately is not
 
 - **Not a live registry.** No process execution, no network, no persistence. A caller

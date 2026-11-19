@@ -1,0 +1,9 @@
+{
+  "schema": "velisa/title@1",
+  "producer": {
+    "skill_id": "hyperframes-skill",
+    "version": "0.10.4"
+  },
+  "generated_at": "2026-11-19T19:00:00+09:00",
+  "inputs": []
+}
