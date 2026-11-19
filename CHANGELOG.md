@@ -1,3 +1,14 @@
+## v0.9.5 (2026-11-19)
+
+## What's Changed
+
+## Other changes
+
+- docs(adr): ADR-019, every Skill commits its contract as contract/contract.json (#172)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.9.4 (2026-11-13)
 
 ## What's Changed
