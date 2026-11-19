@@ -1,0 +1,118 @@
+name: Contract file check
+
+# Reusable: is the Skill's committed contract (contract/contract.json, ADR-019-committed-contract-file)
+# still exactly what its code prints? It runs the repository's own generator with `--check`
+# (`python contract/generate.py --check` or `node contract/generate.mjs --check`), which exits 1 when
+# the file is out of date. Decision D36, ADR-022.
+#
+# Most Skills already run the same generator from a unit test (tests/test_contract_file.py or
+# tests/contract-file.test.mjs) in their own CI; such a Skill does not need this workflow too
+# (ADR-022 lists which do). It is for a repository whose test suite does not run the check, or that
+# wants it as its own named check.
+#
+# A Skill calls it with:
+#
+#   on:
+#     pull_request:
+#     push:
+#       branches: [main]
+#   permissions:
+#     contents: read
+#   jobs:
+#     contract-file:
+#       uses: kajisho5/Velisa/.github/workflows/contract-file-check.yml@main
+#       with:
+#         runtime: python            # or node
+#         install: python -m pip install -e .   # what the generator needs to print the contract
+
+on:
+  workflow_call:
+    inputs:
+      runtime:
+        description: python or node.
+        type: string
+        default: python
+      script:
+        description: The generator, relative to the repository root (default contract/generate.py, or contract/generate.mjs for node).
+        type: string
+        default: ""
+      install:
+        description: >-
+          Shell command run first so the generator can print the contract. Default: for python,
+          `python -m pip install -e .` when pyproject.toml exists; for node, `npm ci` when
+          package-lock.json exists. Set it to `true` to install nothing.
+        type: string
+        default: ""
+      python-version:
+        type: string
+        default: "3.12"
+      node-version:
+        type: string
+        default: "22"
+
+permissions:
+  contents: read
+
+jobs:
+  contract-file:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Which generator
+        id: which
+        shell: bash
+        env:
+          RUNTIME: ${{ inputs.runtime }}
+          SCRIPT: ${{ inputs.script }}
+        run: |
+          set -euo pipefail
+          case "$RUNTIME" in
+            python) default=contract/generate.py ;;
+            node) default=contract/generate.mjs ;;
+            *) echo "::error::runtime must be python or node, not '$RUNTIME'"; exit 1 ;;
+          esac
+          script="${SCRIPT:-$default}"
+          if [ ! -f "$script" ]; then
+            echo "::error::$script does not exist (set the script input)"
+            exit 1
+          fi
+          echo "script=$script" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-python@v7
+        if: inputs.runtime == 'python'
+        with:
+          python-version: ${{ inputs.python-version }}
+      - uses: actions/setup-node@v4
+        if: inputs.runtime == 'node'
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Install what the generator needs
+        shell: bash
+        env:
+          RUNTIME: ${{ inputs.runtime }}
+          INSTALL: ${{ inputs.install }}
+        run: |
+          set -euo pipefail
+          if [ -n "$INSTALL" ]; then
+            bash -c "$INSTALL"
+          elif [ "$RUNTIME" = python ] && [ -f pyproject.toml ]; then
+            python -m pip install -q -e .
+          elif [ "$RUNTIME" = node ] && [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            echo "nothing to install"
+          fi
+      - name: The committed contract file is up to date
+        shell: bash
+        env:
+          RUNTIME: ${{ inputs.runtime }}
+          SCRIPT: ${{ steps.which.outputs.script }}
+        run: |
+          set -euo pipefail
+          if [ "$RUNTIME" = python ]; then
+            python "$SCRIPT" --check
+          else
+            node "$SCRIPT" --check
+          fi

@@ -719,3 +719,25 @@ ffmpeg-skill, voice-enhance, dubbing, sound-design, slide-sync. The check starts
 - Velisa's own `control-room-test-*` and `registry_*` test directories fall under the same rule.
 
 No ecosystem-wide check runs yet; skillpact's conformance job (ADR-014) is the place for one.
+
+## D36 — Reusable checks for every Skill; release methods stay per repository
+
+**Decision** (owner, 2026-11-19, details delegated):
+- `contract-diff.yml` is fixed in three places. Overlapping runs no longer leave an old result: callers set a concurrency group, and the workflow re-reads the pull request's head before it writes. The comment says when the check fails the pull request. Only the workflow's own comment is updated.
+- Three more reusable workflows are added: `contract-file-check.yml`, `changelog-check.yml` and `release-guard.yml`.
+- The release workflows are not unified. Only the shared step is checked: a tag's `contract/contract.json` says the tag's version.
+
+**Why**:
+- The three contract-diff problems were found when the workflow was introduced (ADR-020).
+- The changelog and tag checks were written per repository, or not at all.
+- The Skills release in seven different ways, each tested where it lives.
+
+**Evidence**: [ADR-022](../adr/ADR-022-reusable-checks-and-release-methods.md) has the table of release methods and the measurements:
+- 26 tags carry a contract file, and none disagrees with its tag.
+- 14 of 19 CHANGELOGs pass the default settings, and the other five pass with one input each.
+- Every Skill already runs `generate --check` in CI from a unit test.
+
+**What follows**:
+- contract-diff, with the concurrency group, goes on every Skill with a committed contract. ffmpeg-skill has no contract file. dubbing, sound-design, voice-enhance and slide-sync wait until their contract shape is reworked.
+- contract-file-check is called by no Skill for now, because the check would run twice.
+- changelog-check and release-guard are on trial in qc-skill, publish-skill and blender-skill. They go wider once the trial runs are clean. `owns` is unchanged.
