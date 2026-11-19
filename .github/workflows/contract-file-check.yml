@@ -84,7 +84,7 @@ jobs:
         if: inputs.runtime == 'python'
         with:
           python-version: ${{ inputs.python-version }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         if: inputs.runtime == 'node'
         with:
           node-version: ${{ inputs.node-version }}
