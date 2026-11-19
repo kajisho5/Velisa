@@ -741,3 +741,20 @@ No ecosystem-wide check runs yet; skillpact's conformance job (ADR-014) is the p
 - contract-diff, with the concurrency group, goes on every Skill with a committed contract. ffmpeg-skill has no contract file. dubbing, sound-design, voice-enhance and slide-sync wait until their contract shape is reworked.
 - contract-file-check is called by no Skill for now, because the check would run twice.
 - changelog-check and release-guard are on trial in qc-skill, publish-skill and blender-skill. They go wider once the trial runs are clean. `owns` is unchanged.
+
+## D37 — The release job tests its commit before pushing it; chore / ci / docs / test pull requests release nothing
+
+**Decision** (owner, 2026-11-19, details delegated):
+- Every release job that pushes a commit to main tests that commit first. The step is called "Test the release commit before pushing it", and it runs the repository's fast tests, which include the CHANGELOG, version and contract tests. A failure pushes nothing.
+- Pull requests labelled only chore, ci, docs, test or similar release nothing. A pull request with a release-level label releases, and so does one with no label at all (as a patch). This is imagemagick-skill's rule. In the release-drafter repositories, `release_gate.py` decides it, because release-drafter's `default` cannot say "no release".
+- `render_changelog.sh` writes the heading in the form the repository's CHANGELOG already uses.
+
+**Why**: the release commit is pushed with `GITHUB_TOKEN`, so main's CI never runs on it. On 2026-11-19 it broke two mains:
+- sound-design-skill: a `## v0.3.4` heading, where the file and its tests use `## 0.3.4`;
+- hyperframes-skill: no CHANGELOG section for 0.10.3.
+
+Both releases shipped only a CI change.
+
+**Evidence**: [ADR-023](../adr/ADR-023-release-commit-tested-and-gated.md) has the per-repository table and the measurements.
+
+**What follows**: ffmpeg-skill and video-production-agent are not changed. artifacts-skill and blender-skill release through a pull request, so CI already runs on their release commit. transcription-skill keeps its path-based rule (its ADR-036), which already holds release back for docs / ci / test-only changes. `owns` is unchanged.
