@@ -104,6 +104,7 @@ jobs:
             fi
             exit 1
           fi
+          sed -i '/^Report written to /d' contract-diff.md # the path is the runner's; the artifact has the file
           cat contract-diff.md
           echo "classification=$(jq -r .classification "$report")" >> "$GITHUB_OUTPUT"
           echo "recommended_bump=$(jq -r .recommended_bump "$report")" >> "$GITHUB_OUTPUT"
