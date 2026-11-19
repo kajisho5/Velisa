@@ -24,17 +24,16 @@ Other checks are written once per repository and drift apart: whether `contract/
    - `contract-diff.yml`, with the concurrency group, goes on every Skill with a committed contract, except those whose contract shape is being reworked (dubbing, sound-design, voice-enhance, slide-sync).
    - `changelog-check.yml` and `release-guard.yml` are on trial in qc-skill (release on every push to main), publish-skill (hand-pushed tag) and blender-skill (release-please).
 
-## Release methods (2026-11-19)
+## Release methods (2026-11-19, updated the same day)
 
 | Method | Repositories | Who makes the tag |
 |---|---|---|
-| A release job on every push to main. It resolves the version from the labels of the merged pull requests (release-drafter or its own resolver), writes the CHANGELOG section, regenerates the contract, and pushes the release commit and tag | audio-production, color-grading, media-analysis, motion-graphics, qc, subtitle, thumbnail, transcription, video-editing (release-drafter); imagemagick, remotion-ffmpeg (own resolver, which also takes a version bumped by hand in the pull request) | the job, with `GITHUB_TOKEN` |
+| A release job on every push to main. It resolves the version from the labels of the merged pull requests (release-drafter or its own resolver), writes the CHANGELOG section, regenerates the contract, and pushes the release commit and tag | audio-production, color-grading, media-analysis, motion-graphics, qc, subtitle, thumbnail, transcription, video-editing (release-drafter); publish, detection, diarization, ingest, nle-bridge (moved to this method on 2026-11-19); imagemagick, remotion-ffmpeg (own resolver, which also takes a version bumped by hand in the pull request) | the job, with `GITHUB_TOKEN` |
 | The same, but run on the completion of CI on main (`workflow_run`) | hyperframes | the job |
 | A bump pull request (`chore(release): vX.Y.Z`) opened by a workflow; merging it releases | artifacts | the release job after CI |
 | release-please pull request | blender (tags `blender-skill-vX.Y.Z`), stepcap | release-please |
 | The version is bumped by hand in a pull request. On the push to main, the release job tags a version that has no tag yet; it also runs on a tag push or by hand. PyPI trusted publishing | bdmvkit, dvdcc, udfkit, vtskit | the job, or a person |
-| A person pushes `v*` on the main commit that carries the version; the job checks the version and creates the GitHub Release | publish, oncemore (also builds the Mac app) | a person |
-| No release workflow and no tag yet | detection, diarization, ingest, nle-bridge | — |
+| A person pushes `v*` on the main commit that carries the version; the job checks the version and creates the GitHub Release | oncemore (also builds the Mac app) | a person |
 
 GitHub starts no workflow for a tag pushed with the default `GITHUB_TOKEN`. So where a job makes the tag, `release-guard.yml` is called on that workflow's completion (`workflow_run`); where a person pushes the tag, it is called on the tag push.
 
@@ -47,6 +46,16 @@ GitHub starts no workflow for a tag pushed with the default `GITHUB_TOKEN`. So w
   - thumbnail-skill's release-drafter notes use level-2 headings inside each entry (`other-headings: ^## `).
   - audio-production-skill lists v0.4.0 four times and v0.3.0 twice in its history (`stop-at: ^## v0\.4\.0 `).
   bdmvkit, dvdcc, ingest, oncemore, udfkit and vtskit have no CHANGELOG.
+
+## Rollout results (2026-11-19)
+
+- **contract-diff**: 25 Skill repositories call it, with the concurrency group. On each caller's own pull request it labelled `contract:none` and posted one comment.
+  - udfkit runs it on every pull request, not only on those that touch the contract, so that a pull request that changes the contract and then reverts it gets `contract:none` again. The other callers keep the path filter. Such a pull request keeps its old label there until a later run.
+- **changelog-check** passed on its own pull request in qc-skill, publish-skill and blender-skill (`stop-at: ^## Changelog$`).
+- **release-guard** passed by hand and on the release workflow's completion (`workflow_run`):
+  - qc-skill checked v1.4.4 and publish-skill checked v0.2.3, the releases made by merging the trial;
+  - blender-skill checked `blender-skill-v0.31.1` (`tag-pattern`; its stray `v0.0.1` tag is ignored).
+- 16 release tags were made after these merges, the first in each repository to contain one. Every one carries a contract that says its tag's version.
 
 ## Consequences
 
