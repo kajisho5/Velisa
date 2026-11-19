@@ -1,3 +1,18 @@
+## v0.12.0 (2026-11-19)
+
+## What's Changed
+
+## Features
+
+- feat(ecosystem): reusable contract-file, changelog and release-tag checks; contract-diff fixes (ADR-022, D36) (#176)
+
+## Other changes
+
+- feat(ecosystem): reusable contract-file, changelog and release-tag checks; contract-diff fixes (ADR-022, D36) (#176)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.11.0 (2026-11-19)
 
 ## What's Changed
