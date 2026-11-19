@@ -758,3 +758,27 @@ Both releases shipped only a CI change.
 **Evidence**: [ADR-023](../adr/ADR-023-release-commit-tested-and-gated.md) has the per-repository table and the measurements.
 
 **What follows**: ffmpeg-skill and video-production-agent are not changed. artifacts-skill and blender-skill release through a pull request, so CI already runs on their release commit. transcription-skill keeps its path-based rule (its ADR-036), which already holds release back for docs / ci / test-only changes. `owns` is unchanged.
+
+## D38 — The shared data-format specs get JSON Schemas and conformance fixtures; Skills copy them into their tests
+
+**Decision** (owner, 2026-11-19, details delegated):
+- `kit@1`, `title.json`, `stinger.json` and the licence record each get a JSON Schema (draft 2020-12) in `registry/schemas/`. The schema follows the spec document, PROPOSED fields included as optional.
+- What a schema cannot state (a time on a frame, `cut_point` inside `cover`, frame numbers agreeing with seconds) is a rule in `registry/spec_conformance.py`.
+- Valid and invalid examples sit in `registry/conformance/<spec>/`, listed with their hashes in a generated `manifest.json`. Velisa's CI (`spec-conformance.yml`) fails when one does not behave as its directory says.
+- A Skill copies the schemas and fixtures it needs into its tests (`--export`), pinned to a Velisa commit, and tests its writer or reader against them. Trial: hyperframes-skill (writes `title.json` / `stinger.json`) and motion-graphics-skill (reads `title.json`).
+
+**Why**: the specs were tables. Each Skill checked its own reading of them, and nothing checked that a writer and its readers agree.
+
+**Evidence**: [ADR-024](../adr/ADR-024-spec-schemas-and-conformance-fixtures.md) has the table of every place an implementation differs from its spec, and the trial results.
+
+**What follows**: five rows are open for the spec owner and the Skill concerned. ffmpeg-skill refuses the keys kit@1 adds and `colours`, and reads keys the spec's table lacks (K1-K3). Whether a kit's `logo_position` may be `"X,Y"` (K5). Whether sound-design-skill's schema takes the video and image extension (L2). Other Skills take the fixtures one at a time.
+
+## D39 — Sidecar JSON files share a four-field envelope
+
+**Decision** (owner, 2026-11-19, details delegated): every sidecar a Skill writes beside an output carries `schema` (`<namespace>/<name>@<major>`), `producer` (`{skill_id, version}`), `generated_at` (UTC) and `inputs` (the sha256 of each input medium) at its top level. The spec is `docs/specs/sidecar-envelope.md`, the schema `registry/schemas/sidecar-envelope.schema.json`.
+
+**Why**: the sidecars that exist say who wrote them, when, and from what in five different spellings, or not at all.
+
+**Evidence**: [ADR-025](../adr/ADR-025-sidecar-envelope.md); the inventory of today's sidecars is in the spec.
+
+**What follows**: no Skill adopts it in this change. The spec lists one additive follow-up per Skill: hyperframes-skill and subtitle-skill first, then the work-directory manifests of audio-production, color-grading, motion-graphics and video-editing (optional), then a check in skillpact's conformance job.

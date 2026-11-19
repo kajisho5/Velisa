@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kajisho5/Velisa/blob/main/registry/schemas/sidecar-envelope.schema.json",
+  "title": "velisa sidecar envelope@1: the common outer fields of a sidecar JSON file",
+  "description": "docs/specs/sidecar-envelope.md (ADR-025). The four fields every sidecar a Skill writes beside an output carries, whatever its body: schema (the spec's name and version), producer (skill_id, version), generated_at (UTC) and inputs (the sha256 of each input medium). The body's own fields sit beside them at the top level and are the body spec's business, so this schema allows any other key. A body schema that adopts the envelope adds these four properties to its own list (allOf with this schema).",
+  "type": "object",
+  "required": ["schema", "producer", "generated_at", "inputs"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9.-]*/[a-z0-9][a-z0-9_.-]*@[1-9][0-9]*$",
+      "description": "<namespace>/<spec name>@<major version>, e.g. velisa/title@1: the spec's name and version"
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_id", "version"],
+      "properties": {
+        "skill_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "the Skill's id as its contract states it"},
+        "version": {"type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$", "description": "the Skill's version (SemVer)"}
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$",
+      "description": "when the sidecar was written, UTC, RFC 3339 with Z"
+    },
+    "inputs": {
+      "type": "array",
+      "description": "each input medium the output was made from, by content; empty when the output was made from no medium (a render from a template alone)",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sha256"],
+        "properties": {
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "file": {"type": "string", "minLength": 1, "description": "the file's name, never its path"},
+          "role": {"type": "string", "minLength": 1, "description": "what the input was to the producer (source, music, logo, ...)"}
+        }
+      }
+    }
+  }
+}

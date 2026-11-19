@@ -15,6 +15,11 @@ Machine-readable schema: sound-design-skill [`schemas/licence-record.schema.json
 (the stored entry and the record a reader gets), checked against `library-import` output by its
 `tests/test_licence_schema.py` (sound-design-skill PR #26).
 
+Velisa's schema, the same fields plus the extension to video and images below:
+[`registry/schemas/licence-record.schema.json`](../../registry/schemas/licence-record.schema.json), with valid and
+invalid examples in `registry/conformance/licence-record/`
+([ADR-024](../adr/ADR-024-spec-schemas-and-conformance-fixtures.md)).
+
 ## Principles (as sound-design-skill applies them)
 
 - A licence is recorded exactly as declared, with `verified: false`. No skill checks or clears a

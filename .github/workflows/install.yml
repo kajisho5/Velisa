@@ -47,11 +47,12 @@ jobs:
         env:
           AVOS_TEST_BASH: /bin/bash
         run: python3 -m unittest discover -s scripts/tests -v
-      # 62 tests. Some skip by design and say why in the log -- 21 on macos-latest, 11 on
+      # Some tests skip by design and say why in the log -- 25 on macos-latest, 11 on
       # ubuntu-latest (whose system Python already has jsonschema):
       #   11 "qc-skill's `qc` console script is not on PATH" -- test_conformance_live.py runs the
       #      conformance checks against a live qc-skill process; this job does not install qc-skill.
-      #   10 "jsonschema package not installed" -- test_schema.py's validation tests; registry/ is
+      #   14 "jsonschema package not installed" -- the validation tests of test_schema.py (10) and
+      #      test_spec_conformance.py (4; the spec-conformance workflow installs jsonschema and runs them); registry/ is
       #      dependency-free and jsonschema is only an optional test dependency.
       - name: Capability registry tests (offline)
         run: python3 -m unittest discover -s registry/tests -t . -v

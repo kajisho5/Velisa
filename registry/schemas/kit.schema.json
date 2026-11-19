@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kajisho5/Velisa/blob/main/registry/schemas/kit.schema.json",
+  "title": "velisa/kit@1: one brand kit",
+  "description": "docs/specs/kit.md. A superset of ffmpeg-skill brand.json: every brand.json key keeps its spelling and meaning, and kit@1 only adds keys (schema, name, colors.secondary, fonts, logo_variants, contrast; PROPOSED in the spec). Keys outside the spec are refused, so a misspelt key fails here as ffmpeg-skill refuses it. ffmpeg-skill brand.json keys the spec's table does not list (emoji_assets, colors.upcoming, the caption keys box / color / colour / font) are allowed by the spec's rule that every brand.json is a kit@1; ADR-024 lists them.",
+  "type": "object",
+  "additionalProperties": false,
+  "not": {
+    "required": [
+      "colors",
+      "colours"
+    ]
+  },
+  "properties": {
+    "schema": {
+      "const": "velisa/kit@1",
+      "description": "the shape's id; absent in a plain brand.json (PROPOSED)"
+    },
+    "name": {
+      "$ref": "#/$defs/text",
+      "description": "the kit's name (PROPOSED)"
+    },
+    "font": {
+      "$ref": "#/$defs/text",
+      "description": "a font family name"
+    },
+    "font_file": {
+      "$ref": "#/$defs/optional_path",
+      "description": "a font file, relative to the kit file"
+    },
+    "colors": {
+      "$ref": "#/$defs/colors"
+    },
+    "colours": {
+      "$ref": "#/$defs/colors",
+      "description": "the same object as colors, under the British spelling remotion-ffmpeg-skill reads; never both"
+    },
+    "logo": {
+      "$ref": "#/$defs/optional_path",
+      "description": "a logo file, relative to the kit file"
+    },
+    "logo_position": {
+      "enum": [
+        "top-left",
+        "top",
+        "top-right",
+        "left",
+        "center",
+        "right",
+        "bottom-left",
+        "bottom",
+        "bottom-right"
+      ],
+      "description": "one of ffmpeg-skill overlay's nine position names (overlay.py POS); its explicit \"X,Y\" form is not in the spec (ADR-024)"
+    },
+    "logo_scale": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "the logo's width in px (ffmpeg-skill overlay --scale)"
+    },
+    "logo_opacity": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "safe_margin": {
+      "type": "number",
+      "minimum": 0,
+      "description": "px"
+    },
+    "lang": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "description": "a language / script hint (ffmpeg-skill --lang)"
+    },
+    "styles": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "caption": {
+          "$ref": "#/$defs/caption"
+        }
+      }
+    },
+    "caption": {
+      "$ref": "#/$defs/caption",
+      "description": "burn-in defaults; styles.caption wins where both set a key"
+    },
+    "loudness": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lufs": {
+          "type": "number"
+        },
+        "tp": {
+          "type": "number"
+        }
+      }
+    },
+    "emoji_assets": {
+      "description": "ffmpeg-skill brand.json key, not in the spec's table (ADR-024)"
+    },
+    "fonts": {
+      "type": "array",
+      "description": "the font licence, recorded, not inferred (PROPOSED)",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "family"
+        ],
+        "properties": {
+          "family": {
+            "$ref": "#/$defs/text"
+          },
+          "file": {
+            "$ref": "#/$defs/text",
+            "description": "relative to the kit file"
+          },
+          "licence": {
+            "$ref": "#/$defs/text",
+            "description": "as declared: an SPDX id (OFL-1.1, Apache-2.0) or the licence's name"
+          },
+          "embedding": {
+            "type": "boolean",
+            "description": "whether the licence allows embedding the font in video"
+          }
+        }
+      }
+    },
+    "logo_variants": {
+      "type": "object",
+      "description": "paths of what imagemagick-skill brandkit.py writes from one logo (PROPOSED)",
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "$ref": "#/$defs/text"
+        },
+        "mono": {
+          "$ref": "#/$defs/text"
+        },
+        "white": {
+          "$ref": "#/$defs/text"
+        },
+        "black": {
+          "$ref": "#/$defs/text"
+        },
+        "clear_space": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "contrast": {
+      "type": "array",
+      "description": "the colour pairs a tool checked and their ratio (PROPOSED)",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fg",
+          "bg",
+          "ratio"
+        ],
+        "properties": {
+          "fg": {
+            "$ref": "#/$defs/rrggbb"
+          },
+          "bg": {
+            "$ref": "#/$defs/rrggbb"
+          },
+          "ratio": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 21
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "optional_path": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "rrggbb": {
+      "type": "string",
+      "pattern": "^[0-9A-Fa-f]{6}$",
+      "description": "RRGGBB without #"
+    },
+    "colors": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "primary": {
+          "$ref": "#/$defs/rrggbb"
+        },
+        "secondary": {
+          "$ref": "#/$defs/rrggbb",
+          "description": "motion-graphics-skill's fourth colour role (PROPOSED)"
+        },
+        "text": {
+          "$ref": "#/$defs/rrggbb"
+        },
+        "outline": {
+          "$ref": "#/$defs/rrggbb"
+        },
+        "background": {
+          "$ref": "#/$defs/rrggbb"
+        },
+        "accent": {
+          "$ref": "#/$defs/rrggbb"
+        },
+        "upcoming": {
+          "$ref": "#/$defs/rrggbb",
+          "description": "ffmpeg-skill brand.json key, not in the spec's table (ADR-024)"
+        }
+      }
+    },
+    "caption": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "font": {
+          "$ref": "#/$defs/text"
+        },
+        "size": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "colour": {
+          "$ref": "#/$defs/text",
+          "description": "the caption colour; the spec does not fix its notation"
+        },
+        "color": {
+          "$ref": "#/$defs/text",
+          "description": "the caption colour; the spec does not fix its notation"
+        },
+        "box": {},
+        "position": {
+          "$ref": "#/$defs/text"
+        },
+        "animate": {
+          "$ref": "#/$defs/text"
+        },
+        "karaoke": {
+          "type": "boolean"
+        },
+        "bold": {
+          "type": "boolean"
+        },
+        "outline": {
+          "type": "number",
+          "minimum": 0
+        },
+        "emoji_assets": {
+          "description": "ffmpeg-skill brand.json key, not in the spec's table (ADR-024)"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "licence": "Example Stock Licence v2",
+  "kind": "video",
+  "source": "https://example.org/clip/987",
+  "asset_id": "987",
+  "provider": "Example Stock",
+  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}
