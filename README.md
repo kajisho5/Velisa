@@ -297,7 +297,15 @@ declare with System Intelligence's `si layer-check`. It reports only for now and
 that change its `contract/contract.json`. It compares the contract at the merge base with the one at the head with
 System Intelligence's `si contract-diff`, labels the pull request `contract:none`, `contract:additive` or
 `contract:breaking`, and keeps one comment with every change and the release bump it needs (ADR-020, decision D34).
-It reports only for now and does not fail.
+It reports only for now and does not fail. Callers group runs per pull request with `concurrency`, so an older
+run never writes last.
+
+**Reusable checks.** Three more reusable workflows (ADR-022, decision D36):
+- `contract-file-check.yml` runs a Skill's `contract/generate.py --check` (or `generate.mjs`).
+- `changelog-check.yml` checks the CHANGELOG headings, and that a pull request that moves the version adds its heading.
+- `release-guard.yml` checks that a release tag's `contract/contract.json` says the tag's version.
+
+The release workflows themselves stay per repository; ADR-022 lists how each Skill releases.
 
 **GitHub Project.** `.github/workflows/project-sync.yml` adds the issues and pull requests of
 every repository in `ecosystem.json` to the project *AI Video Production Ecosystem* (kajisho5 #1)

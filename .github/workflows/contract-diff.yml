@@ -10,7 +10,7 @@ name: Contract diff
 # release bump it needs (before 1.0: breaking minor, additive patch; from 1.0: major, minor).
 #
 # REPORT ONLY: the job stays green whatever it finds, unless the caller sets
-# `fail-on-breaking: true`. Labelling and commenting need `pull-requests: write` and
+# `fail-on-breaking: true` (the comment then says the check fails on a breaking change). Labelling and commenting need `pull-requests: write` and
 # `issues: write` from the caller; without them (a pull request from a fork) the result is still
 # in the job summary and the artifact.
 #
@@ -23,9 +23,17 @@ name: Contract diff
 #     contents: read
 #     issues: write
 #     pull-requests: write
+#   concurrency: # a newer push cancels the older run, so an old result never lands last
+#     group: contract-diff-${{ github.event.pull_request.number }}
+#     cancel-in-progress: true
 #   jobs:
 #     contract-diff:
 #       uses: kajisho5/Velisa/.github/workflows/contract-diff.yml@main
+#
+# Runs that overlap on one pull request: besides the caller's `concurrency`, the label and the
+# comment are written only while the commit this run compared is still the pull request's head; a
+# run on an older commit leaves them to the newer run. The comment it updates is the one this
+# workflow's token posted (`comment-author`), never one a person wrote with the same first line.
 #
 # System Intelligence is pinned to a full commit SHA (the tag in the comment), like layering.yml.
 
@@ -48,6 +56,10 @@ on:
         description: Keep one comment on the pull request with the changes.
         type: boolean
         default: true
+      comment-author:
+        description: The login whose comment is updated in place (the account of the token that posts it).
+        type: string
+        default: github-actions[bot]
     outputs:
       classification:
         description: none, additive or breaking (empty when neither side has a contract).
@@ -119,8 +131,27 @@ jobs:
             contract-diff.md
             ${{ runner.temp }}/contract-diff.json
           if-no-files-found: ignore
+      - name: Is the compared commit still the pull request's head?
+        id: fresh
+        if: (inputs.label || inputs.comment) && steps.diff.outputs.classification != ''
+        continue-on-error: true
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          current="$(gh api "repos/$REPO/pulls/$PR" --jq .head.sha)"
+          if [ "$current" = "$HEAD_SHA" ]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::the pull request moved on to $current; the run for that commit writes the label and the comment"
+          fi
       - name: Label the pull request
-        if: inputs.label && steps.diff.outputs.classification != ''
+        if: inputs.label && steps.diff.outputs.classification != '' && steps.fresh.outputs.current == 'true'
         continue-on-error: true # a fork's token cannot write; the summary still has the result
         shell: bash
         env:
@@ -145,7 +176,7 @@ jobs:
           done
           gh api "repos/$REPO/issues/$PR/labels" -f "labels[]=contract:$CLASSIFICATION" > /dev/null
       - name: Comment on the pull request
-        if: inputs.comment && steps.diff.outputs.classification != ''
+        if: inputs.comment && steps.diff.outputs.classification != '' && steps.fresh.outputs.current == 'true'
         continue-on-error: true
         shell: bash
         env:
@@ -153,6 +184,8 @@ jobs:
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
           CONTRACT_PATH: ${{ inputs.contract-path }}
+          FAIL_ON_BREAKING: ${{ inputs.fail-on-breaking }}
+          AUTHOR: ${{ inputs.comment-author }}
         run: |
           set -euo pipefail
           marker="<!-- velisa:contract-diff -->"
@@ -163,13 +196,18 @@ jobs:
             # GitHub caps a comment at 65536 characters; the artifact has the whole report.
             head -c 60000 contract-diff.md
             echo
-            echo "Report only: this check does not fail the pull request (Velisa D34, ADR-020)."
+            if [ "$FAIL_ON_BREAKING" = "true" ]; then
+              echo "This check fails the pull request on a breaking change (\`fail-on-breaking\`; Velisa D34, ADR-020)."
+            else
+              echo "Report only: this check does not fail the pull request (Velisa D34, ADR-020)."
+            fi
             echo
             echo "---"
             echo "_Posted by Velisa's contract-diff workflow_"
           } > comment.md
+          # Only this workflow's own comment: a person's comment that starts with the marker is left alone.
           existing="$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
-            --jq ".[] | select(.body | startswith(\"$marker\")) | .id" | head -n 1)"
+            --jq ".[] | select(.user.login == \"$AUTHOR\" and (.body | startswith(\"$marker\"))) | .id" | head -n 1)"
           if [ -n "$existing" ]; then
             gh api -X PATCH "repos/$REPO/issues/comments/$existing" -F body=@comment.md > /dev/null
           else

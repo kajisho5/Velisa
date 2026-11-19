@@ -1,0 +1,139 @@
+name: Release guard
+
+# Reusable: does a release tag's committed contract say the tag's version? For tag `v1.2.3`,
+# `git show v1.2.3:contract/contract.json` must have `"version": "1.2.3"`. Decision D36, ADR-022.
+#
+# The Skills release in different ways (ADR-022 lists them): a release job on every push to main,
+# release-please, a bump pull request, a hand-pushed tag. This workflow does not release anything;
+# it only checks the tag after the fact, whichever way it was made:
+#
+#   - with `tag` set, that tag;
+#   - when the caller runs on a tag push, that tag;
+#   - otherwise the newest tag that matches `tag-pattern` (by version).
+#
+# A tag pushed with the default GITHUB_TOKEN starts no workflow (GitHub's anti-recursion rule), and
+# most release jobs push their tag that way. So a Skill whose release workflow makes the tag calls
+# this on that workflow's completion; one whose tags are pushed by hand calls it on the tag push:
+#
+#   on:
+#     workflow_run:
+#       workflows: ["release"]     # the name of the workflow that makes the tag
+#       types: [completed]
+#     push:
+#       tags: ["v*"]
+#     workflow_dispatch:
+#   permissions:
+#     contents: read
+#   jobs:
+#     release-guard:
+#       uses: kajisho5/Velisa/.github/workflows/release-guard.yml@main
+#
+# The checker is the inline script below; Velisa's scripts/tests/test_reusable_checks.py runs it
+# against a scratch repository.
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: The tag to check. Empty for the pushed tag, or else the newest matching tag.
+        type: string
+        default: ""
+      tag-pattern:
+        description: Python regex a release tag matches in full; the version is the `version` group (or group 1). Empty for `v1.2.3`.
+        type: string
+        default: ""
+      contract-path:
+        description: The committed contract, relative to the repository root.
+        type: string
+        default: contract/contract.json
+      allow-missing-contract:
+        description: Pass (with a warning) when the tag predates the committed contract file.
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  release-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # every tag
+          fetch-tags: true
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: The tag's contract version is the tag's version
+        shell: bash
+        env:
+          TAG: ${{ inputs.tag }}
+          TAG_PATTERN: ${{ inputs.tag-pattern }}
+          CONTRACT_PATH: ${{ inputs.contract-path }}
+          ALLOW_MISSING: ${{ inputs.allow-missing-contract }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import subprocess
+          import sys
+
+          env = os.environ.get
+          pattern = re.compile(env("TAG_PATTERN") or r"^v(?P<version>\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)$")
+          contract = env("CONTRACT_PATH") or "contract/contract.json"
+          tag = env("TAG", "")
+          if not tag and env("REF_TYPE") == "tag":
+              tag = env("REF_NAME", "")
+
+
+          def git(*args):
+              return subprocess.run(["git", *args], capture_output=True, text=True)
+
+
+          def version_of(name):
+              m = pattern.match(name)
+              if not m:
+                  return None
+              return m.group("version") if "version" in pattern.groupindex else m.group(1)
+
+
+          def key(v):
+              m = re.match(r"^(\d+)\.(\d+)\.(\d+)(?:-(.+))?$", v)
+              return (int(m.group(1)), int(m.group(2)), int(m.group(3)), m.group(4) is None, m.group(4) or "") if m else (-1,)
+
+
+          if not tag:
+              tags = [t for t in git("tag", "--list").stdout.split() if version_of(t)]
+              if not tags:
+                  print(f"no tag matches {pattern.pattern}: nothing to check")
+                  sys.exit(0)
+              tag = max(tags, key=lambda t: key(version_of(t)))
+              print(f"latest release tag: {tag}")
+
+          want = version_of(tag)
+          if want is None:
+              print(f"::error::tag {tag} does not match tag-pattern {pattern.pattern}")
+              sys.exit(1)
+          shown = git("show", f"refs/tags/{tag}:{contract}")
+          if shown.returncode != 0:
+              if env("ALLOW_MISSING") == "true":
+                  print(f"::warning::{tag} has no {contract} (released before the file was committed); nothing to compare")
+                  sys.exit(0)
+              print(f"::error::{tag} has no {contract}")
+              sys.exit(1)
+          try:
+              have = json.loads(shown.stdout).get("version")
+          except ValueError as exc:
+              print(f"::error::{tag}:{contract} is not JSON ({exc})")
+              sys.exit(1)
+          if have != want:
+              print(f"::error::{tag}: {contract} says version {have!r}, the tag says {want!r}")
+              sys.exit(1)
+          print(f"{tag}: {contract} version {have} matches the tag")
+          PY
