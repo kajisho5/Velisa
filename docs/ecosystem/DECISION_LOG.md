@@ -676,6 +676,29 @@ down to ffmpeg-skill, 1 is excepted and 0 are violations.
 weekly runs are clean, and the contract-shape baseline no longer lists `/dependencies` (ADR-019, "When the check
 starts to fail"). `owns` is unchanged.
 
+## D34 — Contract changes are classified on pull requests, report-only
+
+**Decision** (owner, 2026-11-19, details delegated): a pull request that changes a Skill's `contract/contract.json`
+is classified `none`, `additive` or `breaking` with System Intelligence's `si contract-diff` (its ADR-019), with the
+release bump that needs (before 1.0: breaking minor, additive patch; from 1.0: breaking major, additive minor). The
+reusable workflow `.github/workflows/contract-diff.yml` puts a `contract:none` / `contract:additive` /
+`contract:breaking` label and one comment on the pull request. It reports only; a caller may opt in to failing
+with `fail-on-breaking`.
+
+**Why**: VERSIONING.md section 3 defines breaking and non-breaking contract changes, and every Skill commits its
+contract (ADR-019-committed-contract-file), but nothing applied the definition, so the bump a contract change needs
+was decided by eye.
+
+**Evidence**: [ADR-020](../adr/ADR-020-contract-diff-on-pull-requests.md). Over the committed contract histories of
+13 Skill repositories, every release-only change (the version repeated in the contract) reads `none`.
+
+**What follows**: qc-skill calls the workflow first. Not yet wired, each with a committed contract: ingest,
+video-editing, color-grading, motion-graphics, subtitle, thumbnail, blender, remotion-ffmpeg, hyperframes,
+audio-production, transcription, diarization, detection, media-analysis, artifacts, publish, nle-bridge,
+imagemagick, bdmvkit, vtskit, udfkit, dvdcc, stepcap, oncemore. No committed contract (nothing to compare):
+ffmpeg-skill, voice-enhance, dubbing, sound-design, slide-sync. The check starts to fail only by a later decision
+(ADR-020, "When it starts to fail"). `owns` is unchanged.
+
 ## D35 — Temporary directories: prefixed, always removed, movable, kept only on request
 
 **Decision** (owner, 2026-11-19, details delegated): every temporary directory a component makes, in product code or tests, follows five rules:
