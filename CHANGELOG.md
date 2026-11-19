@@ -1,3 +1,14 @@
+## v0.12.1 (2026-11-19)
+
+## What's Changed
+
+## Other changes
+
+- ci(contract-shape): drop the baseline entries of six fixed contracts (#177)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.12.0 (2026-11-19)
 
 ## What's Changed
