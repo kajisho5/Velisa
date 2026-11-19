@@ -63,3 +63,4 @@ GitHub starts no workflow for a tag pushed with the default `GITHUB_TOKEN`. So w
 - The changelog check reads the version from a file. It cannot judge a version computed only at release time (method 1 before the release commit). There it checks the heading format, and the version heading is checked once the release commit exists.
 - `release-guard.yml` finds a wrong tag after it is made; it does not stop it. The release jobs that check before tagging (publish-skill) keep doing so.
 - ffmpeg-skill commits no contract file and calls none of these workflows.
+- ADR-023 adds two rules to method 1 (and hyperframes, imagemagick and remotion-ffmpeg): the release commit is tested before it is pushed, and chore / ci / docs / test pull requests release nothing.
