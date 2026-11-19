@@ -1,0 +1,39 @@
+name: Spec conformance
+
+# The shared data-format specs (docs/specs/), checked (ADR-024, decision D38): every JSON Schema in
+# registry/schemas/ is a valid draft 2020-12 schema, every fixture in registry/conformance/<spec>/valid/
+# passes its schema and the rules a schema cannot state, every fixture in invalid/ fails, and
+# registry/conformance/manifest.json (what Skills copy with --export) is current. This job FAILS the
+# pull request; it is not report-only.
+
+on:
+  pull_request:
+    paths:
+      - "registry/**"
+      - "docs/specs/**"
+      - ".github/workflows/spec-conformance.yml"
+  push:
+    branches: [main]
+    paths:
+      - "registry/**"
+      - "docs/specs/**"
+      - ".github/workflows/spec-conformance.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install the JSON Schema validator
+        run: python -m pip install -q "jsonschema==4.23.0"
+      - name: Check every schema and fixture, and the manifest
+        run: python -m registry.spec_conformance --check
+      - name: Spec conformance tests
+        run: python -m unittest registry.tests.test_spec_conformance -v

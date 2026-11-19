@@ -309,6 +309,8 @@ The release workflows themselves stay per repository; ADR-022 lists how each Ski
 
 **Release commits are tested before they are pushed** (ADR-023, decision D37). A Skill's release job commits locally, then runs its fast tests on that commit (step "Test the release commit before pushing it"). Only then does it push. A push that merges only chore / ci / docs / test pull requests releases nothing; this is imagemagick-skill's rule. In the release-drafter repositories, `.github/scripts/release_gate.py` decides this.
 
+**Shared data formats, checked** (ADR-024, decision D38; ADR-025, D39). `kit@1`, `title.json`, `stinger.json`, the licence record and the sidecar envelope each have a JSON Schema in `registry/schemas/` and valid / invalid examples in `registry/conformance/`. `spec-conformance.yml` fails a pull request when an example does not behave as its directory says. A Skill copies them into its tests with `python3 -m registry.spec_conformance --export`; hyperframes-skill and motion-graphics-skill do so first. ADR-024 lists where the Skills differ from the specs.
+
 **GitHub Project.** `.github/workflows/project-sync.yml` adds the issues and pull requests of
 every repository in `ecosystem.json` to the project *AI Video Production Ecosystem* (kajisho5 #1)
 every hour, from this repository alone. It needs one secret here, `PROJECT_TOKEN`: a classic token

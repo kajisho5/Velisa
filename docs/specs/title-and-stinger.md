@@ -24,6 +24,13 @@ Read from (each repository's `origin/main`, 2026-11-12): video-editing-skill `07
 (`src/video_agent/agent/editing.py`, `finishing.py`, `qc_checks.py`, ADR-099 / ADR-102 / ADR-112),
 hyperframes-skill `3528095` (`SKILL.md`, `docs/contract.md`, `ECOSYSTEM_ROADMAP.md` step 15).
 
+Machine-readable schemas: [`registry/schemas/title.schema.json`](../../registry/schemas/title.schema.json) and
+[`registry/schemas/stinger.schema.json`](../../registry/schemas/stinger.schema.json) (JSON Schema 2020-12). The rules a
+schema cannot state (a time on a frame, `cut_point` inside `cover`, frame numbers agreeing with seconds) are in
+`registry/spec_conformance.py` `rules()`. Valid and invalid examples: `registry/conformance/title/` and
+`registry/conformance/stinger/` ([ADR-024](../adr/ADR-024-spec-schemas-and-conformance-fixtures.md), which also lists
+where the makers and receivers differ from this page).
+
 ## Times
 
 Seconds on the file's own timeline, from its first frame. A time that names a frame must be on

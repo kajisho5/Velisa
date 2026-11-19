@@ -1,0 +1,295 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kajisho5/Velisa/blob/main/registry/schemas/licence-record.schema.json",
+  "title": "Velisa licence record: the stored entry or the record a reader gets",
+  "description": "docs/specs/licence-record.md. A document is one resolved record ($defs/record) when it has `status`, else one stored entry ($defs/entry). The field names are sound-design-skill's (schemas/licence-record.schema.json there); this schema adds the spec's extension to video and images (kind video / image, asset_id, ai_generated; PROPOSED). The spec requires only licence in an entry; sound-design-skill writes more (tags, mood, loopable, sha256, measured, imported_*), so every sound-design-skill entry is valid here, not the other way round. A licence is recorded as declared and never verified.",
+  "if": {
+    "type": "object",
+    "required": [
+      "status"
+    ]
+  },
+  "then": {
+    "$ref": "#/$defs/record"
+  },
+  "else": {
+    "$ref": "#/$defs/entry"
+  },
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "optional_text": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "words": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "ai_generated": {
+      "type": "object",
+      "description": "the fields video-editing-skill's sources[].ai_generated takes (PROPOSED)",
+      "additionalProperties": false,
+      "required": [
+        "generator",
+        "licence"
+      ],
+      "properties": {
+        "generator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "licence": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "required": [
+        "licence"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "licence": {
+          "$ref": "#/$defs/text",
+          "description": "as declared: an SPDX id or the licence's name or text"
+        },
+        "kind": {
+          "enum": [
+            "bgm",
+            "sfx",
+            "video",
+            "image"
+          ],
+          "description": "video and image are the spec's extension (PROPOSED)"
+        },
+        "tags": {
+          "$ref": "#/$defs/words"
+        },
+        "mood": {
+          "$ref": "#/$defs/words"
+        },
+        "loopable": {
+          "type": "boolean"
+        },
+        "source": {
+          "$ref": "#/$defs/text",
+          "description": "the source URL, or text"
+        },
+        "provider": {
+          "$ref": "#/$defs/text",
+          "description": "the site or service it was downloaded from"
+        },
+        "author": {
+          "$ref": "#/$defs/text"
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "credit": {
+          "$ref": "#/$defs/text"
+        },
+        "attribution": {
+          "$ref": "#/$defs/text"
+        },
+        "licence_url": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*://\\S+$",
+          "description": "recorded, never opened"
+        },
+        "licence_file": {
+          "$ref": "#/$defs/text"
+        },
+        "licence_text_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "content_id": {
+          "enum": [
+            "registered",
+            "not-registered"
+          ],
+          "description": "only as the source states it"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256",
+          "description": "the file's content at import"
+        },
+        "measured": {
+          "type": "object",
+          "description": "probed facts"
+        },
+        "imported_from": {
+          "$ref": "#/$defs/text"
+        },
+        "imported_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "imported_by": {
+          "$ref": "#/$defs/text",
+          "description": "<skill> <version>"
+        },
+        "asset_id": {
+          "$ref": "#/$defs/text",
+          "description": "the source's own id for the asset (PROPOSED)"
+        },
+        "ai_generated": {
+          "$ref": "#/$defs/ai_generated"
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "required": [
+        "licence",
+        "status",
+        "declared_as",
+        "verified",
+        "usable",
+        "declared_in",
+        "source",
+        "provider",
+        "author",
+        "title",
+        "credit",
+        "licence_url",
+        "licence_file",
+        "licence_text_sha256",
+        "content_id",
+        "attribution",
+        "attribution_source",
+        "note"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "licence": {
+          "$ref": "#/$defs/text",
+          "description": "the declared text, or \"unknown\""
+        },
+        "status": {
+          "enum": [
+            "declared",
+            "unknown"
+          ]
+        },
+        "declared_as": {
+          "$ref": "#/$defs/optional_text"
+        },
+        "verified": {
+          "const": false
+        },
+        "usable": {
+          "type": "boolean"
+        },
+        "declared_in": {
+          "$ref": "#/$defs/optional_text"
+        },
+        "source": {
+          "$ref": "#/$defs/optional_text"
+        },
+        "provider": {
+          "$ref": "#/$defs/optional_text"
+        },
+        "author": {
+          "$ref": "#/$defs/optional_text"
+        },
+        "title": {
+          "$ref": "#/$defs/optional_text"
+        },
+        "credit": {
+          "$ref": "#/$defs/optional_text"
+        },
+        "licence_url": {
+          "$ref": "#/$defs/optional_text"
+        },
+        "licence_file": {
+          "$ref": "#/$defs/optional_text"
+        },
+        "licence_text_sha256": {
+          "$ref": "#/$defs/optional_text"
+        },
+        "content_id": {
+          "enum": [
+            "registered",
+            "not-registered",
+            "unknown"
+          ]
+        },
+        "attribution": {
+          "$ref": "#/$defs/optional_text"
+        },
+        "attribution_source": {
+          "enum": [
+            "declared",
+            "credit",
+            "composed",
+            null
+          ]
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        },
+        "asset_id": {
+          "$ref": "#/$defs/optional_text",
+          "description": "as stored (PROPOSED)"
+        },
+        "ai_generated": {
+          "$ref": "#/$defs/ai_generated",
+          "description": "as stored (PROPOSED)"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "licence": {
+                "const": "unknown"
+              },
+              "usable": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "declared"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "usable": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
