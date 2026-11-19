@@ -1,3 +1,18 @@
+## v0.13.0 (2026-11-19)
+
+## What's Changed
+
+## Features
+
+- feat(registry): JSON Schemas and conformance fixtures for the shared specs; sidecar envelope spec (ADR-024, ADR-025, D38, D39) (#181)
+
+## Other changes
+
+- feat(registry): JSON Schemas and conformance fixtures for the shared specs; sidecar envelope spec (ADR-024, ADR-025, D38, D39) (#181)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.12.3 (2026-11-19)
 
 ## What's Changed
