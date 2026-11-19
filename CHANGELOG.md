@@ -1,3 +1,14 @@
+## v0.12.3 (2026-11-19)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): release commits are tested before they are pushed; chore/ci/docs/test PRs release nothing (ADR-023, D37) (#180)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.12.2 (2026-11-19)
 
 ## What's Changed
