@@ -1,3 +1,18 @@
+## v0.11.0 (2026-11-19)
+
+## What's Changed
+
+## Features
+
+- feat(ecosystem): classify contract changes on pull requests, report-only (ADR-020, D34) (#175)
+
+## Other changes
+
+- feat(ecosystem): classify contract changes on pull requests, report-only (ADR-020, D34) (#175)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.10.1 (2026-11-19)
 
 ## What's Changed
