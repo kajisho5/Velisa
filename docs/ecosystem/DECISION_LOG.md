@@ -730,7 +730,7 @@ No ecosystem-wide check runs yet; skillpact's conformance job (ADR-014) is the p
 **Why**:
 - The three contract-diff problems were found when the workflow was introduced (ADR-020).
 - The changelog and tag checks were written per repository, or not at all.
-- The Skills release in seven different ways, each tested where it lives.
+- The Skills release in several different ways (six after the moves of 2026-11-19), each tested where it lives.
 
 **Evidence**: [ADR-022](../adr/ADR-022-reusable-checks-and-release-methods.md) has the table of release methods and the measurements:
 - 26 tags carry a contract file, and none disagrees with its tag.
