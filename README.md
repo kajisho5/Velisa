@@ -293,6 +293,12 @@ with its reason in [`registry/layering.json`](registry/layering.json). Data cont
 (ADR-019, decision D33). `.github/workflows/layering.yml` checks the calls the agent's pinned contracts
 declare with System Intelligence's `si layer-check`. It reports only for now and does not fail.
 
+**Contract diff.** `.github/workflows/contract-diff.yml` is a reusable workflow a Skill calls on pull requests
+that change its `contract/contract.json`. It compares the contract at the merge base with the one at the head with
+System Intelligence's `si contract-diff`, labels the pull request `contract:none`, `contract:additive` or
+`contract:breaking`, and keeps one comment with every change and the release bump it needs (ADR-020, decision D34).
+It reports only for now and does not fail.
+
 **GitHub Project.** `.github/workflows/project-sync.yml` adds the issues and pull requests of
 every repository in `ecosystem.json` to the project *AI Video Production Ecosystem* (kajisho5 #1)
 every hour, from this repository alone. It needs one secret here, `PROJECT_TOKEN`: a classic token
