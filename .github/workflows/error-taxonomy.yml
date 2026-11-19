@@ -1,0 +1,49 @@
+name: Error taxonomy
+
+# The ecosystem's error taxonomy check (decision D41 in docs/ecosystem/DECISION_LOG.md; ADR-027). Every error
+# code and failure kind a Skill's contract declares is looked up in docs/specs/error-taxonomy.json. The
+# contracts are the copies video-production-agent pins (src/video_agent/tools/<name>/contract_<version>.json),
+# as contract-shape.yml reads them.
+#
+# Report only: the job lists unknown codes, contracts that declare no code, and codes a Skill calls retryable
+# that their class does not retry, in the job summary. It does not fail (no --strict).
+
+on:
+  pull_request:
+    paths:
+      - "docs/specs/error-taxonomy.json"
+      - "scripts/error_taxonomy.py"
+      - ".github/workflows/error-taxonomy.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/specs/error-taxonomy.json"
+      - "scripts/error_taxonomy.py"
+      - ".github/workflows/error-taxonomy.yml"
+  schedule:
+    - cron: "41 5 * * 3" # weekly -- the agent re-pins contracts without any change here
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  error-taxonomy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check out the agent's pinned contracts
+        uses: actions/checkout@v7
+        with:
+          repository: kajisho5/video-production-agent
+          path: .agent
+          sparse-checkout: src/video_agent/tools
+          persist-credentials: false
+      - name: Check every contract against the taxonomy (report only)
+        run: |
+          python3 scripts/error_taxonomy.py \
+            --contracts .agent/src/video_agent/tools \
+            --json "$RUNNER_TEMP/error-taxonomy.json" | tee error-taxonomy.md
+      - name: Job summary
+        if: always()
+        run: '[ -f error-taxonomy.md ] && cat error-taxonomy.md >> "$GITHUB_STEP_SUMMARY" || true'
