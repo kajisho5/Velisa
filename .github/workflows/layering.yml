@@ -1,0 +1,72 @@
+name: Layering
+
+# The dependency-direction check (decision D33 in docs/ecosystem/DECISION_LOG.md; ADR-019). Every
+# call a pinned Capability Contract declares (its dependencies[] naming another component) must go
+# to a lower layer: each component's "layer" in ecosystem.json, the order and the exceptions in
+# registry/layering.json. Checked by kajisho5/system-intelligence (`si layer-check`, its ADR-018),
+# over the contracts video-production-agent pins (src/video_agent/tools/<name>/contract_<version>.json),
+# the same copies contract-shape.yml checks.
+#
+# REPORT ONLY: `--report-only` keeps the job green whatever it finds; the result is in the job
+# summary and the artifact. ADR-019 ("When the check starts to fail") says when to remove it.
+# An exception that excuses nothing is listed as stale; delete it then.
+#
+# System Intelligence is pinned to a full commit SHA (the tag in the comment), like contract-shape.yml.
+
+on:
+  pull_request:
+    paths:
+      - "ecosystem.json"
+      - "registry/layering.json"
+      - ".github/workflows/layering.yml"
+  push:
+    branches: [main]
+    paths:
+      - "ecosystem.json"
+      - "registry/layering.json"
+      - ".github/workflows/layering.yml"
+  schedule:
+    - cron: "43 5 * * 2" # weekly -- the agent re-pins contracts without any change here
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  layering:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check out the agent's pinned contracts
+        uses: actions/checkout@v7
+        with:
+          repository: kajisho5/video-production-agent
+          path: .agent
+          sparse-checkout: src/video_agent/tools
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install System Intelligence
+        run: python -m pip install -q "git+https://github.com/kajisho5/system-intelligence@31a0019a1275e4c39862da183037500537d9a86d" # v0.6.0
+      - name: Check the direction of every declared call (report only)
+        shell: bash
+        env:
+          SI_READ_ONLY: "1" # system-intelligence ADR-013
+        run: |
+          si layer-check ecosystem.json \
+            --contracts .agent/src/video_agent/tools \
+            --layering registry/layering.json \
+            --report-only \
+            --out "$RUNNER_TEMP/layering.json" | tee layering.md
+      - name: Job summary
+        if: always()
+        run: '[ -f layering.md ] && cat layering.md >> "$GITHUB_STEP_SUMMARY" || true'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: layering
+          path: |
+            layering.md
+            ${{ runner.temp }}/layering.json
+          if-no-files-found: ignore

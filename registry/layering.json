@@ -1,0 +1,11 @@
+{
+  "$comment": "The layers of the ecosystem, lowest first, and the calls allowed against them (ADR-019, decision D33). Each component's layer is its \"layer\" in ecosystem.json. A component calls only components in lower layers; a call within one layer, or upward, must be listed here with its reason. Data contracts (shared specs and sidecar files) are not calls and are never listed. .github/workflows/layering.yml checks the contracts the agent pins against this file with System Intelligence (`si layer-check`); an exception that excuses nothing is reported as stale, delete it then. Report only until the condition in ADR-019 is met.",
+  "layers": ["engine", "skill", "app", "orchestrator", "governance"],
+  "exceptions": [
+    {
+      "from": "thumbnail-skill",
+      "to": "qc-skill",
+      "reason": "render_variants measures each variant's text legibility with qc-skill's video.text_regions rule (thumbnail-skill ADR-16) rather than copying a judgement qc-skill owns; optional (required: false): without a qc-skill checkout the contrast is reported as not measured"
+    }
+  ]
+}

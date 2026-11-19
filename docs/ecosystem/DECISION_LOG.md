@@ -654,3 +654,24 @@ stepcap `app`; the routing skill's owner table and the org charts show both as a
 delivery specs) and the "no package yet" notes on eight repositories that have packages; nle-bridge's `planned` in
 ROADMAP.md; ROADMAP proposals 5-7 and 9-11 marked done (ffmpeg-skill #417, #418, #419, #421, #422, #423 closed
 completed on 2026-11-06). The generator is WORK_QUEUE item 27.
+
+## D33 — Layers: calls go down; same-layer calls are listed exceptions
+
+**Decision** (owner, 2026-11-19, details delegated): every `ecosystem.json` component gets a `layer`. The five
+layers, lowest first, are `engine` (ffmpeg-skill), `skill` (the 27 production skills and disc kits), `app`
+(stepcap, oncemore), `orchestrator` (video-production-agent) and `governance` (skillpact, system-intelligence). A
+component calls only lower layers. A same-layer or upward call is allowed only when `registry/layering.json` lists
+it with its reason. Data contracts and clones made only in CI are not calls. One exception today:
+thumbnail-skill → qc-skill (text legibility of thumbnail variants). The check is `si layer-check` (system-intelligence
+ADR-018), which Velisa CI runs report-only (`layering.yml`).
+
+**Why**: D21, D23, D24, D25 and D31 already describe an engine underneath, measurement layers and one owner per
+check. Nothing recorded the layers or checked the direction of calls, so a skill-to-skill call could appear unseen.
+
+**Evidence**: [ADR-019](../adr/ADR-019-layers-and-dependency-direction.md), whose inventory covers every edge with
+its repository, SHA, file and line. The first run over the agent's pinned contracts found 15 declared calls: 14 go
+down to ffmpeg-skill, 1 is excepted and 0 are violations.
+
+**What follows**: the check starts to fail once the owner has accepted the exception list and every layer, two
+weekly runs are clean, and the contract-shape baseline no longer lists `/dependencies` (ADR-019, "When the check
+starts to fail"). `owns` is unchanged.
