@@ -287,6 +287,12 @@ with [System Intelligence](https://github.com/kajisho5/system-intelligence)'s `s
 (ADR-018). The weekly ecosystem audit (`ecosystem-audit.yml`) also reports roadmap drift
 (`si roadmap-drift`) and field readiness (`si diagnose --field`), read-only.
 
+**Layers.** Every component in `ecosystem.json` has a `layer`: `engine`, `skill`, `app`, `orchestrator` or
+`governance`, lowest first. A component calls only lower layers; a same-layer or upward call must be listed
+with its reason in [`registry/layering.json`](registry/layering.json). Data contracts are not calls
+(ADR-019, decision D33). `.github/workflows/layering.yml` checks the calls the agent's pinned contracts
+declare with System Intelligence's `si layer-check`. It reports only for now and does not fail.
+
 **GitHub Project.** `.github/workflows/project-sync.yml` adds the issues and pull requests of
 every repository in `ecosystem.json` to the project *AI Video Production Ecosystem* (kajisho5 #1)
 every hour, from this repository alone. It needs one secret here, `PROJECT_TOKEN`: a classic token
