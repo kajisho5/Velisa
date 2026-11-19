@@ -1,3 +1,14 @@
+## v0.10.1 (2026-11-19)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): temporary directories are prefixed, always removed, movable (ADR-021, D35) (#174)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.10.0 (2026-11-19)
 
 ## What's Changed

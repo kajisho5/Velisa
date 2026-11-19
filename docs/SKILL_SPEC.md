@@ -168,6 +168,10 @@ A conformant Skill's test suite must include:
 5. **Domain tests** proving the Capabilities the Skill declares actually produce the
    declared output types from the declared input types — ordinary correctness testing,
    not new to this spec.
+6. **A no-leftover test** (ADR-021). Run part of the suite with `TMPDIR` set to an empty
+   directory and confirm that the directory is still empty afterwards. Every temporary
+   directory, in product code and tests, carries the Skill's prefix. It is removed on
+   every path out, and it is kept only when an explicit opt-in asks for that.
 
 §5.4 below (conformance suite) generalizes items 1–4 into a black-box suite any Skill
 must pass regardless of what its own internal test suite looks like — internal tests are

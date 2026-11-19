@@ -698,3 +698,24 @@ audio-production, transcription, diarization, detection, media-analysis, artifac
 imagemagick, bdmvkit, vtskit, udfkit, dvdcc, stepcap, oncemore. No committed contract (nothing to compare):
 ffmpeg-skill, voice-enhance, dubbing, sound-design, slide-sync. The check starts to fail only by a later decision
 (ADR-020, "When it starts to fail"). `owns` is unchanged.
+
+## D35 — Temporary directories: prefixed, always removed, movable, kept only on request
+
+**Decision** (owner, 2026-11-19, details delegated): every temporary directory a component makes, in product code or tests, follows five rules:
+
+- its name carries the component's prefix;
+- it is removed on every path out (a context manager, `finally`, `addCleanup` / `addClassCleanup`, with `atexit` and SIGTERM as a backstop);
+- it honours `TMPDIR`;
+- it is kept only on an explicit opt-in that prints the path;
+- each repository tests that a run with an empty `TMPDIR` leaves it empty.
+
+**Why**: leftovers from tests filled shared disks twice: video-production-agent's `va_*` directories (14 GB), and later 11 GB in about 78,000 entries in one `/tmp`. Nothing said whose job removing them was.
+
+**Evidence**: [ADR-021](../adr/ADR-021-temporary-directories.md), whose inventory lists what each skill repository left per run and the fix for each: hyperframes-skill (about 114 directories per run), video-editing-skill (138), remotion-ffmpeg-skill (4), transcription-skill (2) and artifacts-skill (1). The other 18 skill repositories leave nothing outside pytest's own retention.
+
+**What follows**: two cases are not fixed yet:
+
+- system-intelligence keeps the clone of a GitHub target by design (`si-github-*`). Removing it unless `--keep-clone` is given is that repository's follow-up.
+- Velisa's own `control-room-test-*` and `registry_*` test directories fall under the same rule.
+
+No ecosystem-wide check runs yet; skillpact's conformance job (ADR-014) is the place for one.
