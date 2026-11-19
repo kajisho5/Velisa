@@ -1,3 +1,18 @@
+## v0.10.0 (2026-11-19)
+
+## What's Changed
+
+## Features
+
+- feat(ecosystem): layers and the direction of dependencies, checked report-only (ADR-019, D33) (#173)
+
+## Other changes
+
+- feat(ecosystem): layers and the direction of dependencies, checked report-only (ADR-019, D33) (#173)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.9.5 (2026-11-19)
 
 ## What's Changed
