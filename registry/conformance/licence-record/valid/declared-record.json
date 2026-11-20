@@ -1,0 +1,20 @@
+{
+  "licence": "CC-BY-4.0",
+  "status": "declared",
+  "declared_as": "CC-BY-4.0",
+  "verified": false,
+  "usable": true,
+  "declared_in": "sound-library.json",
+  "source": "https://example.org/sounds/1234",
+  "provider": "Example Sounds",
+  "author": "A. Author",
+  "title": "Door slam",
+  "credit": null,
+  "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+  "licence_file": null,
+  "licence_text_sha256": null,
+  "content_id": "unknown",
+  "attribution": "\"Door slam\" by A. Author (https://example.org/sounds/1234), licensed under CC-BY-4.0 (https://creativecommons.org/licenses/by/4.0/)",
+  "attribution_source": "composed",
+  "note": "The licence is recorded as declared (CC-BY-4.0); it has not been verified."
+}

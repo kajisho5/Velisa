@@ -1,0 +1,22 @@
+{
+  "licence": "CC-BY-4.0",
+  "kind": "sfx",
+  "tags": [
+    "door"
+  ],
+  "mood": [],
+  "loopable": false,
+  "source": "https://example.org/sounds/1234",
+  "provider": "Example Sounds",
+  "author": "A. Author",
+  "title": "Door slam",
+  "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "measured": {
+    "duration": 1.2,
+    "streams": 1
+  },
+  "imported_from": "door.wav",
+  "imported_at": "2026-11-12T09:00:00Z",
+  "imported_by": "sound-design-skill 0.3.6"
+}

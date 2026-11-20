@@ -12,6 +12,11 @@ Read from (each repository's `origin/main`, 2026-11-12): ffmpeg-skill `11c153e`
 thumbnail-skill `bca8ee2` (README, `src/thumbnail_skill/contract.py`), imagemagick-skill `ab89bf9`
 (`brandkit.py` in SKILL.md), hyperframes-skill `3528095` (`ECOSYSTEM_ROADMAP.md` step 14).
 
+Machine-readable schema: [`registry/schemas/kit.schema.json`](../../registry/schemas/kit.schema.json) (JSON Schema
+2020-12), with valid and invalid examples in [`registry/conformance/kit/`](../../registry/conformance/kit/)
+([ADR-024](../adr/ADR-024-spec-schemas-and-conformance-fixtures.md), which also lists where the readers differ from
+this page).
+
 ## Rule: a superset of ffmpeg-skill `brand.json`
 
 Every `brand.json` is a valid `kit@1`, and every key `brand.json` defines keeps its meaning and its
