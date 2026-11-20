@@ -47,9 +47,9 @@ owner of a spec or a Skill has to decide.
 
 | # | Where | The spec says | The implementation does | Schema | Status |
 |---|---|---|---|---|---|
-| K1 | ffmpeg-skill `check_brand_keys` (#510) | a kit file can be passed to ffmpeg-skill as it is; keys it does not use are kept and ignored | refuses every key it does not read. So `schema`, `name`, `colors.secondary`, `fonts`, `logo_variants`, `contrast` and `colours` stop ffmpeg-skill with an input error | follows the spec | **Open**: ffmpeg-skill accepts the kit@1 keys, or the spec says a kit is converted for ffmpeg-skill as for motion-graphics. ffmpeg-skill is not changed here |
+| K1 | ffmpeg-skill `check_brand_keys` (#510) | a kit file can be passed to ffmpeg-skill as it is; keys it does not use are kept and ignored | refuses every key it does not read. So `schema`, `name`, `colors.secondary`, `fonts`, `logo_variants`, `contrast` and `colours` stop ffmpeg-skill with an input error | follows the spec | **Decided** (2026-11-20, [ADR-030](ADR-030-kit-projection-for-ffmpeg-skill.md), D45): the spec says a consumer projects a kit onto ffmpeg-skill's brand keys before passing it; ffmpeg-skill is not changed |
 | K2 | ffmpeg-skill `BRAND_KEYS` | the brand.json keys are the ones in the table | also reads `emoji_assets` (top level and in `caption`), `colors.upcoming`, and `box`, `color`, `colour`, `font` in `caption` (the same keys as `styles.caption`) | allowed: the spec's rule says every brand.json is a kit@1 | **Open**: add them to the spec's table |
-| K3 | ffmpeg-skill | "`colours` for remotion" | refuses `colours` as a misspelling | allows `colours` (never with `colors`) | **Open**, with K1 |
+| K3 | ffmpeg-skill | "`colours` for remotion" | refuses `colours` as a misspelling | allows `colours` (never with `colors`) | **Decided** with K1 (ADR-030, D45): `colours` stays a kit spelling for remotion-ffmpeg-skill; the projection for ffmpeg-skill writes it as `colors` |
 | K4 | hyperframes-skill `kit.mjs`, remotion-ffmpeg-skill `_hex_colour` | colours are `RRGGBB` without `#` | accept `#RRGGBB` too (remotion also `0x` and `&H`) | `RRGGBB` only, so a kit with `#` fails | Settled: readers may be lenient; a kit is written without `#` |
 | K5 | ffmpeg-skill overlay, thumbnail-skill, motion-graphics-skill | `logo_position`: the four corners "and the other ffmpeg-skill position names" | the nine names of overlay.py (`top-left` ... `bottom-right`); ffmpeg-skill also takes an explicit `"X,Y"` | the nine names | **Open**: whether `"X,Y"` is a kit value |
 | K6 | thumbnail-skill `kit.py` (ADR-18), hyperframes-skill `--kit` (step 16), motion-graphics-skill `options.kit` (ADR-31) | mapping table: thumbnail-skill and hyperframes-skill have "no brand input"; motion-graphics takes a theme or `brand_kit` | all three read a kit@1 file themselves now | not affected | Settled: the spec's mapping table is out of date; updating its prose is a follow-up |
@@ -97,8 +97,8 @@ owner of a spec or a Skill has to decide.
   (`test_every_spec_document_links_its_schema`, the manifest check).
 - A Skill's copy goes stale silently until it re-exports. That is the price of offline, pinned tests. The manifest's
   `source.commit` says how old a copy is.
-- The open rows (K1, K2, K3, K5, L2) are decisions for the spec owner and ffmpeg-skill or sound-design-skill. Until
-  then a kit with the kit@1 keys cannot be handed to ffmpeg-skill as it is (K1).
+- The open rows (K2, K5, L2) are decisions for the spec owner and ffmpeg-skill or sound-design-skill. K1 and K3 were
+  decided on 2026-11-20 (ADR-030, D45): a kit is projected onto ffmpeg-skill's brand keys before it is passed.
 
 ## What follows
 
