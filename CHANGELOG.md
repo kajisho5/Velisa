@@ -1,3 +1,14 @@
+## v0.15.2 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): what 1.0 means for a Skill and the order the Skills get there (ADR-031, D46) (#186)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.15.1 (2026-11-20)
 
 ## What's Changed
