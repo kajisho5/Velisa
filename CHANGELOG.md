@@ -1,3 +1,18 @@
+## v0.15.0 (2026-11-20)
+
+## What's Changed
+
+## Features
+
+- feat(maintainer): velisa-maintainer plugin with /repin, /release, /roadmap; field test kit; polyrepo ADR (ADR-028, ADR-029, D42-D44) (#184)
+
+## Other changes
+
+- feat(maintainer): velisa-maintainer plugin with /repin, /release, /roadmap; field test kit; polyrepo ADR (ADR-028, ADR-029, D42-D44) (#184)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.14.1 (2026-11-20)
 
 ## What's Changed
