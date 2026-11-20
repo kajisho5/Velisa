@@ -1,3 +1,14 @@
+## v0.15.4 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): editing by transcript (ADR-032, D47) (#188)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.15.3 (2026-11-20)
 
 ## What's Changed
