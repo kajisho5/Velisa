@@ -849,3 +849,19 @@ Both releases shipped only a CI change.
 **Evidence**: [ADR-029](../adr/ADR-029-polyrepo-stays.md), with the comparison table.
 
 **What follows**: revisit when ADR-029's conditions hold over a month (for example, a quarter of merged pull requests split across three or more repositories, re-pins regularly needing hand fixes, drifting copies in more than five repositories, or per-subdirectory installs shown to work).
+
+## D45 — What 1.0 means for a Skill; the Skills go to 1.0 one at a time, most stable first
+
+**Decision** (owner request, 2026-11-20, details delegated):
+- From a Skill's 1.0.0, a change `si contract-diff` calls breaking ships only in a major release. Additive changes are minor, and a release with no contract change can be a patch.
+- The promise covers the `provides[]` entries marked `STABLE` and the tools they map to. `EXPERIMENTAL` entries may still change in a minor release, with a CHANGELOG line.
+- A `STABLE` entry is first marked `DEPRECATED` in a minor release. It keeps working for at least one more minor release and 30 days, and is removed only in the next major release.
+- 1.0 is cut through each repository's own flow: the `major` label in the release-drafter Skills.
+- The agent's re-pin treats a 0.x → 1.0.0 release with a `none` or `additive` diff as a gate widening.
+- Order, from the 2026-11-20 measurements: thumbnail-skill, imagemagick-skill, motion-graphics-skill, subtitle-skill, then the rest of ADR-030's table.
+
+**Why**: 24 Skills on 0.x, and every lifecycle `EXPERIMENTAL`, meant a version number told a dependent nothing about breakage.
+
+**Evidence**: [ADR-030](../adr/ADR-030-skills-at-1-0.md), with the ranking table and its sources.
+
+**What follows**: each Skill's 1.0 is its own pull request and release. A Skill that hits a problem on the way stops the sequence until it is fixed.

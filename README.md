@@ -274,6 +274,10 @@ writes a result file to commit.
 **One repository per component** (ADR-029, decision D44). The repositories stay separate; the ADR compares a
 monorepo and says when to ask again.
 
+**1.0 for a Skill** (ADR-030, decision D45). From 1.0.0, a breaking change to a `STABLE` entry ships only in a major release;
+`EXPERIMENTAL` entries may still change in a minor release; deprecation lasts at least one minor release and 30 days. The
+ADR ranks the 0.x Skills by stability, and they move to 1.0 in that order, one at a time.
+
 **Update notices.** `.github/workflows/skill-updates.yml` checks every repository daily and
 posts what changed (new commits with their subjects, new version tags) on the issue labelled
 `skill-updates`, mentioning the owner, so GitHub notifies by mail and in the app. Locally:
