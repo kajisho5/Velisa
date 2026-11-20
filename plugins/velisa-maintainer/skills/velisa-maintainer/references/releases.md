@@ -24,6 +24,7 @@ In auto mode (the version file still equals the latest tag), a push releases onl
 | `dependencies` (Dependabot) | releases, as a patch, in every Skill decided by labels or paths (addendum, 2026-11-19); a Dependabot `major` / `minor` label is about the dependency, not the Skill |
 | no label at all | releases, as a patch (remotion-ffmpeg: nothing) |
 | only `contract:none` / `contract:additive` / `contract:breaking` (the contract-diff bot's label) | as if it had no label: `release_gate.py` does not count `contract:*` labels (D37, addendum of 2026-11-20) |
+| `contract:breaking` without a major label (`major`, or what `version-resolver` maps to major), on a Skill whose latest tag is 1.0.0 or later; only in the 17 Skills that carry `release_gate.py` (hyperframes, imagemagick, remotion-ffmpeg, transcription and the others have no such check: read their own flow) | nothing: the release job fails, and `release_gate.py` prints the pull request (ADR-031 section 5, D46 addendum). The pull request's own `major-label-check` fails first. Each such pull request needs its own major label; a major version bumped by hand lets the release go. On 0.x the rows above apply unchanged |
 | only `chore`, `ci`, `docs` / `documentation`, `test`, `maintenance`, `refactor` | nothing |
 
 A commit that came from no pull request is judged by its subject: `chore:`, `ci:`, `docs:`, `test:`, `build:`, `refactor:`, `style:` release nothing. A version bumped by hand in a pull request is released as written, whatever the labels.
@@ -42,7 +43,7 @@ CHANGELOG headings keep the repository's own form (`## X.Y.Z - date` or `## vX.Y
 
 1. Latest tag: `gh api repos/kajisho5/<repo>/tags -q '.[0].name'` (sort by version if tags are not in order).
 2. Pull requests merged since: `gh api 'repos/kajisho5/<repo>/pulls?state=closed&base=main&sort=updated&direction=desc&per_page=30' -q '.[] | select(.merged_at) | {number, title, merged_at, labels: [.labels[].name]}'`, keep those merged after the tag's commit date.
-3. Apply the table above. Then read the last run: `gh api 'repos/kajisho5/<repo>/actions/workflows/release.yml/runs?branch=main&per_page=1'`, and its job log for "Nothing to release" or a failed "Test the release commit" step.
+3. Apply the table above. Then read the last run: `gh api 'repos/kajisho5/<repo>/actions/workflows/release.yml/runs?branch=main&per_page=1'`, and its job log for "Nothing to release", a failed "Test the release commit" step, or a failed gate step naming a `contract:breaking` pull request. For that last case, in auto mode (the version file still equals the tag), add `major` to the pull request (only the owner does): release-drafter then resolves the next major. If the version was bumped by hand, `major` does not help; the version must be raised to the next major (X+1.0.0) in a pull request. When every breaking change is in an `EXPERIMENTAL` entry, the reviewer can instead remove `contract:breaking`. Then run the release again.
 
 ## Releasing from a session
 
