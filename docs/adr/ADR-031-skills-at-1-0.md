@@ -147,10 +147,11 @@ The rule applies once the latest release tag is 1.0.0 or later. A pull request l
 - **Pull request**: `major-label-check.yml` runs `release_gate.py --check-pr` and fails the check when the label is missing.
   - contract-diff labels with `GITHUB_TOKEN`, and a label set that way starts no workflow. So on opened / synchronize / reopened, the check first waits for that commit's contract-diff run, then reads the labels.
   - `labeled` / `unlabeled` run the check again when a person changes a label.
-  - The check also fails when that contract-diff run did not succeed, never came, or timed out: the label is then not known. On 0.x it passes without reading anything.
+  - The check also fails when that contract-diff run did not succeed, never came, or timed out: the label is then not known. It also fails when contract-diff ran but left no `contract:*` label. A fork's token cannot write one, so a maintainer reads contract-diff's summary and adds the label. On 0.x it passes without reading anything.
   - A pull request that bumps the major version in `pyproject.toml` passes. One that bumps the version by hand within the same major fails, even with `major`: in that mode the labels do not pick the version. "By hand" is decided as `release.yml` decides it, by comparing the whole version string with the tag, so `1.2.3+build.1` on `v1.2.3` is a hand bump and not a major release.
 - **Release**: `release_gate.py` stops the release when a merged pull request since the tag carries `contract:breaking` without a major label. It prints each such pull request as an error, writes `releasable=false` and exits 1, so the release job fails and nothing is tagged.
-  - A release that is major anyway still goes: another merged pull request carries a major label, or the major version was bumped by hand.
+  - Each such pull request needs its own major label, as on the pull request itself. A major label on another merged pull request does not count: that pull request could carry a label release-drafter skips.
+  - A major version bumped by hand lets the release go. A version file that cannot be read counts as a hand bump, not as auto mode.
   - To release after a stop in auto mode (the version file still equals the tag), put `major` on that pull request and run the release again: release-drafter then resolves the next major. If the version was bumped by hand, `major` does not help: the version must be raised to the next major (X+1.0.0) in a pull request.
 - **0.x**: unchanged. A breaking change there needs only a minor bump (ADR-020), and neither check looks at it.
 
