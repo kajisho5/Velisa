@@ -1,3 +1,14 @@
+## v0.14.1 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): changelog-check and release-guard on every Skill (D36 rollout); dependencies PRs release a patch (ADR-023 addendum, D37) (#183)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.14.0 (2026-11-20)
 
 ## What's Changed
