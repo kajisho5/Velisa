@@ -147,6 +147,7 @@ The rule applies once the latest release tag is 1.0.0 or later. A pull request l
 - **Pull request**: `major-label-check.yml` runs `release_gate.py --check-pr` and fails the check when the label is missing.
   - contract-diff labels with `GITHUB_TOKEN`, and a label set that way starts no workflow. So on opened / synchronize / reopened, the check first waits for that commit's contract-diff run, then reads the labels.
   - `labeled` / `unlabeled` run the check again when a person changes a label.
+  - The check fails when the pull request removes `contract-diff.yml` from a repository whose base branch has it.
   - The check also fails when that contract-diff run did not succeed, never came, or timed out: the label is then not known. It also fails when contract-diff ran but left no `contract:*` label. A fork's token cannot write one, so a maintainer reads contract-diff's summary and adds the label. On 0.x it passes without reading anything.
   - A pull request that bumps the major version in `pyproject.toml` passes. One that bumps the version by hand within the same major fails, even with `major`: in that mode the labels do not pick the version. "By hand" is decided as `release.yml` decides it, by comparing the whole version string with the tag, so `1.2.3+build.1` on `v1.2.3` is a hand bump and not a major release.
 - **Release**: `release_gate.py` stops the release when a merged pull request since the tag carries `contract:breaking` without a major label. It prints each such pull request as an error, writes `releasable=false` and exits 1, so the release job fails and nothing is tagged.
@@ -156,6 +157,11 @@ The rule applies once the latest release tag is 1.0.0 or later. A pull request l
 - **0.x**: unchanged. A breaking change there needs only a minor bump (ADR-020), and neither check looks at it.
 
 It does not use ADR-020's `fail-on-breaking`: contract-diff stays report-only, and the check reads its label. There is still no way to name an `EXPERIMENTAL`-only exception (section 2). Until there is, the reviewer removes `contract:breaking` by hand after checking that every breaking change is in an `EXPERIMENTAL` entry. The check runs again on `unlabeled`. A later push brings the label back, because contract-diff labels each commit again.
+
+Known gaps, left for a later change:
+
+- **Fork pull requests.** contract-diff cannot label a fork's pull request. A `contract:*` label that a maintainer added for an earlier head stays after a later push, and the check accepts it. On a fork pull request, the maintainer checks the label again after each push.
+- **Labels can change during the release job.** The release job reads the labels in `release_gate.py`, then again in release-drafter, seconds later. If `major` is removed between the two, the resolved version is not checked against the rule again.
 
 The check goes by the version, not by `STABLE` entries. So it also covers the three Skills that were on 1.x before this ADR (audio-production 1.4.3, color-grading 1.1.4, qc 1.4.5), although they have no `STABLE` entry yet. The same manual removal applies to them.
 
