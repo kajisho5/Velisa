@@ -1,3 +1,18 @@
+## v0.14.0 (2026-11-20)
+
+## What's Changed
+
+## Features
+
+- feat(ecosystem): timebase spec and error taxonomy, with vectors, reference code and a report-only check (ADR-026, ADR-027, D40, D41) (#182)
+
+## Other changes
+
+- feat(ecosystem): timebase spec and error taxonomy, with vectors, reference code and a report-only check (ADR-026, ADR-027, D40, D41) (#182)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.13.0 (2026-11-19)
 
 ## What's Changed
