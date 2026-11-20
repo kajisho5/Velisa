@@ -16,7 +16,7 @@ Decision per sibling:
 |---|---|
 | none / additive, inside the adapter's `SUPPORTED_SKILL_VERSIONS` | `auto`: the pin moves |
 | none / additive, a new minor of a 0.x / 1.x line outside the gate | `widen`: the gate takes the `X.Y.` prefix, with a dated comment; the refusal probes move to `X.(Y+1).0` |
-| breaking, a major change (other than a first 1.0.0 after 0.x with a `none` / `additive` diff, which widens the gate to `1.0.`: agent ADR-117 addendum 3, ADR-030), a minor outside the gate on 2.x+, a tag not newer than the pin, or `verify` failed | `review`: the pin moves, the gate does not |
+| breaking, a major change (other than a first 1.0.0 after 0.x with a `none` / `additive` diff, which widens the gate to `1.0.`: agent ADR-117 addendum 3, ADR-031), a minor outside the gate on 2.x+, a tag not newer than the pin, or `verify` failed | `review`: the pin moves, the gate does not |
 
 ## The pull request
 

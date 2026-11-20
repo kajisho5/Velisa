@@ -1,6 +1,6 @@
-# ADR-030: What 1.0 Means for a Skill, and the Order the Skills Get There
+# ADR-031: What 1.0 Means for a Skill, and the Order the Skills Get There
 
-Status: Accepted (decision D45). The owner approved moving the 0.x Skills to 1.0, one Skill at a time.
+Status: Accepted (decision D46). The owner approved moving the 0.x Skills to 1.0, one Skill at a time.
 
 ## Context
 
