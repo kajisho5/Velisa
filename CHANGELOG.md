@@ -1,3 +1,14 @@
+## v0.15.1 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(spec): a kit is projected onto ffmpeg-skill's brand keys before it is passed (K1, K3; ADR-030, D45) (#185)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.15.0 (2026-11-20)
 
 ## What's Changed
