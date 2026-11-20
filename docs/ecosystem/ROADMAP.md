@@ -257,7 +257,7 @@ What every skill was checked against, and where each gap landed. "Step" means a 
 | Speed: proxies, GPU (NVENC / VideoToolbox / QSV), parallel, cache, incremental | ffmpeg-skill hardware encoders and `proxy`; media-analysis cache | segment cache and partial re-render (video-editing); incremental QC (qc); chunked parallel transcription; proxies at ingest |
 | Recovery: resume, partial re-render, idempotency, logs | agent `--resume`; ingest resumable; hyperframes `bit_exact` | resumable blocks (voice-enhance, transcription, diarization); idempotency conformance (skillpact); series uploads never sent twice (publish) |
 | Natural-language control: vague requests, confirmation gates, preview and revise, "さっきの" | requirements_extraction (unambiguous phrases), CONFIRM floors, `revise --feedback` | motion brief slots, relative revisions and references, delivery presets from a sentence (agent) |
-| Agent contract: inputs and outputs, error classes, progress | per-skill error codes with `retryable` | one error-class vocabulary and progress events (skillpact; agent over MCP) |
+| Agent contract: inputs and outputs, error classes, progress | per-skill error codes with `retryable` | one error-class vocabulary (done, report only: [ADR-027](../adr/ADR-027-error-taxonomy.md)) and progress events (skillpact; agent over MCP) |
 | Future: generated video, many languages, AI voice, vertical shorts, clips from long recordings | dubbing, subtitle translate, remotion `--aspect` | Shorts set and highlight signals (agent, media-analysis); AI clips in an edit (video-editing); AI voice disclosure (dubbing); generative media: [ADR-016](../adr/ADR-016-generative-media.md) first, no skill yet |
 
 ### Delivery formats for broadcast and NLE (all skills)

@@ -311,6 +311,17 @@ The release workflows themselves stay per repository; ADR-022 lists how each Ski
 
 **Shared data formats, checked** (ADR-024, decision D38; ADR-025, D39). `kit@1`, `title.json`, `stinger.json`, the licence record and the sidecar envelope each have a JSON Schema in `registry/schemas/` and valid / invalid examples in `registry/conformance/`. `spec-conformance.yml` fails a pull request when an example does not behave as its directory says. A Skill copies them into its tests with `python3 -m registry.spec_conformance --export`; hyperframes-skill and motion-graphics-skill do so first. ADR-024 lists where the Skills differ from the specs.
 
+**Timebase** (ADR-026, decision D40). [`docs/specs/timebase.md`](docs/specs/timebase.md) says how frame rates, times,
+frames and SMPTE timecode are written and converted: exact `N/D` rates (29.97 is 30000/1001, never 2997/100), one
+rounding rule (a half up), positions counted in whole frames, drop-frame at 29.97 and 59.94 only. Its conformance
+vectors are [`docs/specs/timebase-vectors.json`](docs/specs/timebase-vectors.json); `scripts/timebase.py` is the
+reference implementation (`python3 scripts/timebase.py vectors`).
+
+**Error taxonomy** (ADR-027, decision D41). [`docs/specs/error-taxonomy.md`](docs/specs/error-taxonomy.md) puts every
+Skill's error codes in 15 shared classes, each with a retry policy and a rule for its message to a person.
+`scripts/error_taxonomy.py` lists codes the taxonomy does not know; `.github/workflows/error-taxonomy.yml` runs it
+weekly on the contracts the agent pins. It reports only and does not fail.
+
 **GitHub Project.** `.github/workflows/project-sync.yml` adds the issues and pull requests of
 every repository in `ecosystem.json` to the project *AI Video Production Ecosystem* (kajisho5 #1)
 every hour, from this repository alone. It needs one secret here, `PROJECT_TOKEN`: a classic token
