@@ -1,3 +1,14 @@
+## v0.15.5 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): the ADR-031 section 5 check is implemented (D46 addendum) (#189)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.15.4 (2026-11-20)
 
 ## What's Changed
