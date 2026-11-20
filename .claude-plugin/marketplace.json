@@ -13,6 +13,16 @@
       "category": "os"
     },
     {
+      "name": "velisa-maintainer",
+      "source": "./plugins/velisa-maintainer",
+      "description": "For maintainers of the Velisa repositories, not for production: re-pins, releases, contract diffs, the shared specs and schemas, and the commands /repin, /release and /roadmap.",
+      "category": "maintenance",
+      "tags": [
+        "maintenance",
+        "保守"
+      ]
+    },
+    {
       "name": "video-production-agent",
       "source": {
         "source": "github",

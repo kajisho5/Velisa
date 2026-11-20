@@ -11,6 +11,9 @@ on:
     paths:
       - "install.sh"
       - "scripts/**"
+      - "plugins/**"
+      - ".claude-plugin/**"
+      - "docs/field-test/**"
       - "registry/**"
       - "ecosystem.json"
       - "docs/ecosystem/registry.json"
@@ -20,6 +23,9 @@ on:
     paths:
       - "install.sh"
       - "scripts/**"
+      - "plugins/**"
+      - ".claude-plugin/**"
+      - "docs/field-test/**"
       - "registry/**"
       - "ecosystem.json"
       - "docs/ecosystem/registry.json"

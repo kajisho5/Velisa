@@ -34,12 +34,13 @@ class MarketplaceTests(unittest.TestCase):
         mk, meta = marketplace.build(MANIFEST)
         names = [e["name"] for e in mk["plugins"]]
         plugins = [c for c in MANIFEST["components"] if c.get("plugin") and c["status"] != "planned"]
-        self.assertEqual(names, ["velisa"] + [c["repo"] for c in plugins])
+        self.assertEqual(names, ["velisa", "velisa-maintainer"] + [c["repo"] for c in plugins])
         self.assertEqual(len(names), len(set(names)))
-        for e in mk["plugins"][1:]:
+        for e in mk["plugins"][2:]:
             self.assertEqual(e["source"], {"source": "github", "repo": f"{MANIFEST['org']}/{e['name']}"})
             self.assertNotIn("version", e, "no version: installs follow each repository's commits")
         self.assertEqual(meta["dependencies"], [c["repo"] for c in plugins if not c.get("optional")])
+        self.assertNotIn("velisa-maintainer", meta["dependencies"], "installing the OS does not install the maintainer tools")
         self.assertFalse(mk["name"].startswith(("claude", "anthropic")))
 
     def test_routing_skill_names_every_component(self):
@@ -66,6 +67,101 @@ class MarketplaceTests(unittest.TestCase):
                 path = (doc.parent / target.split("#", 1)[0]).resolve()
                 self.assertTrue(path.is_file(), f"{doc.name}: broken link {target}")
                 self.assertTrue(path.is_relative_to(plugin_dir), f"{doc.name}: {target} is outside the plugin")
+
+
+class MaintainerPluginTests(unittest.TestCase):
+    """plugins/velisa-maintainer (ADR-028, D42): a local plugin with one skill, its references and three commands."""
+    plugin = ROOT / "plugins/velisa-maintainer"
+    skill = plugin / "skills/velisa-maintainer"
+
+    def test_marketplace_entry_points_at_the_plugin(self):
+        mk, _ = marketplace.build(MANIFEST)
+        entry = mk["plugins"][1]
+        self.assertEqual(entry["name"], "velisa-maintainer")
+        self.assertEqual((ROOT / entry["source"]).resolve(), self.plugin.resolve())
+        meta = json.loads((self.plugin / ".claude-plugin/plugin.json").read_text(encoding="utf-8"))
+        self.assertEqual(meta["name"], entry["name"])
+        self.assertNotIn("dependencies", meta)
+
+    def test_skill_is_short_and_links_every_reference(self):
+        text = (self.skill / "SKILL.md").read_text(encoding="utf-8")
+        self.assertTrue(text.startswith("---\nname: velisa-maintainer\ndescription: "))
+        self.assertLessEqual(len(text.splitlines()), 60, "keep SKILL.md short; details go to references/")
+        refs = sorted(p.name for p in (self.skill / "references").glob("*.md"))
+        self.assertEqual(refs, ["contract-diff.md", "releases.md", "repin.md", "schemas.md", "session-limits.md", "specs.md"])
+        for name in refs:
+            self.assertIn(f"](references/{name})", text)
+
+    def test_references_cover_the_maintenance_topics(self):
+        ref = {p.name: p.read_text(encoding="utf-8") for p in (self.skill / "references").glob("*.md")}
+        for word in ("ADR-117", "repin: needs review", "verify", "workflow_dispatch", "bot/repin"):
+            self.assertIn(word, ref["repin.md"])
+        for word in ("release_gate.py", "dependencies", "ADR-022", "ADR-023", "Test the release commit before pushing it"):
+            self.assertIn(word, ref["releases.md"])
+        for word in ("ADR-020", "contract:breaking", "si contract-diff"):
+            self.assertIn(word, ref["contract-diff.md"])
+        for word in ("ADR-026", "ADR-027", "30000/1001", "CANCELLED"):
+            self.assertIn(word, ref["specs.md"])
+        for word in ("ADR-024", "ADR-025", "--export", "manifest.json"):
+            self.assertIn(word, ref["schemas.md"])
+        for word in ("tag", "branch", "GraphQL", "ready", "PATCH", "@coderabbitai"):
+            self.assertIn(word, ref["session-limits.md"])
+
+    def test_commands_and_links(self):
+        commands = sorted(p.stem for p in (self.plugin / "commands").glob("*.md"))
+        self.assertEqual(commands, ["release", "repin", "roadmap"])
+        for p in (self.plugin / "commands").glob("*.md"):
+            text = p.read_text(encoding="utf-8")
+            self.assertTrue(text.startswith("---\ndescription: "), p.name)
+            self.assertNotIn("graphql", text.lower().replace("never graphql", ""), p.name)
+        self.assertIn("${CLAUDE_PLUGIN_ROOT}/scripts/roadmap.py", (self.plugin / "commands/roadmap.md").read_text(encoding="utf-8"))
+        for doc in [self.skill / "SKILL.md", *(self.skill / "references").glob("*.md")]:
+            for target in re.findall(r"\]\(([^)\s]+)\)", doc.read_text(encoding="utf-8")):
+                if re.match(r"[a-z]+:", target) or target.startswith("#"):
+                    continue
+                path = (doc.parent / target.split("#", 1)[0]).resolve()
+                self.assertTrue(path.is_file(), f"{doc.name}: broken link {target}")
+                self.assertTrue(path.is_relative_to(self.plugin.resolve()), f"{doc.name}: {target} is outside the plugin")
+
+
+class RoadmapScriptTests(unittest.TestCase):
+    roadmap = load("roadmap", "../plugins/velisa-maintainer/scripts/roadmap.py")
+    TEXT = """# r
+
+## Steps
+
+- [x] **1. Done thing** — what ([#3](https://example.invalid/3))
+  - Done when: it works
+- [ ] **2. Real-NLE check** — import the files
+  - なぜ要るか：理由
+  - Done when: a fixture per NLE
+  - Needs: step 1
+- [ ] **3a. Parts** — several
+  - [x] Part 1: done
+  - [ ] Part 2: open
+not a step line
+
+## Boundaries
+- [ ] **4. Later** — x
+"""
+
+    def test_parse(self):
+        steps = self.roadmap.parse(self.TEXT)
+        self.assertEqual([(s["number"], s["done"]) for s in steps], [("1", True), ("2", False), ("3a", False), ("4", False)])
+        self.assertEqual(steps[1]["title"], "Real-NLE check")
+        self.assertEqual(steps[1]["notes"], {"なぜ要るか": "理由", "Done when": "a fixture per NLE", "Needs": "step 1"})
+        self.assertEqual(steps[2]["parts"], [{"done": True, "text": "Part 1: done"}, {"done": False, "text": "Part 2: open"}])
+        self.assertEqual(steps[3]["section"], "Boundaries")
+
+    def test_render_lists_open_steps_only(self):
+        out = self.roadmap.render(self.roadmap.parse(self.TEXT), False)
+        self.assertNotIn("Done thing", out)
+        self.assertIn("- [ ] 2. Real-NLE check\n    Done when: a fixture per NLE\n    Needs: step 1", out)
+        self.assertIn("    - [ ] Part 2: open", out)
+        self.assertNotIn("Part 1", out)
+        self.assertTrue(out.endswith("3 open of 4 steps\n"))
+        self.assertIn("Done thing", self.roadmap.render(self.roadmap.parse(self.TEXT), True))
+        self.assertIn("no checkbox steps", self.roadmap.render([], False))
 
 
 class FakeAPI:

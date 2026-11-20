@@ -1,0 +1,16 @@
+{
+  "name": "velisa-maintainer",
+  "displayName": "Velisa maintainer",
+  "description": "For whoever maintains the Velisa repositories, not for producing video: re-pins, releases, contract diffs, the shared specs and schemas, roadmaps, and what a Claude Code session cannot do on GitHub. Commands /repin, /release and /roadmap.",
+  "author": {
+    "name": "kajisho5",
+    "url": "https://github.com/kajisho5"
+  },
+  "homepage": "https://github.com/kajisho5/Velisa",
+  "repository": "https://github.com/kajisho5/Velisa",
+  "keywords": [
+    "maintenance",
+    "release",
+    "contracts"
+  ]
+}
