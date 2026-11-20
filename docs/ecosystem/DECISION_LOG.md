@@ -763,6 +763,8 @@ Both releases shipped only a CI change.
 
 **Addendum** (owner, 2026-11-19): a pull request labelled `dependencies` releases, as a patch, in every Skill whose release is decided from labels or changed paths. Before, 18 of the 21 such Skills released nothing for it, or only for some updates; color-grading, media-analysis and qc already released it. `release_gate.py` is one file again in all 17 repositories that have it. Every `version-resolver` maps `dependencies` to a patch and maps no maintenance label. imagemagick and remotion-ffmpeg give it a patch in `resolve_version.py`, and transcription in `release_scope.py` (its ADR-049). [ADR-023](../adr/ADR-023-release-commit-tested-and-gated.md#addendum-2026-11-19-a-dependencies-pull-request-releases-a-patch) has the before / after table.
 
+**Addendum** (2026-11-20): `release_gate.py` no longer counts the `contract:none` / `contract:additive` / `contract:breaking` labels that contract-diff (ADR-020) puts on every pull request. Before, a pull request whose only label was `contract:none` counted as "other labels only" and released nothing, although an unlabelled one ships as a patch. A `contract:*` label that a `version-resolver` maps to a bump would still count; none does today, and no release script reads these labels for the version. The file stays identical in all 17 repositories, each with a regression test.
+
 ## D38 — The shared data-format specs get JSON Schemas and conformance fixtures; Skills copy them into their tests
 
 **Decision** (owner, 2026-11-19, details delegated):

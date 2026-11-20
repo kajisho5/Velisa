@@ -23,6 +23,7 @@ In auto mode (the version file still equals the latest tag), a push releases onl
 | a release-level label (`feature` / `minor` / `enhancement`, `fix` / `bug` / `patch`, `major` / `breaking`, or what the repository's `version-resolver` maps) | releases at that level |
 | `dependencies` (Dependabot) | releases, as a patch, in every Skill decided by labels or paths (addendum, 2026-11-19); a Dependabot `major` / `minor` label is about the dependency, not the Skill |
 | no label at all | releases, as a patch (remotion-ffmpeg: nothing) |
+| only `contract:none` / `contract:additive` / `contract:breaking` (the contract-diff bot's label) | as if it had no label: `release_gate.py` does not count `contract:*` labels (D37, addendum of 2026-11-20) |
 | only `chore`, `ci`, `docs` / `documentation`, `test`, `maintenance`, `refactor` | nothing |
 
 A commit that came from no pull request is judged by its subject: `chore:`, `ci:`, `docs:`, `test:`, `build:`, `refactor:`, `style:` release nothing. A version bumped by hand in a pull request is released as written, whatever the labels.
