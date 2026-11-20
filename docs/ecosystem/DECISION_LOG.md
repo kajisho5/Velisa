@@ -878,3 +878,12 @@ Both releases shipped only a CI change.
 **Evidence**: [ADR-031](../adr/ADR-031-skills-at-1-0.md), with the ranking table and its sources.
 
 **What follows**: each Skill's 1.0 is its own pull request and release. A Skill that hits a problem on the way stops the sequence until it is fixed.
+
+**Addendum** (2026-11-20): the blocking check of ADR-031 section 5 is implemented in the 17 Skills that carry `release_gate.py`. Three files are identical in all 17: `release_gate.py`, `major-label-check.yml` and `tests/test_release_gate_major.py`.
+- From a latest tag of 1.0.0, a pull request labelled `contract:breaking` without a major label (what `release-drafter.yml` maps to major) fails the new `major-label-check.yml`. That check waits for the commit's contract-diff run, and runs again on `labeled` / `unlabeled`.
+- The release job stops on the same rule: `release_gate.py` prints the reason, writes `releasable=false` and exits 1. A release that is major anyway still goes.
+- 0.x is unchanged.
+- An `EXPERIMENTAL`-only break has no named exception yet: the reviewer removes `contract:breaking` by hand.
+- The check goes by version, so the three pre-ADR 1.x Skills (audio-production, color-grading, qc) are covered too.
+
+[ADR-031 section 5, addendum](../adr/ADR-031-skills-at-1-0.md#addendum-2026-11-20-the-check-is-implemented) lists the pull requests.
