@@ -282,6 +282,10 @@ ADR ranks the 0.x Skills by stability, and they move to 1.0 in that order, one a
 transcription-skill gives the words' times and the gaps, video-editing-skill places each cut in its gap, on a silence and on
 a frame, and retimes the transcript and subtitles; the agent shows what goes and waits for a yes.
 
+**Batch selects** (ADR-033, decision D48). media-analysis-skill and qc-skill measure each shot (cuts, blur, exposure,
+shake, black and frozen frames, silence, speech); the agent keeps or rejects each shot by its rule `selects@1`, lists why,
+and renders the selects sequence through its existing trim and join only after a yes.
+
 **Update notices.** `.github/workflows/skill-updates.yml` checks every repository daily and
 posts what changed (new commits with their subjects, new version tags) on the issue labelled
 `skill-updates`, mentioning the owner, so GitHub notifies by mail and in the app. Locally:
