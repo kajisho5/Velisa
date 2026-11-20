@@ -108,7 +108,8 @@ platform format rows from `check` / `qc-skill`, the step-4 comparison items that
   What was removed is not verified.
 - **Framing after a 9:16 crop**: the default crop is the centre and nothing tracks a subject. Pick
   the offset from a contact sheet (ffmpeg-skill `look.py`) or from `detection-skill`, and have the
-  user check the sheet of the result
+  user check the sheet of the result. Per-shot windows, when not to crop, and the look before and
+  after: [reframe.md](reframe.md)
   ([gotchas: reframing](https://github.com/kajisho5/ffmpeg-skill/blob/main/references/gotchas.md#reframing-fps-and-duration)).
 - **Burned-in subtitles in the source**: they cannot be removed (blur or delogo is not inpainting).
   Offer the options: crop the band, cover it with a box, or get a clean master
