@@ -742,6 +742,8 @@ No ecosystem-wide check runs yet; skillpact's conformance job (ADR-014) is the p
 - contract-file-check is called by no Skill for now, because the check would run twice.
 - changelog-check and release-guard are on trial in qc-skill, publish-skill and blender-skill. They go wider once the trial runs are clean. `owns` is unchanged.
 
+**Rollout** (2026-11-19): the trial runs were clean, so both checks went on the other 26 Skills with a committed contract (ffmpeg-skill and video-production-agent excluded). Five need one changelog input (`stop-at` in four, `other-headings` in thumbnail-skill); five have no CHANGELOG and call release-guard only. release-guard runs on the completion of the workflow that makes the tag, and also on a pushed `v*` tag where a person can push one. Its first run passed in all 26. [ADR-022](../adr/ADR-022-reusable-checks-and-release-methods.md#rollout-to-every-skill-2026-11-19) has the inputs and triggers.
+
 ## D37 — The release job tests its commit before pushing it; chore / ci / docs / test pull requests release nothing
 
 **Decision** (owner, 2026-11-19, details delegated):
@@ -758,6 +760,8 @@ Both releases shipped only a CI change.
 **Evidence**: [ADR-023](../adr/ADR-023-release-commit-tested-and-gated.md) has the per-repository table and the measurements.
 
 **What follows**: ffmpeg-skill and video-production-agent are not changed. artifacts-skill and blender-skill release through a pull request, so CI already runs on their release commit. transcription-skill keeps its path-based rule (its ADR-036), which already holds release back for docs / ci / test-only changes. `owns` is unchanged.
+
+**Addendum** (owner, 2026-11-19): a pull request labelled `dependencies` releases, as a patch, in every Skill whose release is decided from labels or changed paths. Before, 18 of the 21 such Skills released nothing for it, or only for some updates; color-grading, media-analysis and qc already released it. `release_gate.py` is one file again in all 17 repositories that have it. Every `version-resolver` maps `dependencies` to a patch and maps no maintenance label. imagemagick and remotion-ffmpeg give it a patch in `resolve_version.py`, and transcription in `release_scope.py` (its ADR-049). [ADR-023](../adr/ADR-023-release-commit-tested-and-gated.md#addendum-2026-11-19-a-dependencies-pull-request-releases-a-patch) has the before / after table.
 
 ## D38 — The shared data-format specs get JSON Schemas and conformance fixtures; Skills copy them into their tests
 

@@ -1,6 +1,6 @@
 # ADR-022: Reusable Checks for Skills, and the Release Methods Left as They Are
 
-Status: Accepted (contract-diff on every Skill with a contract; changelog-check and release-guard on trial)
+Status: Accepted (contract-diff, changelog-check and release-guard on every Skill with a contract; see the rollout below)
 
 ## Context
 
@@ -56,6 +56,34 @@ GitHub starts no workflow for a tag pushed with the default `GITHUB_TOKEN`. So w
   - qc-skill checked v1.4.4 and publish-skill checked v0.2.3, the releases made by merging the trial;
   - blender-skill checked `blender-skill-v0.31.1` (`tag-pattern`; its stray `v0.0.1` tag is ignored).
 - 16 release tags were made after these merges, the first in each repository to contain one. Every one carries a contract that says its tag's version.
+
+## Rollout to every Skill (2026-11-19)
+
+After the trial, `changelog-check.yml` and `release-guard.yml` went on every Skill that commits `contract/contract.json`: 26 repositories besides the three trial ones, one pull request each. ffmpeg-skill (no contract file) and video-production-agent are not callers.
+
+- **changelog-check** runs on every pull request. Five repositories have no CHANGELOG (bdmvkit, dvdcc, oncemore, udfkit, vtskit), so they call only release-guard. Of the other 21, 16 pass with the defaults. Five need one input:
+
+| Repository | Input | Why |
+|---|---|---|
+| audio-production | `stop-at: ^## v0\.4\.0 ` | v0.4.0 and v0.3.0 appear more than once in the older history |
+| nle-bridge | `stop-at: ^## 0\.1\.0 \(before the first release\)$` | an untagged section written before the first release; it starts like a version heading, so `other-headings` cannot allow it |
+| stepcap | `stop-at: ^## Changelog$` | the section before release-please took over |
+| thumbnail | `other-headings: ^## ` | release-drafter's notes use level-2 headings inside each entry |
+| video-editing | `stop-at: ^## Before release automation` | the history from before the release job, never tagged |
+
+  No repository needed `heading-pattern`, `version-file` or `version-pattern`: every version file is a static `pyproject.toml` or `package.json` version. nle-bridge is new since the measurement above; ingest-skill now has a CHANGELOG and passes the defaults.
+- **release-guard**'s trigger follows how the tag is made:
+
+| Tag made by | Trigger | Repositories |
+|---|---|---|
+| the release job on a push to main (`GITHUB_TOKEN`) | `workflow_run` of `Release` / `release` | audio-production, color-grading, detection, diarization, dubbing, imagemagick, ingest, media-analysis, motion-graphics, nle-bridge, remotion-ffmpeg, slide-sync, sound-design, subtitle, thumbnail, transcription, video-editing, voice-enhance |
+| the release job after CI on main | `workflow_run` of `Release` | artifacts, hyperframes |
+| release-please | `workflow_run` of `release` | stepcap |
+| the release job, or a person pushing `v*` | `workflow_run` of `Release` on main, and `push: tags: [v*]` | bdmvkit, dvdcc, udfkit, vtskit |
+| a person pushing `v*` (or the release workflow run by hand) | `push: tags: [v*]`, and `workflow_run` of `Release` on main | oncemore |
+
+  Every caller can also be run by hand. artifacts and oncemore set `allow-missing-contract: true`, because their newest tag is older than the contract file. The default tag pattern `v1.2.3` fits every one.
+- **First results**: every changelog-check passed on its own pull request. release-guard's first run, on the release workflow's completion after each merge (oncemore: run by hand), passed in all 26: 24 found that the newest tag's contract says the tag's version, and artifacts (v0.4.0) and oncemore (v1.4.0) passed with the warning. None of these merges cut a release: they were `ci:` pull requests, which release nothing (ADR-023).
 
 ## Consequences
 

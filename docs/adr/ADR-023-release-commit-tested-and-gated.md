@@ -52,3 +52,38 @@ ffmpeg-skill and video-production-agent are not covered by this change.
 - The gate reads labels, so a mislabelled pull request can be held back. A person who wants it released adds a release-level label before the next merge, or bumps the version by hand.
 - The fast tests are a subset. Integration tests that need FFmpeg or ffmpeg-skill still run only in CI on pull requests.
 - `release-guard.yml` (ADR-022) still checks a tag after it is made. This ADR adds the check before the push.
+
+## Addendum (2026-11-19): a `dependencies` pull request releases a patch
+
+Decided by the owner on 2026-11-19 (decision D37, addendum). It replaces the line of rule 2 above that left `dependencies` to each repository.
+
+### Context
+
+Rule 2 let each repository keep its own meaning for `dependencies`, the label Dependabot puts on its pull requests. Measured on 2026-11-19, a pull request labelled only `dependencies` was handled in five ways:
+
+| Repositories | Before |
+|---|---|
+| color-grading, media-analysis, qc | released, as a patch (`version-resolver` maps it) |
+| audio-production, detection, diarization, dubbing, ingest, nle-bridge, publish, slide-sync, sound-design, video-editing, voice-enhance, motion-graphics, subtitle | nothing: `version-resolver` did not map it, and `release_gate.py` listed it with the maintenance labels |
+| thumbnail | nothing: Dependabot labelled its pull requests `chore` only, and no category mapped `dependencies` |
+| hyperframes | nothing: `version-resolver` did not map it |
+| imagemagick, remotion-ffmpeg | nothing, by an explicit rule in `resolve_version.py` |
+| transcription | a pip update released (it changes `pyproject.toml`); a GitHub Actions update did not (it changes only `.github/`, ADR-036) |
+
+### Decision
+
+A pull request labelled `dependencies` releases, as a patch, in every Skill whose release is decided from labels or changed paths. An updated dependency changes what users install. A Dependabot `major` or `minor` label on such a pull request is about the dependency, not the Skill.
+
+- **`release_gate.py`** is the same file in all 17 repositories that have it: `dependencies` is a release label and no longer a maintenance label. Each `test_release_scripts.py` / `test_release_gate.py` checks that a `dependencies` pull request releases.
+- **`version-resolver`** maps `dependencies` to a patch in every `release-drafter.yml`, and none maps chore / ci / docs / test / refactor (imagemagick's and transcription's listed some of them; both now have the shared form). thumbnail-skill, whose file has no `version-resolver`, gains a "Dependencies" category with `semver-increment: patch`, and its Dependabot labels its pull requests `dependencies`.
+- **imagemagick and remotion-ffmpeg** (`resolve_version.py`): `dependencies` gives a patch, whatever other labels the pull request carries. remotion-ffmpeg stays stricter otherwise: an unlabelled change still releases nothing there.
+- **hyperframes** (`release.mjs`) reads the same `version-resolver`, so mapping the label is enough.
+- **transcription** (its ADR-049): `release_scope.py --dependency-labels` also reads the labels of the pull requests merged since the tag. One labelled `dependencies` makes the push releasable, whatever paths it changed. ADR-036's path rule is otherwise unchanged.
+- `dependabot_release_labels.py` is unchanged: it still removes only major / minor level labels that a bot put on a Dependabot pull request.
+
+Not applicable, because no label decides their release: artifacts, blender and stepcap (conventional commits through a bump or release-please pull request), and bdmvkit, dvdcc, udfkit, vtskit and oncemore (the version is bumped by hand). ffmpeg-skill and video-production-agent are not covered.
+
+### Consequences
+
+- A Dependabot merge now makes a patch release, a tag and, where the Skill publishes one, a package upload. video-production-agent sees a new patch version to re-pin.
+- A person who does not want a dependency update released yet holds the pull request back; a label no longer does it.
