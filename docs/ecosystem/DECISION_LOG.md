@@ -849,3 +849,13 @@ Both releases shipped only a CI change.
 **Evidence**: [ADR-029](../adr/ADR-029-polyrepo-stays.md), with the comparison table.
 
 **What follows**: revisit when ADR-029's conditions hold over a month (for example, a quarter of merged pull requests split across three or more repositories, re-pins regularly needing hand fixes, drifting copies in more than five repositories, or per-subdirectory installs shown to work).
+
+## D45 — A kit is projected onto ffmpeg-skill's brand keys before it is passed (ADR-024 K1, K3)
+
+**Decision** (owner, 2026-11-20, details delegated): a consumer that hands a `kit@1` file to ffmpeg-skill writes a projection and passes that: only the keys of the spec's `brand.json` table, `colours` written as `colors`, `logo` and `font_file` as absolute paths, nothing added. `colours` stays an accepted kit spelling. ffmpeg-skill is not changed.
+
+**Why**: ffmpeg-skill refuses every brand-file key it does not read, so the kit@1 keys and `colours` stop it; that refusal also catches misspelt keys, and Velisa does not change ffmpeg-skill.
+
+**Evidence**: [ADR-030](../adr/ADR-030-kit-projection-for-ffmpeg-skill.md), with the consumers checked; `docs/specs/kit.md` "Rule"; ADR-024's K1 and K3 rows marked decided.
+
+**What follows**: remotion-ffmpeg-skill passes its `--brand` file to ffmpeg-skill's delivery template unchanged ([remotion-ffmpeg-skill#32](https://github.com/kajisho5/remotion-ffmpeg-skill/issues/32)). K2 and K5 stay open.

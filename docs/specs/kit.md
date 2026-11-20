@@ -20,9 +20,23 @@ this page).
 ## Rule: a superset of ffmpeg-skill `brand.json`
 
 Every `brand.json` is a valid `kit@1`, and every key `brand.json` defines keeps its meaning and its
-spelling. `kit@1` only adds keys. So a kit file can be passed as it is to the two readers that take
-`brand.json` today: ffmpeg-skill (`load_brand` merges the file over its defaults; keys it does not
-use are kept and ignored) and remotion-ffmpeg-skill (`brand_look` reads only the keys below).
+spelling. `kit@1` only adds keys. remotion-ffmpeg-skill's `brand_look` reads only the keys below, so a
+kit file can be given to it as it is.
+
+A kit is **not** passed to ffmpeg-skill as it is ([ADR-030](../adr/ADR-030-kit-projection-for-ffmpeg-skill.md), D45).
+ffmpeg-skill refuses every brand-file key it does not read (`check_brand_keys`), so the kit@1 keys and
+the `colours` spelling stop it with an input error. A consumer that hands a kit to ffmpeg-skill
+(`--brand`, or `"brand"` in a `render` project) first writes a **projection**:
+
+- only the keys of the table "Keys from `brand.json`" below, at the top level and inside `colors`,
+  `caption` and `styles.caption`; every key in "Keys added by `kit@1`" is left out (`schema`, `name`,
+  `colors.secondary`, `fonts`, `logo_variants`, `contrast`);
+- `colours` is written as `colors` (a kit never has both);
+- `logo` and `font_file` are resolved against the kit file's directory and written as absolute paths,
+  because the projection is a different file in a different place;
+- nothing is added: a key the kit does not state stays absent, so ffmpeg-skill's defaults apply.
+
+The projection is a plain `brand.json`. A reader other than ffmpeg-skill may still take the kit itself.
 
 ### Keys from `brand.json` (existing)
 
@@ -30,7 +44,7 @@ use are kept and ignored) and remotion-ffmpeg-skill (`brand_look` reads only the
 |---|---|---|
 | `font` | family name | `DejaVu Sans` |
 | `font_file` | path, relative to the kit file | none |
-| `colors` (also `colours` for remotion) | `{primary, text, outline, background, accent}`, each `RRGGBB` without `#` | `FFD200`, `FFFFFF`, `000000`, `101418`, `1E6F8E` |
+| `colors` (`colours` is accepted by remotion-ffmpeg-skill; a projection for ffmpeg-skill writes `colors`) | `{primary, text, outline, background, accent}`, each `RRGGBB` without `#` | `FFD200`, `FFFFFF`, `000000`, `101418`, `1E6F8E` |
 | `logo` | path, relative to the kit file | none |
 | `logo_position` | `top-left` \| `top-right` \| `bottom-left` \| `bottom-right` and the other ffmpeg-skill position names | `top-right` |
 | `logo_scale` | logo width in px (`overlay --scale`) | 160 |
@@ -56,8 +70,8 @@ use are kept and ignored) and remotion-ffmpeg-skill (`brand_look` reads only the
 
 | Renderer | What it reads today | From `kit@1` |
 |---|---|---|
-| ffmpeg-skill | `--brand brand.json` on `caption`, `overlay --logo`, `graphics`; `"brand"` in a `render` project; explicit flags win | the file itself |
-| remotion-ffmpeg-skill | `--brand brand.json` on `render` / `still` / `pipeline`: `colors.primary` → `accent`, `colors.text` → `textColor` (the caption colour wins), `styles.caption.font` or `font` → `fontFamily`, `font_file`; `logo`, safe margins and loudness only on delivery (`deliver.py` / `pipeline.py --brand`); caption `size` / `position` / `animate` / `box` / `outline` are reported unused | the file itself |
+| ffmpeg-skill | `--brand brand.json` on `caption`, `overlay --logo`, `graphics`; `"brand"` in a `render` project; explicit flags win. Unknown keys are refused (`check_brand_keys`) | the projection above, never the kit file itself |
+| remotion-ffmpeg-skill | `--brand brand.json` on `render` / `still` / `pipeline`: `colors.primary` → `accent`, `colors.text` → `textColor` (the caption colour wins), `styles.caption.font` or `font` → `fontFamily`, `font_file`; `logo`, safe margins and loudness only on delivery (`deliver.py` / `pipeline.py --brand`); caption `size` / `position` / `animate` / `box` / `outline` are reported unused | the file itself for its own reading; where it hands the file on to ffmpeg-skill (`deliver.py` / `pipeline.py --brand`), the projection |
 | motion-graphics-skill, one theme | `options.themes` + `options.theme`, each a `motion-graphics/theme@1` file: `colors` with all four roles (opaque `RRGGBB` or a colour name), `font` (`font_id` or `font_file`), `logo` (`path`, `position`, `margin`, `scale_width`, `opacity`), `spacing.margin`, `base_style`, `name`. Unknown fields are refused (`bad_theme`), so a kit is converted, not passed | `colors.primary` / `secondary` / `background` / `text` → the four roles; `font_file` → `font.font_file`; `logo` → `logo.path`, `logo_position` → `logo.position` (one of its nine position names), `logo_scale` → `logo.scale_width`, `logo_opacity` → `logo.opacity`, `safe_margin` → `spacing.margin` and `logo.margin`; `name` → `name` |
 | motion-graphics-skill, colours only | `options.brand_kit`: `{primary?, secondary?, background?, text?}` (opaque, no `@alpha`); refused together with a theme | the same four colour roles |
 | thumbnail-skill | no brand input. Colours are `#RRGGBB` / `#RRGGBBAA` per element (`canvas.background`, text `color`, `stroke.color`, `background.color`); fonts only by registered `font_id`; `variants.palettes`: `[{name, color, background?, stroke?}]` | the caller writes `#` + the kit's colours into the request (for example `colors.text` → text `color`, `colors.background` → `canvas.background`, `colors.outline` → `stroke.color`); `font` has no counterpart until a `font_id` is registered for it |
@@ -72,6 +86,7 @@ Rules for a converter (the agent, or a person):
   required); use `options.brand_kit` with the roles the kit has instead. Using `accent` as
   `secondary` is a choice to state, not a default **(PROPOSED)**.
 - `#` is added for thumbnail-skill and removed nowhere else.
+- For ffmpeg-skill, the projection in "Rule" above is written and passed, never the kit file.
 
 ## Not in this spec
 
