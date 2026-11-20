@@ -260,6 +260,20 @@ Code reports `Plugin updated: <name>`; or run `/plugin marketplace update velisa
 Installed before the rename (`@ai-video-production-os`)? Reinstall once — the commands are in
 [`docs/RENAMING.md`](docs/RENAMING.md#plugin-marketplace-name).
 
+**Maintainer tools** (ADR-028, decision D42). `/plugin install velisa-maintainer@velisa` adds a skill and three
+commands for whoever maintains these repositories, not for producing video: `/repin` (dispatch the agent's re-pin and
+report its pull request), `/release <repo>` (how that repository releases and what the next release would hold) and
+`/roadmap <repo>` (its open roadmap steps). The skill's references cover re-pins, releases, contract diffs, the specs,
+the schemas and what a Claude Code session cannot do on GitHub. `velisa` does not install it.
+
+**Field tests** (ADR-028, decision D43). Steps that need real hardware, software, accounts or consented media (a GPU
+with weights, Premiere Pro / Resolve, platform test accounts, a set-top disc player, venue recordings) are listed in
+[`docs/field-test/`](docs/field-test/README.md) with the procedure; `python3 scripts/field_test.py record <step>`
+writes a result file to commit.
+
+**One repository per component** (ADR-029, decision D44). The repositories stay separate; the ADR compares a
+monorepo and says when to ask again.
+
 **Update notices.** `.github/workflows/skill-updates.yml` checks every repository daily and
 posts what changed (new commits with their subjects, new version tags) on the issue labelled
 `skill-updates`, mentioning the owner, so GitHub notifies by mail and in the app. Locally:

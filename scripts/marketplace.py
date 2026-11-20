@@ -11,6 +11,9 @@ Writes two files, both generated (edit ecosystem.json, not them):
                                                         (skills/wakeup/SKILL.md, hand-written)
                                                         says which skill to use for what; its "who owns
                                                         what" table is regenerated here too
+  The maintainer plugin (plugins/velisa-maintainer, hand-written) gets its marketplace entry here, right after the
+  meta plugin. It is for whoever maintains the repositories (re-pins, releases, roadmaps) and is not a dependency of
+  the meta plugin, so installing the OS does not install it (ADR-028, decision D42).
 
 Usage:
   python3 scripts/marketplace.py           write both files
@@ -29,6 +32,8 @@ MARKETPLACE_NAME = "velisa"
 META = "velisa"
 ROUTING_SKILL = "wakeup"  # invoked as /velisa:wakeup
 META_DIR = f"plugins/{META}"
+MAINTAINER = "velisa-maintainer"   # skills/velisa-maintainer and the commands /repin, /release, /roadmap
+MAINTAINER_DIR = f"plugins/{MAINTAINER}"
 
 
 def build(manifest: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
@@ -40,6 +45,12 @@ def build(manifest: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         "source": f"./{META_DIR}",
         "description": "Installs the whole of Velisa (formerly AI Video Production OS): every Skill below except the optional disc-authoring kits, and the routing skill that picks the right one.",
         "category": "os",
+    }, {
+        "name": MAINTAINER,
+        "source": f"./{MAINTAINER_DIR}",
+        "description": "For maintainers of the Velisa repositories, not for production: re-pins, releases, contract diffs, the shared specs and schemas, and the commands /repin, /release and /roadmap.",
+        "category": "maintenance",
+        "tags": ["maintenance", "保守"],
     }]
     for c in plugins:
         dep = departments[c["department"]]

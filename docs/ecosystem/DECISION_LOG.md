@@ -813,3 +813,39 @@ Both releases shipped only a CI change.
 **Evidence**: [ADR-027](../adr/ADR-027-error-taxonomy.md); every code with its class is in `docs/specs/error-taxonomy-map.md`.
 
 **What follows**: report only. The agent has one issue for its tables; no Skill is filed for its codes now.
+
+## D42 — Maintenance tools are a second plugin, `velisa-maintainer`, with /repin, /release and /roadmap
+
+**Decision** (owner request, 2026-11-20, details delegated):
+- `plugins/velisa-maintainer/` is a second local plugin in the marketplace, listed after `velisa` by `scripts/marketplace.py`. `velisa` does not depend on it, so installing the OS does not install it.
+- Its skill `velisa-maintainer` is a short `SKILL.md` with six references: re-pin (ADR-117 of the agent), releases (ADR-022, ADR-023 and its addendum, `release_gate.py`, the labels, `dependencies` as a patch), contract diff (ADR-020), the timebase and error taxonomy (ADR-026, ADR-027), the schemas and conformance fixtures (ADR-024, ADR-025), and what a session cannot do on GitHub (tag push, branch deletion, GraphQL, draft to ready, repository settings, `@coderabbitai` comments).
+- Commands: `/repin` dispatches the agent's `repin.yml` and reports the pull request; `/release <repo>` explains the repository's release and dispatches only where `workflow_dispatch` exists; `/roadmap <repo>` lists open roadmap steps (`scripts/roadmap.py` in the plugin). REST only; none pushes a tag, merges or marks a draft ready.
+
+**Why**: the facts a maintenance session needs were in five long ADRs and in refusals it met one by one; the OS plugin is for people producing video and should not carry them.
+
+**Evidence**: [ADR-028](../adr/ADR-028-maintainer-plugin-and-field-test-kit.md); `scripts/tests/test_marketplace.py` checks the entry, the skill's length and links, the references' topics, the commands and the roadmap parser.
+
+**What follows**: a reference changes with its ADR. The commands were checked as files, not run from an installed plugin.
+
+## D43 — Steps that need real hardware or media get a field test kit; results are committed here
+
+**Decision** (owner request, 2026-11-20, details delegated):
+- `docs/field-test/steps.json` lists the roadmap steps whose "Done when" needs a GPU with weights, a commercial NLE, platform test accounts, a set-top disc player or consented recordings: nine steps in diarization, voice-enhance, nle-bridge, publish, sound-design, transcription (three) and oncemore. No roadmap marks a step 確認待ち / "awaiting confirmation"; they were found by reading each open step and each "still to do" note.
+- `docs/field-test/README.md` is the procedure; `scripts/field_test.py record` writes a JSON record (`velisa/field-test-result@1`) and a Markdown page into `docs/field-test/results/`. Media are hashed, never copied, and their paths are not written; media of people need `--consent`; credential-like values are refused; `check` validates committed results in CI.
+- The step's own repository is updated from a committed result, and ticked only on `pass`.
+
+**Why**: the owner holds the hardware, accounts and venues; without a fixed list of what to measure and a file to bring back, a field run's numbers do not reach the roadmap.
+
+**Evidence**: [ADR-028](../adr/ADR-028-maintainer-plugin-and-field-test-kit.md); `scripts/tests/test_field_test.py`.
+
+**What follows**: none of the nine steps was run here. A new hardware or media step is added to `steps.json` by hand.
+
+## D44 — The repositories stay separate (no monorepo)
+
+**Decision** (owner request, 2026-11-20, details delegated): no migration to a monorepo, in whole or in part. Cross-repository costs are reduced where they are: reusable workflows here, identical copies checked by tests, the agent's automated re-pin from release tags, shared specs, schemas and vectors here that Skills copy.
+
+**Why**: every Skill installs and releases alone, and the agent pins releases, not a sibling's main; the licences differ (MIT, LGPL-3.0, Apache-2.0, GPL-3.0); ffmpeg-skill, the largest dependency, is maintained apart; the costs measured in November (one pull request per repository per rollout, hand re-pins) are bounded and now automated, while a migration would rewrite every release method, the marketplace sources, the history and every link.
+
+**Evidence**: [ADR-029](../adr/ADR-029-polyrepo-stays.md), with the comparison table.
+
+**What follows**: revisit when ADR-029's conditions hold over a month (for example, a quarter of merged pull requests split across three or more repositories, re-pins regularly needing hand fixes, drifting copies in more than five repositories, or per-subdirectory installs shown to work).
