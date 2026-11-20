@@ -1,3 +1,14 @@
+## v0.15.6 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): batch selects: facts from the measuring Skills, the choice in the agent, a yes before the render (ADR-033, D48) (#190)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.15.5 (2026-11-20)
 
 ## What's Changed
