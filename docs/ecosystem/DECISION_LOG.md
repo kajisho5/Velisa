@@ -903,3 +903,17 @@ Both releases shipped only a CI change.
 **Evidence**: [ADR-032](../adr/ADR-032-editing-by-transcript.md).
 
 **What follows**: transcription-skill, video-editing-skill and video-production-agent implement it, each in its own pull request; the agent re-pins through its repin workflow.
+
+## D48 — Batch selects: facts from the measuring Skills, the choice in the agent, a yes before the render
+
+**Decision** (owner request, 2026-11-20, details delegated):
+- Each flag has one owner: shot boundaries, silence and speech from media-analysis-skill (`scene_detection`, `silence`, `speech_regions`); black and frozen frames from qc-skill `inspect` (`video.black_segments`, `video.freeze_segments`).
+- media-analysis-skill adds the one missing measurement, `picture_quality` (`media-analysis/picture`, `measure.video.picture_quality`): per window, `blurdetect` sharpness, `signalstats` luma mean / 10th / 90th percentile, and camera jitter, speed and motion agreement from block-median projection shifts. Facts only, no threshold; an additive contract change in a minor release.
+- The agent chooses by its rule `selects@1`: per shot, reject for black / frozen over half the shot, soft (blur at least 1.3 × the batch's 25th percentile, or over `max_blur`), under- / over-exposed (mean luma below 40 / above 210), shaky (jitter above 1.0 % of the width, judged only when at least 0.6 of the textured blocks agree with the median shift) or shorter than 1.0 s; dead air is flagged and rejects only on request; a score ranks the usable shots; `min_score` and `max_duration` select by score; the sequence stays in source order.
+- `video-agent selects` and MCP `selects` show every shot with its reasons and the total duration; nothing renders before `--set edit.selects=<file>` makes CONFIRM `selects.keep` decisions, assembled by the existing trim + `video.concat` path.
+
+**Why**: the Skill that already measures a fact keeps it; the measuring Skill states facts and the agent decides; the existing assembly path renders the selection, so no Skill gains an operation.
+
+**Evidence**: [ADR-033](../adr/ADR-033-batch-selects.md).
+
+**What follows**: media-analysis-skill and video-production-agent implement it, each in its own pull request; the agent re-pins through its repin workflow.
