@@ -859,3 +859,20 @@ Both releases shipped only a CI change.
 **Evidence**: [ADR-030](../adr/ADR-030-kit-projection-for-ffmpeg-skill.md), with the consumers checked; `docs/specs/kit.md` "Rule"; ADR-024's K1 and K3 rows marked decided.
 
 **What follows**: remotion-ffmpeg-skill passes its `--brand` file to ffmpeg-skill's delivery template unchanged ([remotion-ffmpeg-skill#32](https://github.com/kajisho5/remotion-ffmpeg-skill/issues/32)). K2 and K5 stay open.
+
+## D46 — What 1.0 means for a Skill; the Skills go to 1.0 one at a time, most stable first
+
+**Decision** (owner request, 2026-11-20, details delegated):
+- From a Skill's 1.0.0, a change that `si contract-diff` calls breaking, to a part of the contract the promise covers, ships only in a major release. Additive changes are minor, and a release with no contract change can be a patch.
+- The promise covers the `provides[]` entries marked `STABLE` and the tools they map to. `EXPERIMENTAL` entries may still change in a minor release, with a CHANGELOG line.
+- A `STABLE` entry is first marked `DEPRECATED` in a minor release. It keeps working for at least one more minor release and 30 days, and is removed only in the next major release.
+- 1.0 is cut through each repository's own flow: the `major` label in the release-drafter Skills.
+- The agent's re-pin treats a 0.x → 1.0.0 release with a `none` or `additive` diff as a gate widening.
+- Order, from the 2026-11-20 measurements: thumbnail-skill, motion-graphics-skill, publish-skill, imagemagick-skill, subtitle-skill, then the rest of ADR-031's table.
+- Enforcement is by review for now: the release flow takes the bump from labels, and contract-diff reports without blocking. A blocking check is a follow-up (ADR-031 section 5).
+
+**Why**: 24 Skills on 0.x, and every lifecycle `EXPERIMENTAL`, meant a version number told a dependent nothing about breakage.
+
+**Evidence**: [ADR-031](../adr/ADR-031-skills-at-1-0.md), with the ranking table and its sources.
+
+**What follows**: each Skill's 1.0 is its own pull request and release. A Skill that hits a problem on the way stops the sequence until it is fixed.
