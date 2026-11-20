@@ -853,12 +853,13 @@ Both releases shipped only a CI change.
 ## D45 — What 1.0 means for a Skill; the Skills go to 1.0 one at a time, most stable first
 
 **Decision** (owner request, 2026-11-20, details delegated):
-- From a Skill's 1.0.0, a change `si contract-diff` calls breaking ships only in a major release. Additive changes are minor, and a release with no contract change can be a patch.
+- From a Skill's 1.0.0, a change that `si contract-diff` calls breaking, to a part of the contract the promise covers, ships only in a major release. Additive changes are minor, and a release with no contract change can be a patch.
 - The promise covers the `provides[]` entries marked `STABLE` and the tools they map to. `EXPERIMENTAL` entries may still change in a minor release, with a CHANGELOG line.
 - A `STABLE` entry is first marked `DEPRECATED` in a minor release. It keeps working for at least one more minor release and 30 days, and is removed only in the next major release.
 - 1.0 is cut through each repository's own flow: the `major` label in the release-drafter Skills.
 - The agent's re-pin treats a 0.x → 1.0.0 release with a `none` or `additive` diff as a gate widening.
-- Order, from the 2026-11-20 measurements: thumbnail-skill, imagemagick-skill, motion-graphics-skill, subtitle-skill, then the rest of ADR-030's table.
+- Order, from the 2026-11-20 measurements: thumbnail-skill, motion-graphics-skill, publish-skill, imagemagick-skill, subtitle-skill, then the rest of ADR-030's table.
+- Enforcement is by review for now: the release flow takes the bump from labels, and contract-diff reports without blocking. A blocking check is a follow-up (ADR-030 section 5).
 
 **Why**: 24 Skills on 0.x, and every lifecycle `EXPERIMENTAL`, meant a version number told a dependent nothing about breakage.
 
