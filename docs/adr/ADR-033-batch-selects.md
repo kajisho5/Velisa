@@ -50,8 +50,10 @@ What already exists, read on `origin/main` on 2026-11-20:
    - **camera motion**: the global shift between successive frames sampled at `motion_rate` (default 10 per second),
      scaled to `motion_width` (default 160). Each frame is split into 4 × 3 blocks. The horizontal and vertical
      projection profiles of each block are matched within ±12 % of the width, refined to a sub-pixel shift, and the
-     median over the blocks with texture is taken, so a subject moving through part of the frame does not count as
-     camera motion. The camera path is the running sum of the shifts. **Jitter** is the RMS distance between that path
+     median over the blocks with texture is taken. A subject moving through part of the frame then does not count as
+     camera motion, but one covering most of the blocks moves the median. So each window also reports
+     **motion agreement**: the share of textured blocks within 1 px of the median. The camera path is the running sum of
+     the shifts. **Jitter** is the RMS distance between that path
      and its centred moving average over `smooth` seconds (default 0.5), in percent of the frame width: shake rather
      than a pan. **Speed** is the mean shift in percent of the width per second.
 
@@ -66,13 +68,17 @@ What already exists, read on `origin/main` on 2026-11-20:
      - soft (the shot's median blur at least 1.3 × the batch's reference, the 25th percentile of the shots' medians,
        or over an absolute `max_blur` when one is given);
      - under-exposed (mean luma below 40) or over-exposed (mean luma above 210);
-     - shaky (median jitter above 1.0 % of the width);
+     - shaky (median jitter above 1.0 % of the width, when the median motion agreement is at least 0.6). With lower
+       agreement the blocks moved differently, and the median need not be the camera's. The shot is then flagged
+       "camera motion not judged" and is not rejected as shaky;
      - shorter than `min_shot` (1.0 s).
    - **Flag only**:
      - **dead air**: silent over at least 90 % of the shot, or no speech when speech was measured. Silent B-roll is
        usable, so dead air rejects only when `reject_dead_air` is set;
      - black, frozen or shaky parts below the reject share.
-   - **Score**: 100 minus a penalty per flag, so usable shots can be ranked.
+   - **Score**: 100 minus a penalty per flag, floored at 0, so usable shots can be ranked: soft 30, under- or
+     over-exposed 25, shaky 25, shorter than `min_shot` 20, dead air 10, and black or frozen 40 × the share of the shot
+     they cover. `min_score` has no default.
    - **Selection**: the usable shots in source order (input order, then time). `min_score` rejects shots below a score.
      `max_duration` keeps the best-scored usable shots that fit the cap, then puts them back in source order. A shot
      left out by the cap is reported as such.
@@ -86,8 +92,9 @@ What already exists, read on `origin/main` on 2026-11-20:
    flags, score, kept or rejected, and the reasons. They print the list and the total duration. Nothing is rendered.
    `--set edit.selects=<file>` on `plan` (a path key, never from a brief) makes one `selects.keep` decision per clip
    with kept shots, with a CONFIRM floor, and a `video.concat` of those clips in source order that cites them. The
-   render reuses the existing assembly path: each clip is trimmed frame-accurately to its kept shots, and the clips
-   are joined by `video.concat`. Clips with no kept shot are not used. A clip that changed since the preview refuses
+   render reuses the existing assembly path. Each clip's `video.trim` holds all of its kept ranges, as it already does
+   for removed pauses: one multi-range, frame-accurate cut that keeps those ranges and drops what lies between them.
+   The trimmed clips are then joined by `video.concat`. Clips with no kept shot are not used. A clip that changed since the preview refuses
    the file.
 
 5. **Order by score is not rendered here.** The plan joins each source once, so shots of different clips cannot be
