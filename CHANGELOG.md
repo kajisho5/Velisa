@@ -1,3 +1,14 @@
+## v0.15.3 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): release\_gate.py leaves contract:\* labels out of the count (D37 addendum) (#187)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.15.2 (2026-11-20)
 
 ## What's Changed
