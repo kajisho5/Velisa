@@ -878,3 +878,18 @@ Both releases shipped only a CI change.
 **Evidence**: [ADR-031](../adr/ADR-031-skills-at-1-0.md), with the ranking table and its sources.
 
 **What follows**: each Skill's 1.0 is its own pull request and release. A Skill that hits a problem on the way stops the sequence until it is fixed.
+
+## D47 — Editing by transcript: word-index selections, cut edges in the gaps, frames by the timebase
+
+**Decision** (owner request, 2026-11-20, details delegated):
+- A person's selection is word indices and whole segments, `remove` or `keep`; never seconds.
+- transcription-skill `transcription/select` (rule `transcript-selection@1`) turns it into removed runs of words, each with the window each cut edge may use (the gap to the kept speech, found by time), the sentences, speakers and seconds touched. It cuts nothing.
+- video-editing-skill `video-editing ripple` (rule `ripple@1`, an additive top-level block, no new operation type) places each edge in its window: 0.20 s kept after speech and 0.10 s before it, never past the window's middle; into a measured silence when the source is given; to the nearest frame of the source's rate (timebase@1, a half up), staying inside the window, or on the removed side when the window holds no frame. It returns the frame cut list, a JSON EDL, a `CONDENSE` request for `run`, and the transcript and SRT / VTT retimed to the cut.
+- A kept word of any speaker that overlaps a removed span is refused (`selection_overlaps_kept_speech`) unless `overlap: include` removes it too.
+- The agent shows the sentences, speakers and seconds before anything is cut (`video-agent transcript-edit`, MCP `transcript_edit`); `edit.transcript_edit` is a CONFIRM decision cut by `CONDENSE`.
+
+**Why**: indices make the same selection give the same cut; the Skill that knows the words gives their times, the Skill that knows the media and the frame grid places the cut; a new tool and a new block keep both contracts additive.
+
+**Evidence**: [ADR-032](../adr/ADR-032-editing-by-transcript.md).
+
+**What follows**: transcription-skill, video-editing-skill and video-production-agent implement it, each in its own pull request; the agent re-pins through its repin workflow.

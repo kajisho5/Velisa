@@ -278,6 +278,10 @@ monorepo and says when to ask again.
 `EXPERIMENTAL` entries may still change in a minor release; deprecation lasts at least one minor release and 30 days. The
 ADR ranks the 0.x Skills by stability, and they move to 1.0 in that order, one at a time.
 
+**Editing by transcript** (ADR-032, decision D47). A selection is word indices and sentences, never seconds;
+transcription-skill gives the words' times and the gaps, video-editing-skill places each cut in its gap, on a silence and on
+a frame, and retimes the transcript and subtitles; the agent shows what goes and waits for a yes.
+
 **Update notices.** `.github/workflows/skill-updates.yml` checks every repository daily and
 posts what changed (new commits with their subjects, new version tags) on the issue labelled
 `skill-updates`, mentioning the owner, so GitHub notifies by mail and in the app. Locally:
