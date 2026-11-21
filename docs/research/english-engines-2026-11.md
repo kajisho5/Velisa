@@ -25,6 +25,8 @@
 
 ## 1. 結論の一覧
 
+> **オーナーの決定（2026-11-21）: 既定は変えない。** 下の表の「推奨する既定」は、測定してから検討する**候補**であり、今は採用しない。当面は「推奨する既定」と「推奨する opt-in」の列のエンジンをすべて opt-in として追加し、既定（transcription の `base`、dubbing の Chatterbox、subtitle の Argos）はそのまま残す。既定を切り替えるかは、実際の素材で同じ機械で測り比べたあとに、オーナーが改めて決める。
+
 | スキル | いまの既定（英語のとき） | 推奨する既定 | 推奨する opt-in | 主な理由 |
 |---|---|---|---|---|
 | transcription-skill | `faster_whisper` / `base` | **`faster_whisper` / `large-v3-turbo`**（既定モデルを変える） | `speechcpp` / `parakeet-tdt-0.6b-v3:q8_0`（英語と欧州言語の高速経路）、Moonshine（英語・軽量、後日） | `base` は精度が足りない。turbo は MIT で 99 言語、言語検出あり。Parakeet は CPU で最速級だが帰属表示が要り、言語も必須 |
@@ -33,7 +35,7 @@
 | dubbing-skill | Chatterbox Multilingual | **Kokoro-82M**（英語のナレーション・音声解説。プリセット声） | Pocket TTS（声の複製、同意必須）、Qwen3-TTS 0.6B CustomVoice（プリセット声・10 言語）。Chatterbox は「凍結した旧エンジン」へ格下げ | **Chatterbox は 2026 年 8 月に「保守終了」と宣言された** |
 | subtitle-skill（翻訳） | Argos | **OPUS-MT（tc-big 系、CC-BY-4.0）**。英語↔主要言語のペアで | Ollama の既定モデルを `qwen3:8b` から `qwen3.5:9b` へ（ディスクが厳しければ `qwen3.5:4b`）、Gemma 4 E4B | Argos の重みライセンスは今も未記載。英語起点の OPUS-MT は多数のペアでライセンスが明記されている |
 
-日本語専用のエンジン（`haas_ja`、`speechcpp` の `reazonspeech-v2`、VOICEVOX、Style-Bert-VITS2）は、すべて **opt-in のまま残す**。既定を変える 3 件（transcription の既定モデル、dubbing の既定エンジン、subtitle の既定エンジン）は、どれも既存の呼び出し側の出力を変える。そのため各リポジトリで ADR を書き、video-production-agent の再ピン留めが必要になる（ADR-004 の決定 11、dubbing ADR-001 と同じ扱い）。
+日本語専用のエンジン（`haas_ja`、`speechcpp` の `reazonspeech-v2`、VOICEVOX、Style-Bert-VITS2）は、すべて **opt-in のまま残す**。既定を変える候補の 3 件（transcription の既定モデル、dubbing の既定エンジン、subtitle の既定エンジン）は、どれも既存の呼び出し側の出力を変える。上の決定により今は切り替えない。将来切り替える場合は、各リポジトリで ADR を書き、video-production-agent の再ピン留めが必要になる（ADR-004 の決定 11、dubbing ADR-001 と同じ扱い）。
 
 ---
 
