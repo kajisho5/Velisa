@@ -22,11 +22,12 @@ Step 4 asks the OS for a non-blocking conformance job, with L1 or better as the 
 4. **Requirements.** The script maps the binaries a contract requires to Ubuntu packages, for example `magick`/`convert` to `imagemagick` and `ffmpeg`/`ffprobe` to `ffmpeg`, and the job installs those packages. SkillPact names any requirement that is still unmet on the runner, so an unknown binary shows up in the report. The job does not guess a package for it.
 5. **Non-blocking.** Two things keep a failing Skill from failing the workflow: `continue-on-error` on the check step, and `continue-on-error` on the matrix job. The workflow is not a required check. A Skill below L1 shows as a warning and as a row in the summary table.
 6. **Report.** Each repository's job summary holds SkillPact's own report: findings, test counts and the failing cases. A final job writes one table to the run's summary, with one row per repository giving its level and pass/fail.
-7. **Pinning.** The Action is pinned to the full commit SHA of skillpact#33's merge commit (`90895aa3…`), as skillpact's README asks. Dependabot's `github-actions` entry moves it.
+7. **Pinning.** The Action is pinned to a full commit SHA, as skillpact's README asks. It was skillpact#33's merge commit (`90895aa3…`); since 2026-11-12 it is the v0.8.1 tag's commit (`9f0559ee…`). Dependabot's `github-actions` entry moves it.
+8. **What the contracts declare (amended 2026-11-12, skillpact roadmap step 5).** From v0.8.1 the Action has a `declares` output: the progress events and error classes a contract declares under `x.runtime` (and its idempotency modes), as compact JSON. Each matrix job records it next to the level. The summary table gains two columns, *progress events* (how many capabilities declare them, of how many) and *error classes* (how many error codes, counted per class), followed by a list of the Skills that declare either, with the capability ids and each code's class. The output is empty when the contract is invalid or tests are off; the table then says "not reported". The job still never blocks on it.
 
 ## Consequences
 
-- The OS now sees the conformance level of every Skill that has a contract. Nothing blocks on it.
+- The OS now sees the conformance level of every Skill that has a contract, and which of them declare progress events and error classes. Nothing blocks on it.
 - Satellite tests run on this repository's runners with a read-only token (`contents: read`). Inside the job they run in SkillPact's sandbox.
 - A requirement that has no entry in the script's package map stays unmet. That Skill can then reach only L1 here until an entry is added.
 - SkillPact contracts are still not linked to the OS capability contract (skillpact roadmap step 2). This job checks the Skills; it does not feed the planner.

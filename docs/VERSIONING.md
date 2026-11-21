@@ -99,6 +99,11 @@ Skill author uses for it (this document does not mandate SemVer specifically for
 skill`'s own `"1.0"` string is evidence the ecosystem already treats it informally as
 major.minor).
 
+**CURRENT** (ADR-031, decision D46): from a Skill's 1.0.0 the promise above is kept for its `STABLE`
+entries: breaking only in a major release, additive in a minor one. `EXPERIMENTAL` entries may still change
+in a minor release, and a `STABLE` entry is `DEPRECATED` for at least one minor release and 30 days before
+a major release removes it.
+
 ## 4. Skill lifecycle state vs. Capability lifecycle state
 
 Not to be confused with each other, and both distinct from the two version axes above:

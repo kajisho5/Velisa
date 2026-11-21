@@ -1,0 +1,238 @@
+name: Changelog check
+
+# Reusable: is CHANGELOG.md in the expected form, and does a change that moves the version carry
+# that version's heading? Decision D36, ADR-022.
+#
+#   1. Every level-2 heading (`## `, outside code fences) is a version heading (`heading-pattern`)
+#      or an allowed other heading (`other-headings`, default `Unreleased`). A heading that starts
+#      like a version (`## 1`, `## v1`, `## [1`) but does not match is always an error. Each
+#      version appears once, newest first.
+#   2. On a pull request, the version at the merge base and at the head are read from
+#      `version-file` (pyproject.toml, package.json or VERSION by default). When they differ, the
+#      head's CHANGELOG must have a heading for the new version, and the version must not go
+#      down. `require-version-heading: always` asks it of every run, `never` of none.
+#
+# The default heading pattern takes the forms the Skills use: `## v1.2.3 - 2026-11-19`,
+# `## 1.2.3 - 2026-11-19`, `## v1.2.3 — 2026-11-19`, `## v1.2.3 (2026-11-19)`, `## 1.2.3`,
+# `## [1.2.3](compare-link) (2026-11-19)` (release-please). History older than an automated
+# changelog can be left out with `stop-at`. The checker is the inline script below; Velisa's
+# scripts/tests/test_reusable_checks.py runs it against fixtures.
+#
+# A Skill calls it with:
+#
+#   on:
+#     pull_request:
+#   permissions:
+#     contents: read
+#   jobs:
+#     changelog:
+#       uses: kajisho5/Velisa/.github/workflows/changelog-check.yml@main
+
+on:
+  workflow_call:
+    inputs:
+      changelog:
+        description: The changelog, relative to the repository root.
+        type: string
+        default: CHANGELOG.md
+      heading-pattern:
+        description: Python regex a version heading matches in full; the version is the `version` group (or group 1). Empty for the default.
+        type: string
+        default: ""
+      other-headings:
+        description: Python regex for the other allowed level-2 headings. Empty for `## Unreleased` / `## [Unreleased]`.
+        type: string
+        default: ""
+      stop-at:
+        description: Python regex; checking stops at the first line it matches (older history kept as it was).
+        type: string
+        default: ""
+      require-descending:
+        description: Versions must be newest first and appear once.
+        type: boolean
+        default: true
+      version-file:
+        description: Where the version is (pyproject.toml, package.json, VERSION, or any file with version-pattern). Empty to pick the first that exists of those three.
+        type: string
+        default: ""
+      version-pattern:
+        description: Python regex that finds the version in version-file (`version` group or group 1), for a file that is not TOML, JSON or a bare version.
+        type: string
+        default: ""
+      require-version-heading:
+        description: bump (a pull request that changes the version), always, or never.
+        type: string
+        default: bump
+
+permissions:
+  contents: read
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0 # the merge base must be present
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Merge base
+        id: base
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          if [ -n "$BASE_SHA" ]; then
+            echo "ref=$(git merge-base "$BASE_SHA" "$HEAD_SHA")" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Check the changelog
+        shell: bash
+        env:
+          CHANGELOG: ${{ inputs.changelog }}
+          HEADING_PATTERN: ${{ inputs.heading-pattern }}
+          OTHER_HEADINGS: ${{ inputs.other-headings }}
+          STOP_AT: ${{ inputs.stop-at }}
+          REQUIRE_DESCENDING: ${{ inputs.require-descending }}
+          VERSION_FILE: ${{ inputs.version-file }}
+          VERSION_PATTERN: ${{ inputs.version-pattern }}
+          REQUIRE_VERSION_HEADING: ${{ inputs.require-version-heading }}
+          BASE_REF: ${{ steps.base.outputs.ref }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import subprocess
+          import sys
+          import tomllib
+
+          env = os.environ.get
+          changelog = env("CHANGELOG", "CHANGELOG.md")
+          heading_re = re.compile(env("HEADING_PATTERN") or r"^## \[?v?(?P<version>\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)\]?(?:\([^)\s]+\))?(?:\s+(?:[-–—]\s+)?\(?\d{4}-\d{2}-\d{2}\)?)?(?:\s+[-–—]\s+\S.*)?\s*$")
+          other_re = re.compile(env("OTHER_HEADINGS") or r"^## \[?Unreleased\]?(?:\s.*)?$")
+          attempt_re = re.compile(r"^## \[?v?\d")
+          stop_re = re.compile(env("STOP_AT")) if env("STOP_AT") else None
+          descending = env("REQUIRE_DESCENDING", "true") == "true"
+          require = env("REQUIRE_VERSION_HEADING", "bump")
+          version_file = env("VERSION_FILE", "")
+          version_pattern = env("VERSION_PATTERN", "")
+          base_ref = env("BASE_REF", "")
+          errors = []
+
+
+          def semver(text):
+              m = re.match(r"^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?", text)
+              if not m:
+                  return None
+              pre = m.group(4)
+              return (int(m.group(1)), int(m.group(2)), int(m.group(3)), 1 if pre is None else 0, pre or "")
+
+
+          def read_version(name, text):
+              if version_pattern:
+                  m = re.search(version_pattern, text, re.M)
+                  if not m:
+                      raise ValueError(f"{name}: no match for version-pattern")
+                  return m.group("version") if "version" in m.re.groupindex else m.group(1)
+              base = os.path.basename(name)
+              if base.endswith(".toml"):
+                  data = tomllib.loads(text)
+                  v = data.get("project", {}).get("version") or data.get("tool", {}).get("poetry", {}).get("version")
+                  if not v:
+                      raise ValueError(f"{name}: no static [project] version (set version-file or version-pattern)")
+                  return v
+              if base.endswith(".json"):
+                  v = json.loads(text).get("version")
+                  if not isinstance(v, str):
+                      raise ValueError(f"{name}: no top-level \"version\" string")
+                  return v
+              return text.strip()
+
+
+          def pick_version_file():
+              if version_file:
+                  return version_file
+              for name in ("pyproject.toml", "package.json", "VERSION"):
+                  if os.path.isfile(name):
+                      return name
+              return ""
+
+
+          # 1. Heading format
+          if not os.path.isfile(changelog):
+              print(f"::error::{changelog} does not exist")
+              sys.exit(1)
+          seen = {}
+          order = []
+          in_fence = False
+          with open(changelog, encoding="utf-8") as fh:
+              for lineno, line in enumerate(fh, 1):
+                  line = line.rstrip("\n")
+                  if stop_re and stop_re.match(line):
+                      break
+                  if line.lstrip().startswith("```"):
+                      in_fence = not in_fence
+                  if in_fence or not line.startswith("## "):
+                      continue
+                  m = heading_re.match(line)
+                  if m:
+                      v = m.group("version") if "version" in heading_re.groupindex else m.group(1)
+                      if v in seen:
+                          errors.append(f"{changelog}:{lineno}: {v} again (first at line {seen[v]})")
+                      seen[v] = lineno
+                      order.append((lineno, v))
+                  elif attempt_re.match(line):
+                      errors.append(f"{changelog}:{lineno}: version heading in the wrong form: {line!r}")
+                  elif not other_re.match(line):
+                      errors.append(f"{changelog}:{lineno}: not a version heading nor an allowed one: {line!r}")
+          if descending:
+              for (l1, v1), (l2, v2) in zip(order, order[1:]):
+                  a, b = semver(v1), semver(v2)
+                  if a and b and a <= b:
+                      errors.append(f"{changelog}:{l2}: {v2} comes after {v1}; newest first")
+          print(f"{changelog}: {len(order)} version heading(s), newest {order[0][1] if order else 'none'}")
+
+          # 2. The version the change ships has its heading
+          if require != "never":
+              vf = pick_version_file()
+              if not vf:
+                  errors.append("no version file found (set version-file)")
+              else:
+                  try:
+                      with open(vf, encoding="utf-8") as fh:
+                          head = read_version(vf, fh.read())
+                  except (OSError, ValueError) as exc:
+                      errors.append(str(exc))
+                      head = None
+                  base = None
+                  if head and base_ref:
+                      shown = subprocess.run(["git", "show", f"{base_ref}:{vf}"], capture_output=True, text=True)
+                      if shown.returncode == 0:
+                          try:
+                              base = read_version(vf, shown.stdout)
+                          except ValueError:
+                              base = None
+                  if head:
+                      bumped = base is not None and base != head
+                      if bumped:
+                          print(f"{vf}: version {base} -> {head}")
+                          a, b = semver(base), semver(head)
+                          if a and b and b < a:
+                              errors.append(f"{vf}: the version goes down, {base} -> {head}")
+                      else:
+                          print(f"{vf}: version {head}" + (" (unchanged)" if base is not None else ""))
+                      if (require == "always" or bumped) and head not in seen:
+                          errors.append(f"{changelog}: no heading for {head}, the version in {vf}")
+
+          for e in errors:
+              print(f"::error::{e}")
+          sys.exit(1 if errors else 0)
+          PY

@@ -1073,3 +1073,23 @@ and Chinese retakes.
 
 **Boundary**: fillers are not retakes; they stay with 無音・フィラー除去 (`audio-production-skill`, engine
 `silence.py --filler`, 啊 excluded unless `--filler-extra 啊`). Nothing is removed without a confirmed decision.
+
+**Update (2026-11-12, owner decision, DECISION_LOG D26)**: the split moved. `video-editing-skill` computes the
+candidates (`言い直し・重複の候補計算`); the agent presents them and records the person's approval
+(`言い直し・重複の候補の提示と承認`). The detection described above belongs in `video-editing-skill`; the CONFIRM
+decisions, the margin and the receipt stay here.
+
+## 27. Generate `docs/CAPABILITY_MATRIX.md` and `docs/REPOSITORY_MAP.md` from the pinned contracts
+
+**Why**: both are hand-written and have drifted (ownership audit D §6.1 and §6.5: missing rows for hyperframes,
+remotion, blender, imagemagick and others, a stated row count that differs from the table, "11 repositories"
+against the 33 components in `ecosystem.json`). Owner decision 2026-11-12 (DECISION_LOG D32): generate them instead
+of correcting them by hand; only factual errors are fixed in the meantime.
+
+**Concretely**: generate CAPABILITY_MATRIX.md and REPOSITORY_MAP.md from pinned contracts: a script under
+`scripts/` reads `ecosystem.json` and the contract each component pins (the same files the agent pins, or
+`contract --json` captured in CI), writes both pages, and has a `--check` mode run in CI like
+`scripts/marketplace.py --check`.
+
+**Boundary**: no hand-edited rows in the generated parts; a fact the contracts do not state is left out, never
+guessed.

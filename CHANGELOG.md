@@ -1,5 +1,270 @@
+## v0.15.6 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): batch selects: facts from the measuring Skills, the choice in the agent, a yes before the render (ADR-033, D48) (#190)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.15.5 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): the ADR-031 section 5 check is implemented (D46 addendum) (#189)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.15.4 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): editing by transcript (ADR-032, D47) (#188)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.15.3 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): release\_gate.py leaves contract:\* labels out of the count (D37 addendum) (#187)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.15.2 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): what 1.0 means for a Skill and the order the Skills get there (ADR-031, D46) (#186)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.15.1 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(spec): a kit is projected onto ffmpeg-skill's brand keys before it is passed (K1, K3; ADR-030, D45) (#185)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.15.0 (2026-11-20)
+
+## What's Changed
+
+## Features
+
+- feat(maintainer): velisa-maintainer plugin with /repin, /release, /roadmap; field test kit; polyrepo ADR (ADR-028, ADR-029, D42-D44) (#184)
+
+## Other changes
+
+- feat(maintainer): velisa-maintainer plugin with /repin, /release, /roadmap; field test kit; polyrepo ADR (ADR-028, ADR-029, D42-D44) (#184)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.14.1 (2026-11-20)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): changelog-check and release-guard on every Skill (D36 rollout); dependencies PRs release a patch (ADR-023 addendum, D37) (#183)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.14.0 (2026-11-20)
+
+## What's Changed
+
+## Features
+
+- feat(ecosystem): timebase spec and error taxonomy, with vectors, reference code and a report-only check (ADR-026, ADR-027, D40, D41) (#182)
+
+## Other changes
+
+- feat(ecosystem): timebase spec and error taxonomy, with vectors, reference code and a report-only check (ADR-026, ADR-027, D40, D41) (#182)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.13.0 (2026-11-19)
+
+## What's Changed
+
+## Features
+
+- feat(registry): JSON Schemas and conformance fixtures for the shared specs; sidecar envelope spec (ADR-024, ADR-025, D38, D39) (#181)
+
+## Other changes
+
+- feat(registry): JSON Schemas and conformance fixtures for the shared specs; sidecar envelope spec (ADR-024, ADR-025, D38, D39) (#181)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.12.3 (2026-11-19)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): release commits are tested before they are pushed; chore/ci/docs/test PRs release nothing (ADR-023, D37) (#180)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.12.2 (2026-11-19)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): ADR-022 rollout results and the release methods changed today (#178)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.12.1 (2026-11-19)
+
+## What's Changed
+
+## Other changes
+
+- ci(contract-shape): drop the baseline entries of six fixed contracts (#177)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.12.0 (2026-11-19)
+
+## What's Changed
+
+## Features
+
+- feat(ecosystem): reusable contract-file, changelog and release-tag checks; contract-diff fixes (ADR-022, D36) (#176)
+
+## Other changes
+
+- feat(ecosystem): reusable contract-file, changelog and release-tag checks; contract-diff fixes (ADR-022, D36) (#176)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.11.0 (2026-11-19)
+
+## What's Changed
+
+## Features
+
+- feat(ecosystem): classify contract changes on pull requests, report-only (ADR-020, D34) (#175)
+
+## Other changes
+
+- feat(ecosystem): classify contract changes on pull requests, report-only (ADR-020, D34) (#175)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.10.1 (2026-11-19)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): temporary directories are prefixed, always removed, movable (ADR-021, D35) (#174)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.10.0 (2026-11-19)
+
+## What's Changed
+
+## Features
+
+- feat(ecosystem): layers and the direction of dependencies, checked report-only (ADR-019, D33) (#173)
+
+## Other changes
+
+- feat(ecosystem): layers and the direction of dependencies, checked report-only (ADR-019, D33) (#173)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.9.5 (2026-11-19)
+
+## What's Changed
+
+## Other changes
+
+- docs(adr): ADR-019, every Skill commits its contract as contract/contract.json (#172)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.9.4 (2026-11-13)
+
+## What's Changed
+
+## Other changes
+
+- ci: OS contract-shape check and weekly roadmap-drift / field-readiness reports (#163)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.9.3 (2026-11-13)
+
+## What's Changed
+
+## Other changes
+
+- docs(specs): link licence-record spec to sound-design-skill schema (#162)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
+## v0.9.2 (2026-11-12)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): apply the owner's ownership decisions (D12-D32) (#157)
+- ci(skillpact): pin v0.8.1 and report what each Skill declares (#155)
+- CAPABILITY\_MATRIX: image.alpha, image.brandkit (#154)
+- CAPABILITY\_MATRIX: audio.loudness\_set, audio.stems, measure.audio.speech\_regions (#153)
+- Daily ecosystem health report and launch gates (#151)
+- Routing skill: start on "Velisa, ..." and run as /velisa:wakeup (#150)
+- docs: README facts, VELISA\_HOME (AVOS\_HOME fallback), registry tests in CI, Node 22 (#132)
+- docs(roadmap): live streaming out of scope; motion-titles-skill in place of broadcast-graphics (#141)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## Unreleased
 
+- **Ownership decisions applied (2026-11-12).** `ecosystem.json` has one definition of `status`; voice-enhance, dubbing, sound-design and publish are `active`; `owns` follow the owner's decisions (DECISION_LOG D12-D32); stepcap and oncemore carry `"kind": "app"`. New specs under `docs/specs/` (`title.json` / `stinger.json`, `kit@1`, licence record) and ADR-016 / ADR-017 (Proposed). Marketplace files and org charts regenerated.
+- **Release unstuck.** `VERSION` is 0.9.2. Tag v0.9.1 exists but its release commit never reached main, so `VERSION` stayed 0.9.0 and every release run treated it as a manual bump to an existing tag. The next push to main cuts v0.9.2 (`.github/scripts/prepare-release.sh` respects a `VERSION` that differs from the latest tag). No tag was moved or deleted.
+- **SkillPact conformance reports what each Skill declares.** The weekly run (`skillpact-conformance.yml`) pins skillpact v0.8.1 (`9f0559ee…`) and records the Action's `declares` output; the summary table shows, per Skill, how many capabilities declare progress events and how many error codes map to which class, and lists the declaring Skills (ADR-014 §8, skillpact roadmap step 5). 3 new offline tests.
 - **Ecosystem health, daily.** `scripts/ecosystem-health.py` and `.github/workflows/ecosystem-health.yml` report, for every repository in `ecosystem.json` and this one, any workflow that is red on a default branch and since when, repositories without automatic CI, pull requests open for 14+ days, and duplicated or slow pull-request runs. One issue (label `ecosystem-health`) holds the report; a comment is added only when something turns red. 13 offline tests.
 - `docs/LAUNCH_READINESS.md`: the launch gates (which a machine checks daily and which wait on the owner), the working rules until launch, and the list of checks that need real footage, accounts or an editing application.
 - **Plugin marketplace renamed to Velisa (one-time reinstall).** The Claude Code marketplace `ai-video-production-os` is now `velisa` and its meta plugin `video-production-os` is now `velisa` (`plugins/velisa/`, routing skill `/velisa:velisa`): install with `/plugin marketplace add kajisho5/Velisa` and `/plugin install velisa@velisa`, single Skills as `<skill>@velisa`. Existing users run `/plugin marketplace remove ai-video-production-os`, then the two commands above, and turn auto-update on again (`docs/RENAMING.md`). Generated by `scripts/marketplace.py`; README, ADR-013, ADR-015 and the update notice (`scripts/skill-updates.py`) follow. video-production-agent prints `@velisa` in a PR merged right after this one.

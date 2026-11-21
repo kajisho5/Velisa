@@ -185,8 +185,10 @@ Only verified repositories are listed above; `ecosystem.json` carries the rest. 
 Skills (`voice-production-skill`, `dubbing-skill`, and others) are discussed as *examples
 of what the architecture must support*, in [`docs/SKILL_EVOLUTION.md`](docs/SKILL_EVOLUTION.md)
 and [`docs/DELIVERY_AND_INTEROP.md`](docs/DELIVERY_AND_INTEROP.md) — where one appears in
-`ecosystem.json` at all, it is marked `scaffold` (an empty repository), and this README
-does not pretend otherwise.
+`ecosystem.json` at all, its `status` follows the one definition in that file's `$comment`
+(`active`: working operations behind its contract, released or not; `scaffold`: the repository
+exists but no operation works yet; `planned`: no repository yet), and this README does not
+pretend otherwise.
 
 ## Quick start
 
@@ -258,6 +260,32 @@ Code reports `Plugin updated: <name>`; or run `/plugin marketplace update velisa
 Installed before the rename (`@ai-video-production-os`)? Reinstall once — the commands are in
 [`docs/RENAMING.md`](docs/RENAMING.md#plugin-marketplace-name).
 
+**Maintainer tools** (ADR-028, decision D42). `/plugin install velisa-maintainer@velisa` adds a skill and three
+commands for whoever maintains these repositories, not for producing video: `/repin` (dispatch the agent's re-pin and
+report its pull request), `/release <repo>` (how that repository releases and what the next release would hold) and
+`/roadmap <repo>` (its open roadmap steps). The skill's references cover re-pins, releases, contract diffs, the specs,
+the schemas and what a Claude Code session cannot do on GitHub. `velisa` does not install it.
+
+**Field tests** (ADR-028, decision D43). Steps that need real hardware, software, accounts or consented media (a GPU
+with weights, Premiere Pro / Resolve, platform test accounts, a set-top disc player, venue recordings) are listed in
+[`docs/field-test/`](docs/field-test/README.md) with the procedure; `python3 scripts/field_test.py record <step>`
+writes a result file to commit.
+
+**One repository per component** (ADR-029, decision D44). The repositories stay separate; the ADR compares a
+monorepo and says when to ask again.
+
+**1.0 for a Skill** (ADR-031, decision D46). From 1.0.0, a breaking change to a `STABLE` entry ships only in a major release;
+`EXPERIMENTAL` entries may still change in a minor release; deprecation lasts at least one minor release and 30 days. The
+ADR ranks the 0.x Skills by stability, and they move to 1.0 in that order, one at a time.
+
+**Editing by transcript** (ADR-032, decision D47). A selection is word indices and sentences, never seconds;
+transcription-skill gives the words' times and the gaps, video-editing-skill places each cut in its gap, on a silence and on
+a frame, and retimes the transcript and subtitles; the agent shows what goes and waits for a yes.
+
+**Batch selects** (ADR-033, decision D48). media-analysis-skill and qc-skill measure each shot (cuts, blur, exposure,
+shake, black and frozen frames, silence, speech); the agent keeps or rejects each shot by its rule `selects@1`, lists why,
+and renders the selects sequence through its existing trim and join only after a yes.
+
 **Update notices.** `.github/workflows/skill-updates.yml` checks every repository daily and
 posts what changed (new commits with their subjects, new version tags) on the issue labelled
 `skill-updates`, mentioning the owner, so GitHub notifies by mail and in the app. Locally:
@@ -274,7 +302,51 @@ Locally: `python3 scripts/ecosystem-health.py`. The launch gates built on it are
 **SkillPact conformance.** `.github/workflows/skillpact-conformance.yml` checks, weekly, every
 repository in `ecosystem.json` that has a `skill.contract.json` with
 [SkillPact](https://github.com/kajisho5/skillpact)'s Action and reports the level (L1 / L2 / L3)
-in the run's summary. It never blocks anything (ADR-014).
+in the run's summary, with which Skills declare progress events and error classes. It never blocks
+anything (ADR-014).
+
+**Contract shape.** `.github/workflows/contract-shape.yml` checks every Capability Contract that
+video-production-agent pins against [`registry/capability_contract.schema.json`](registry/capability_contract.schema.json)
+with [System Intelligence](https://github.com/kajisho5/system-intelligence)'s `si contract-check`
+(decision D31). It fails on a contract that breaks the schema, except the violations
+[`registry/contract-shape-baseline.json`](registry/contract-shape-baseline.json) lists with a reason
+(ADR-018). The weekly ecosystem audit (`ecosystem-audit.yml`) also reports roadmap drift
+(`si roadmap-drift`) and field readiness (`si diagnose --field`), read-only.
+
+**Layers.** Every component in `ecosystem.json` has a `layer`: `engine`, `skill`, `app`, `orchestrator` or
+`governance`, lowest first. A component calls only lower layers; a same-layer or upward call must be listed
+with its reason in [`registry/layering.json`](registry/layering.json). Data contracts are not calls
+(ADR-019, decision D33). `.github/workflows/layering.yml` checks the calls the agent's pinned contracts
+declare with System Intelligence's `si layer-check`. It reports only for now and does not fail.
+
+**Contract diff.** `.github/workflows/contract-diff.yml` is a reusable workflow a Skill calls on pull requests
+that change its `contract/contract.json`. It compares the contract at the merge base with the one at the head with
+System Intelligence's `si contract-diff`, labels the pull request `contract:none`, `contract:additive` or
+`contract:breaking`, and keeps one comment with every change and the release bump it needs (ADR-020, decision D34).
+It reports only for now and does not fail. Callers group runs per pull request with `concurrency`, so an older
+run never writes last.
+
+**Reusable checks.** Three more reusable workflows (ADR-022, decision D36):
+- `contract-file-check.yml` runs a Skill's `contract/generate.py --check` (or `generate.mjs`).
+- `changelog-check.yml` checks the CHANGELOG headings, and that a pull request that moves the version adds its heading.
+- `release-guard.yml` checks that a release tag's `contract/contract.json` says the tag's version.
+
+The release workflows themselves stay per repository; ADR-022 lists how each Skill releases.
+
+**Release commits are tested before they are pushed** (ADR-023, decision D37). A Skill's release job commits locally, then runs its fast tests on that commit (step "Test the release commit before pushing it"). Only then does it push. A push that merges only chore / ci / docs / test pull requests releases nothing; this is imagemagick-skill's rule. A Dependabot pull request (`dependencies`) releases, as a patch, in every Skill (addendum to D37). In the release-drafter repositories, `.github/scripts/release_gate.py` decides this.
+
+**Shared data formats, checked** (ADR-024, decision D38; ADR-025, D39). `kit@1`, `title.json`, `stinger.json`, the licence record and the sidecar envelope each have a JSON Schema in `registry/schemas/` and valid / invalid examples in `registry/conformance/`. `spec-conformance.yml` fails a pull request when an example does not behave as its directory says. A Skill copies them into its tests with `python3 -m registry.spec_conformance --export`; hyperframes-skill and motion-graphics-skill do so first. ADR-024 lists where the Skills differ from the specs.
+
+**Timebase** (ADR-026, decision D40). [`docs/specs/timebase.md`](docs/specs/timebase.md) says how frame rates, times,
+frames and SMPTE timecode are written and converted: exact `N/D` rates (29.97 is 30000/1001, never 2997/100), one
+rounding rule (a half up), positions counted in whole frames, drop-frame at 29.97 and 59.94 only. Its conformance
+vectors are [`docs/specs/timebase-vectors.json`](docs/specs/timebase-vectors.json); `scripts/timebase.py` is the
+reference implementation (`python3 scripts/timebase.py vectors`).
+
+**Error taxonomy** (ADR-027, decision D41). [`docs/specs/error-taxonomy.md`](docs/specs/error-taxonomy.md) puts every
+Skill's error codes in 15 shared classes, each with a retry policy and a rule for its message to a person.
+`scripts/error_taxonomy.py` lists codes the taxonomy does not know; `.github/workflows/error-taxonomy.yml` runs it
+weekly on the contracts the agent pins. It reports only and does not fail.
 
 **GitHub Project.** `.github/workflows/project-sync.yml` adds the issues and pull requests of
 every repository in `ecosystem.json` to the project *AI Video Production Ecosystem* (kajisho5 #1)

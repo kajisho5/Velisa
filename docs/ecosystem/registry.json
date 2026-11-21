@@ -1,7 +1,7 @@
 {
   "$schema_note": "Structured mirror of CROSS_REPO_STATUS.md's repository roster (see docs/adr/ADR-011-ecosystem-dashboard.md). This file is the Dashboard's extensibility point: add a repo here, the Dashboard picks it up on the next aggregation run, no Dashboard code change required. Not a source of truth in itself -- it restates facts already recorded in prose docs and must be kept in sync with them by whoever edits either.",
   "schema_version": 1,
-  "updated_at": "2026-10-29",
+  "updated_at": "2026-11-12",
   "repos": [
     {
       "slug": "kajisho5/Velisa",
@@ -102,28 +102,28 @@
       "slug": "kajisho5/dubbing-skill",
       "name": "dubbing-skill",
       "type": "Skill",
-      "role": "TTS, voice replacement, fitting translated lines to source timing, audio description. Repository created 2026-10-29; no package yet.",
+      "role": "TTS, voice replacement, fitting translated lines to source timing, audio description.",
       "depends_on": []
     },
     {
       "slug": "kajisho5/publish-skill",
       "name": "publish-skill",
       "type": "Skill",
-      "role": "Upload and metadata for delivery platforms; owner of platform delivery specs. Repository created 2026-10-29; no package yet.",
+      "role": "Upload and metadata for delivery platforms; reads the platform specs from ffmpeg-skill (their owner) and owns the upload-side limits (file size, duration, rate limits).",
       "depends_on": []
     },
     {
       "slug": "kajisho5/detection-skill",
       "name": "detection-skill",
       "type": "Skill",
-      "role": "Face, text (OCR) and object detection. Repository created 2026-10-29; no package yet.",
+      "role": "Face, text (OCR) and object detection.",
       "depends_on": []
     },
     {
       "slug": "kajisho5/slide-sync-skill",
       "name": "slide-sync-skill",
       "type": "Skill",
-      "role": "Slide import, slide-change detection, slide text. Repository created 2026-10-29; no package yet.",
+      "role": "Slide import, slide-change detection, slide text.",
       "depends_on": []
     },
     {
@@ -200,21 +200,21 @@
       "slug": "kajisho5/voice-enhance-skill",
       "name": "voice-enhance-skill",
       "type": "Skill",
-      "role": "AI voice isolation, dereverberation and mic-bleed reduction for recorded speech. Repository created 2026-10-29; no package yet.",
+      "role": "AI voice isolation, dereverberation and mic-bleed reduction for recorded speech.",
       "depends_on": []
     },
     {
       "slug": "kajisho5/sound-design-skill",
       "name": "sound-design-skill",
       "type": "Skill",
-      "role": "BGM and sound-effect generation (ACE-Step 1.5). Repository created 2026-10-29; no package yet.",
+      "role": "BGM and sound-effect generation (ACE-Step 1.5).",
       "depends_on": []
     },
     {
       "slug": "kajisho5/diarization-skill",
       "name": "diarization-skill",
       "type": "Skill",
-      "role": "Speaker diarization: fills the Transcript speaker_id. Repository created 2026-10-29; no package yet.",
+      "role": "Speaker diarization: fills the Transcript speaker_id.",
       "depends_on": []
     },
     {
@@ -249,7 +249,7 @@
       "slug": "kajisho5/ingest-skill",
       "name": "ingest-skill",
       "type": "Skill",
-      "role": "Media offload with checksum-verified copies, dual backup and a clip inventory. Repository created 2026-10-29; no package yet.",
+      "role": "Media offload with checksum-verified copies, dual backup and a clip inventory.",
       "depends_on": []
     }
   ]

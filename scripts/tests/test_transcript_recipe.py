@@ -15,7 +15,7 @@ SKILL_DIR = ROOT / "plugins/velisa/skills/wakeup"
 PAGE = SKILL_DIR / "transcript.md"
 MANIFEST = json.loads((ROOT / "ecosystem.json").read_text(encoding="utf-8"))
 # The jobs the page names, each followed (within a sentence) by the repository that owns it.
-JOBS = ["文字起こしの語句検索", "言い直し・重複の候補提示", "無音・フィラー除去"]
+JOBS = ["文字起こしの語句検索", "言い直し・重複の候補計算", "言い直し・重複の候補の提示と承認", "無音・フィラー除去"]
 
 
 def owner(job: str) -> str:

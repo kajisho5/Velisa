@@ -334,3 +334,586 @@ text, evidence strings, System Intelligence findings). It mirrors the project's 
 (ADR-011), the same scope `lib/labels.ts` already drew.
 
 **Why**: one site, one language rule; a link shared in Japanese opens in Japanese.
+
+## D12 — Animated overlays: hyperframes-skill makes the material, motion-graphics-skill places it
+
+**Context**: the ownership audit (2026-11-12, `docs/ecosystem/ownership-audit/`) found no owner for animated
+overlays. ffmpeg-skill#425 (typed keyframes on `overlay`) was on hold until one was named.
+
+**Decision** (owner, 2026-11-12): the material is made by `hyperframes-skill` (IN / LOOP / OUT segments, alpha) and
+placed by `motion-graphics-skill`'s `rendered_layer` element. ffmpeg-skill#425 is not needed for this.
+
+**Why**: both ends already ship (hyperframes-skill 0.8.0 segments and alpha, motion-graphics-skill ADR-25, agent
+ADR-102). Keyframes in the engine would widen `overlay`'s responsibility, and the Remotion route carries licence
+conditions.
+
+**Evidence**: `ownership-audit/A-visual.md` §8 O1, §9(b).
+
+**What follows**: video-production-agent needs one path that RUNS hyperframes-skill (today a handoff-only
+SkillSpec) and passes its output to `motion.layer`. That output must be ProRes 4444 or another yuva format:
+`rendered_layer` refuses a VP9 alpha WebM.
+
+## D13 — One definition of `status`; voice-enhance, dubbing, sound-design and publish are `active`
+
+**Context**: the four said `scaffold` while each has working operations wired into the agent. `scaffold` had three
+meanings (README "an empty repository", MATURITY_MODEL "Scaffolded", the agent's "no package").
+
+**Decision** (owner, 2026-11-12): the four become `active`. `status` has one definition, written in
+`ecosystem.json`'s `$comment` and used everywhere: `active` = the repository ships working operations behind its
+contract, released or not; `scaffold` = the repository exists, but no operation works yet; `planned` = the
+repository does not exist yet. Release state (git tags, GitHub Releases) is tracked separately.
+
+**Why**: the old label described none of the four, and three definitions meant every reader picked a different one.
+
+**Evidence**: `ownership-audit/B-audio-recognition.md` §9(h); `ownership-audit/D-delivery-utility-governance-docs.md`
+§5 (rows 1-2), §6.2, §9(f).
+
+**What follows**: done in `ecosystem.json`, the routing skill's owner table and the org charts (both regenerated),
+and README's sentence on `scaffold`. A release step goes on each of the four repositories' roadmaps. Their
+`plugin` flag (each has a root SKILL.md) was not part of this decision and is unchanged.
+
+## D14 — Platform duration and file-size limits: publish-skill's values are authoritative
+
+**Context**: the limits live in ffmpeg-skill `_platforms.py` and in publish-skill `limits.py`, with different values
+(X: 140 s against 1200 s). The 2026-10-30 decision gave the upload-side limits to publish-skill but left
+ffmpeg-skill's table unchanged.
+
+**Decision** (owner, 2026-11-12): publish-skill's values are authoritative (it owns アップロード制限). ffmpeg-skill
+`check`'s duration and size rows are guidance only, and `publish plan` does not use them for its verdict.
+
+**Why**: publish-skill's values carry a source URL and a date; ffmpeg-skill's are constants without one. This
+extends the 2026-10-30 split instead of reopening it.
+
+**Evidence**: `ownership-audit/D-delivery-utility-governance-docs.md` §3 O1, §8 O1, §9(b).
+
+**What follows**: ffmpeg-skill is asked, in an issue there, to label those rows as guidance. Pending until they land:
+publish-skill's `plan` stops using those rows for its verdict (at the audited revision it still includes every
+ffmpeg-skill check row), and video-production-agent's QA, which copies the same rows into its own verdict, does the
+same, so an X delivery over 140 s is not failed against publish-skill's 1200 s limit. `docs/ecosystem/registry.json` no longer calls publish-skill the owner of platform
+delivery specs (D32).
+
+## D15 — No motion-titles-skill; title and stinger material go to hyperframes-skill, the metadata to a Velisa spec
+
+**Context**: the 2026-11-05 field review proposed `motion-titles-skill` for animated title and stinger files.
+
+**Decision** (owner, 2026-11-12): not created. Folded into `hyperframes-skill` (stinger templates and
+`stinger.json`, typesetting, brand input), which gains `テロップ・スティンガー・ループ素材`. The metadata shapes
+`title.json` and `stinger.json` become a Velisa spec: [docs/specs/title-and-stinger.md](../specs/title-and-stinger.md).
+
+**Why**: most of the draft already exists in hyperframes-skill 0.8.0 (templates, CSV batch, segments, alpha) and in
+ffmpeg-skill `export`; the draft itself said the pictures are drawn by hyperframes-skill. A new repository would be
+a thin layer over it.
+
+**Evidence**: `ownership-audit/A-visual.md` §9(c).
+
+**What follows**: the spec documents the fields video-editing-skill, motion-graphics-skill, qc-skill and the agent
+already read (`cut_point`, `cover`, segments), and marks the rest as proposed. hyperframes-skill steps 15, 8 and 14
+carry the work.
+
+## D16 — No design-system-skill; `kit@1` is a Velisa spec
+
+**Context**: three brand formats exist side by side (ffmpeg-skill `brand.json`, motion-graphics `theme@1` and
+`brand_kit`); only motion-graphics-skill and remotion-ffmpeg-skill read one.
+
+**Decision** (owner, 2026-11-12): not created. A Velisa spec only: `kit@1`, a superset of ffmpeg-skill `brand.json`,
+with a mapping table to each renderer's existing input: [docs/specs/kit.md](../specs/kit.md). Revisit as a skill once
+three or more renderers read `kit@1`.
+
+**Why**: with two readers, deriving per-renderer files has few places to go; the spec costs nothing and keeps the
+door open.
+
+**Evidence**: `ownership-audit/A-visual.md` §9(d).
+
+**What follows**: the agent can expand a kit into the inputs each skill already takes. hyperframes-skill step 14 and
+thumbnail-skill are the next readers to watch.
+
+## D17 — No asset-library-skill; the licence record is a Velisa spec
+
+**Context**: fetching (ingest-skill `fetch`), the audio ledger (sound-design-skill library), indexing
+(media-analysis-skill `library`) and credit checking (artifacts-skill `credits_attribution`) exist. Missing: a licence
+record for video and images, and API search.
+
+**Decision** (owner, 2026-11-12): not created. A Velisa spec only: the shared licence-record shape (licence, author,
+source URL, attribution line, sha256, content_id) that sound-design-skill already writes, extended to video and
+images: [docs/specs/licence-record.md](../specs/licence-record.md). Project credits keep using artifacts-skill
+`credits_attribution`.
+
+**Why**: the shape is the missing part; API search needs each service's terms checked first.
+
+**Evidence**: `ownership-audit/C-command-ingest-engine-verification.md` §9(f);
+`ownership-audit/B-audio-recognition.md` §8 D16, §9(g).
+
+**What follows**: a stock API is not wired until its terms are read and recorded.
+
+## D18 — No generative-media-skill; an ADR first
+
+**Context**: the only generator today is thumbnail-skill's background (FLUX.2 [klein] 4B). No video generation exists.
+
+**Decision** (owner, 2026-11-12): not created. An ADR in Velisa comes first: candidate engines, code and weight
+licences, VRAM, commercial terms, and whether thumbnail-skill's `BackgroundProvider` can be reused.
+[ADR-016](../adr/ADR-016-generative-media.md) is that ADR, status Proposed.
+
+**Why**: weight licences decide what is possible, and the audit could not confirm them from primary sources.
+
+**Evidence**: `ownership-audit/A-visual.md` §9(e).
+
+**What follows**: no wiring or engine request until ADR-016 is accepted.
+
+## D19 — Restoration: the no-weights baseline first; a skill only after an ADR on weight licences
+
+**Context**: super-resolution and frame interpolation were proposed as a new area.
+
+**Decision** (owner, 2026-11-12): no new skill. Wire the no-weights baseline first (ffmpeg-skill scaling,
+`minterpolate`, `denoise`). A skill comes only after an ADR records the weights' licences:
+[ADR-017](../adr/ADR-017-restoration.md), status Proposed.
+
+**Why**: the baseline needs no new dependency and stays deterministic; the candidate weights' licences are unverified.
+
+**Evidence**: `ownership-audit/C-command-ingest-engine-verification.md` §9(g).
+
+**What follows**: an archive-preparation path in the agent (`deinterlace` → `denoise` → `stabilize` → `fit`), which
+needs a `denoise` SkillSpec there.
+
+## D20 — Titles: three makers, three roles
+
+**Decision** (owner, 2026-11-12): `motion-graphics-skill` keeps `タイトル・テロップ` (burned into a programme);
+`hyperframes-skill` gains `テロップ・スティンガー・ループ素材` (title and stinger material files);
+`remotion-ffmpeg-skill`'s titles stay inside its own compositions.
+
+**Why**: titles could be made in three places; the split follows what each output is, not which tool draws it.
+Moving hyperframes' templates into motion-graphics-skill would add Node and Chromium to a dependency-free skill.
+
+**Evidence**: `ownership-audit/A-visual.md` §8 O2, §9(a).
+
+**What follows**: `ecosystem.json` updated. The agent defaults to motion-graphics-skill and uses D12's path when
+motion is needed.
+
+## D21 — Overlays: still compositing, graphics placement and the engine
+
+**Decision** (owner, 2026-11-12): `video-editing-skill` keeps `静止画オーバーレイ` (plain still compositing as part of
+an edit). `motion-graphics-skill` gains `ロゴ・PiP・クロマキー合成` and `動くグラフィックの配置`. ffmpeg-skill's
+`Bロール・画面合成` becomes `Bロール合成`; ffmpeg-skill stays the engine underneath.
+
+**Why**: the jobs were split by name only; PiP and chroma key had no stated owner although motion-graphics-skill's
+`video_overlay` does them.
+
+**Evidence**: `ownership-audit/A-visual.md` §8 O3, §9(g).
+
+**What follows**: wiring unchanged. The agent's SkillSpec descriptions can say when `edit.overlay` and `motion.image`
+apply.
+
+## D22 — Animated subtitles: from cues to subtitle-skill, word-timed effects to remotion-ffmpeg-skill
+
+**Decision** (owner, 2026-11-12): everything generated from subtitle cues belongs to `subtitle-skill`, which gains
+`動く字幕(字幕キュー由来)` and passes ffmpeg-skill `caption --animate/--karaoke` through. Word-timed effects belong to
+`remotion-ffmpeg-skill`, which gains `語の時刻に合わせた字幕演出`.
+
+**Why**: splitting by input keeps animated captions available without Node; the engine flags already exist.
+
+**Evidence**: `ownership-audit/A-visual.md` §8 O4, §9(h).
+
+**What follows**: a subtitle-skill step to expose the flags, then a re-pin in the agent.
+
+## D23 — Loudness: audio-production-skill owns it; the agent's routing is not changed now
+
+**Decision** (owner, 2026-11-12): `audio-production-skill` owns loudness (`音量・ラウドネス`, unchanged); ffmpeg-skill
+is the engine. The agent's video path keeps `ffmpeg-skill/loudness`.
+
+**Why**: the audit's two halves disagreed (move the route, or record it). Changing it needs evidence first.
+
+**Evidence**: `ownership-audit/B-audio-recognition.md` §8 D1; `ownership-audit/C-command-ingest-engine-verification.md`
+§8 S2; the README's "where the recommendations split".
+
+**What follows**: a later change of routing needs a measured comparison of `loudnorm` against `ebur128` on the same
+files.
+
+## D24 — Compliance checking: the split is recorded, the wiring is not changed
+
+**Decision** (owner, 2026-11-12): ffmpeg-skill `check` is the engine's preflight, so its `owns`
+`書き出し規格の検査` becomes `書き出し前の規格点検`; `qc-skill` is judgement against the plan or spec.
+
+**Why**: the two looked like a collision but do different jobs: fixed thresholds with fix commands, against rules
+the caller supplies with UNKNOWN as a result.
+
+**Evidence**: `ownership-audit/C-command-ingest-engine-verification.md` §8 S1, §9(c).
+
+**What follows**: Velisa issue #36 can be closed with this record.
+
+## D25 — Measurement and cut detection are layers, not collisions
+
+**Decision** (owner, 2026-11-12): fast list = ffmpeg-skill `scenes`; observation = `media-analysis-skill`, which gains
+`発話区間` (speech_regions); frame-accurate shot table = `detection-skill` `shots`, which gains `ショット検出`;
+judgement only = `qc-skill`; slides = `slide-sync-skill`. Default providers stay as the agent has them.
+
+**Why**: five scene detectors and three measurement paths serve different uses; the agent's `DEFAULT_PROVIDERS`
+already has this shape.
+
+**Evidence**: `ownership-audit/C-command-ingest-engine-verification.md` §8 S2, S3, §9(d);
+`ownership-audit/B-audio-recognition.md` §8 D8/D9, D12.
+
+**What follows**: `ecosystem.json` updated. Wiring `detection/shots` or `speech_regions` into the agent is a separate
+step there.
+
+## D26 — `owns` brought in line with what each repository does
+
+**Decision** (owner, 2026-11-12):
+- `video-editing-skill` gains `言い直し・重複の候補計算`; the agent's `言い直し・重複の候補提示` becomes
+  `言い直し・重複の候補の提示と承認`.
+- `transcription-skill` keeps `文字起こしの語句検索` and implements it (`find` / `search`).
+- ffmpeg-skill keeps `納品レポート` (the tool exists; no consumer yet).
+- ffmpeg-skill gains `カットリスト書き出し` (FCPXML / EDL / OTIO); `nle-bridge-skill` keeps the NLE round trip.
+
+**Why**: the candidate computation already lives in video-editing-skill; the search was owned but not built; the
+timeline export existed in two places with no stated split.
+
+**Evidence**: `ownership-audit/C-command-ingest-engine-verification.md` §5, §8 S4, S6, S7;
+`ownership-audit/D-delivery-utility-governance-docs.md` §3 O3, §8 O3.
+
+**What follows**: WORK_QUEUE item 26 records the moved half; item 25 (the search) stands. The routing skill's
+transcript recipe and its test follow the new names. Velisa issue #34 can be closed with the timeline split.
+
+## D27 — Speaker ids: diarization-skill owns the assignment rule
+
+**Decision** (owner, 2026-11-12): `diarization-skill` owns the rule that assigns speaker ids and gains
+`話者IDの付与規則`. transcription-skill's merge is a copy of the same rule; both share conformance fixtures.
+
+**Why**: two implementations of one rule drift unless one is named the source and a shared test holds them together.
+Removing either would break a pinned contract.
+
+**Evidence**: `ownership-audit/B-audio-recognition.md` §8 D10, §9(d).
+
+**What follows**: the shared fixtures, in both repositories; the agent's wiring is unchanged.
+
+## D28 — Kinetic typography, visualizers and Three.js: one owner each
+
+**Decision** (owner, 2026-11-12): `hyperframes-skill` gains `キネティックタイポ・幾何学モーション`.
+`remotion-ffmpeg-skill` gains `オーディオビジュアライザー` and keeps the measured (beat / lyric) versions. `blender-skill`
+stays 3D only; its overlapping roadmap steps are deferred to these two.
+
+**Why**: three roadmaps planned the same work while almost none of it is built; deciding before anyone starts avoids
+building it twice.
+
+**Evidence**: `ownership-audit/A-visual.md` §9(f).
+
+**What follows**: remotion-ffmpeg-skill's Three.js step waits for hyperframes-skill's generative layer; blender-skill's
+overlapping steps are marked deferred in its roadmap.
+
+## D29 — Disc family: five entries, one agent SkillSpec
+
+**Decision** (owner, 2026-11-12): `ecosystem.json` keeps the five (bdmvkit, vtskit, udfkit, dvdcc, oncemore). The agent
+keeps ONE disc SkillSpec (`disc_author` via oncemore) and drops the four kit SkillSpecs, which name tool ids that do not
+exist.
+
+**Why**: five is right for installation and licences (the kits ship separately on PyPI); for the agent only
+`disc_author` means anything.
+
+**Evidence**: `ownership-audit/D-delivery-utility-governance-docs.md` §5 row 6, §8 O4, §9(a).
+
+**What follows**: the SkillSpec change is in video-production-agent; nothing changes in `ecosystem.json`.
+
+## D30 — stepcap and oncemore are listed as stand-alone apps
+
+**Decision** (owner, 2026-11-12): add `"kind": "app"` to both. Other components need no `kind`; the default is
+skill.
+
+**Why**: neither is a production step the agent calls; both are applications with their own contract.
+
+**Evidence**: `ownership-audit/D-delivery-utility-governance-docs.md` §9(d).
+
+**What follows**: `scripts/tests/test_ecosystem_manifest.py` accepts `kind` (`skill` or `app`); the marketplace tags
+stepcap `app`; the routing skill's owner table and the org charts show both as apps.
+
+## D31 — Contract checks: one role each
+
+**Decision** (owner, 2026-11-12):
+- OS contract shape = `system-intelligence` (Velisa CI calls it).
+- Side effects, signatures and isolation tests = `skillpact`.
+- Runtime version gates = the agent.
+- Velisa `registry/` = the reference definition of the collision policy.
+
+**Why**: the same checks ran in three or four places under the same names with different content.
+
+**Evidence**: `ownership-audit/D-delivery-utility-governance-docs.md` §8 O5, §9(e).
+
+**What follows**: no wiring change; this entry is the written record.
+
+## D32 — Stale documents are frozen; two maps are to be generated
+
+**Decision** (owner, 2026-11-12):
+- `HANDOFF.md`, `CROSS_REPO_STATUS.md` and `CURRENT_STATE.md` carry a header "2026-09 record, frozen; the current
+  state is docs/ecosystem/ROADMAP.md".
+- `docs/CAPABILITY_MATRIX.md` and `docs/REPOSITORY_MAP.md` are to be generated from the pinned contracts; only factual
+  errors are fixed now.
+
+**Why**: the three files still say 9 to 12 repositories and 21 tools; correcting them by hand would drift again.
+
+**Evidence**: `ownership-audit/D-delivery-utility-governance-docs.md` §6 (54 rows), §8 O7;
+`ownership-audit/A-visual.md` §8 O9.
+
+**What follows**: headers added. Fixed now: `docs/ecosystem/registry.json` publish-skill row (not the owner of platform
+delivery specs) and the "no package yet" notes on eight repositories that have packages; nle-bridge's `planned` in
+ROADMAP.md; ROADMAP proposals 5-7 and 9-11 marked done (ffmpeg-skill #417, #418, #419, #421, #422, #423 closed
+completed on 2026-11-06). The generator is WORK_QUEUE item 27.
+
+## D33 — Layers: calls go down; same-layer calls are listed exceptions
+
+**Decision** (owner, 2026-11-19, details delegated): every `ecosystem.json` component gets a `layer`. The five
+layers, lowest first, are `engine` (ffmpeg-skill), `skill` (the 27 production skills and disc kits), `app`
+(stepcap, oncemore), `orchestrator` (video-production-agent) and `governance` (skillpact, system-intelligence). A
+component calls only lower layers. A same-layer or upward call is allowed only when `registry/layering.json` lists
+it with its reason. Data contracts and clones made only in CI are not calls. One exception today:
+thumbnail-skill → qc-skill (text legibility of thumbnail variants). The check is `si layer-check` (system-intelligence
+ADR-018), which Velisa CI runs report-only (`layering.yml`).
+
+**Why**: D21, D23, D24, D25 and D31 already describe an engine underneath, measurement layers and one owner per
+check. Nothing recorded the layers or checked the direction of calls, so a skill-to-skill call could appear unseen.
+
+**Evidence**: [ADR-019](../adr/ADR-019-layers-and-dependency-direction.md), whose inventory covers every edge with
+its repository, SHA, file and line. The first run over the agent's pinned contracts found 15 declared calls: 14 go
+down to ffmpeg-skill, 1 is excepted and 0 are violations.
+
+**What follows**: the check starts to fail once the owner has accepted the exception list and every layer, two
+weekly runs are clean, and the contract-shape baseline no longer lists `/dependencies` (ADR-019, "When the check
+starts to fail"). `owns` is unchanged.
+
+## D34 — Contract changes are classified on pull requests, report-only
+
+**Decision** (owner, 2026-11-19, details delegated): a pull request that changes a Skill's `contract/contract.json`
+is classified `none`, `additive` or `breaking` with System Intelligence's `si contract-diff` (its ADR-019), with the
+release bump that needs (before 1.0: breaking minor, additive patch; from 1.0: breaking major, additive minor). The
+reusable workflow `.github/workflows/contract-diff.yml` puts a `contract:none` / `contract:additive` /
+`contract:breaking` label and one comment on the pull request. It reports only; a caller may opt in to failing
+with `fail-on-breaking`.
+
+**Why**: VERSIONING.md section 3 defines breaking and non-breaking contract changes, and every Skill commits its
+contract (ADR-019-committed-contract-file), but nothing applied the definition, so the bump a contract change needs
+was decided by eye.
+
+**Evidence**: [ADR-020](../adr/ADR-020-contract-diff-on-pull-requests.md). Over the committed contract histories of
+13 Skill repositories, every release-only change (the version repeated in the contract) reads `none`.
+
+**What follows**: qc-skill calls the workflow first. Not yet wired, each with a committed contract: ingest,
+video-editing, color-grading, motion-graphics, subtitle, thumbnail, blender, remotion-ffmpeg, hyperframes,
+audio-production, transcription, diarization, detection, media-analysis, artifacts, publish, nle-bridge,
+imagemagick, bdmvkit, vtskit, udfkit, dvdcc, stepcap, oncemore. No committed contract (nothing to compare):
+ffmpeg-skill, voice-enhance, dubbing, sound-design, slide-sync. The check starts to fail only by a later decision
+(ADR-020, "When it starts to fail"). `owns` is unchanged.
+
+## D35 — Temporary directories: prefixed, always removed, movable, kept only on request
+
+**Decision** (owner, 2026-11-19, details delegated): every temporary directory a component makes, in product code or tests, follows five rules:
+
+- its name carries the component's prefix;
+- it is removed on every path out (a context manager, `finally`, `addCleanup` / `addClassCleanup`, with `atexit` and SIGTERM as a backstop);
+- it honours `TMPDIR`;
+- it is kept only on an explicit opt-in that prints the path;
+- each repository tests that a run with an empty `TMPDIR` leaves it empty.
+
+**Why**: leftovers from tests filled shared disks twice: video-production-agent's `va_*` directories (14 GB), and later 11 GB in about 78,000 entries in one `/tmp`. Nothing said whose job removing them was.
+
+**Evidence**: [ADR-021](../adr/ADR-021-temporary-directories.md), whose inventory lists what each skill repository left per run and the fix for each: hyperframes-skill (about 114 directories per run), video-editing-skill (138), remotion-ffmpeg-skill (4), transcription-skill (2) and artifacts-skill (1). The other 18 skill repositories leave nothing outside pytest's own retention.
+
+**What follows**: two cases are not fixed yet:
+
+- system-intelligence keeps the clone of a GitHub target by design (`si-github-*`). Removing it unless `--keep-clone` is given is that repository's follow-up.
+- Velisa's own `control-room-test-*` and `registry_*` test directories fall under the same rule.
+
+No ecosystem-wide check runs yet; skillpact's conformance job (ADR-014) is the place for one.
+
+## D36 — Reusable checks for every Skill; release methods stay per repository
+
+**Decision** (owner, 2026-11-19, details delegated):
+- `contract-diff.yml` is fixed in three places. Overlapping runs no longer leave an old result: callers set a concurrency group, and the workflow re-reads the pull request's head before it writes. The comment says when the check fails the pull request. Only the workflow's own comment is updated.
+- Three more reusable workflows are added: `contract-file-check.yml`, `changelog-check.yml` and `release-guard.yml`.
+- The release workflows are not unified. Only the shared step is checked: a tag's `contract/contract.json` says the tag's version.
+
+**Why**:
+- The three contract-diff problems were found when the workflow was introduced (ADR-020).
+- The changelog and tag checks were written per repository, or not at all.
+- The Skills release in several different ways (six after the moves of 2026-11-19), each tested where it lives.
+
+**Evidence**: [ADR-022](../adr/ADR-022-reusable-checks-and-release-methods.md) has the table of release methods and the measurements:
+- 26 tags carry a contract file, and none disagrees with its tag.
+- 14 of 19 CHANGELOGs pass the default settings, and the other five pass with one input each.
+- Every Skill already runs `generate --check` in CI from a unit test.
+
+**What follows**:
+- contract-diff, with the concurrency group, goes on every Skill with a committed contract. ffmpeg-skill has no contract file. dubbing, sound-design, voice-enhance and slide-sync wait until their contract shape is reworked.
+- contract-file-check is called by no Skill for now, because the check would run twice.
+- changelog-check and release-guard are on trial in qc-skill, publish-skill and blender-skill. They go wider once the trial runs are clean. `owns` is unchanged.
+
+**Rollout** (2026-11-19): the trial runs were clean, so both checks went on the other 26 Skills with a committed contract (ffmpeg-skill and video-production-agent excluded). Five need one changelog input (`stop-at` in four, `other-headings` in thumbnail-skill); five have no CHANGELOG and call release-guard only. release-guard runs on the completion of the workflow that makes the tag, and also on a pushed `v*` tag where a person can push one. Its first run passed in all 26. [ADR-022](../adr/ADR-022-reusable-checks-and-release-methods.md#rollout-to-every-skill-2026-11-19) has the inputs and triggers.
+
+## D37 — The release job tests its commit before pushing it; chore / ci / docs / test pull requests release nothing
+
+**Decision** (owner, 2026-11-19, details delegated):
+- Every release job that pushes a commit to main tests that commit first. The step is called "Test the release commit before pushing it", and it runs the repository's fast tests, which include the CHANGELOG, version and contract tests. A failure pushes nothing.
+- Pull requests labelled only chore, ci, docs, test or similar release nothing. A pull request with a release-level label releases, and so does one with no label at all (as a patch). This is imagemagick-skill's rule. In the release-drafter repositories, `release_gate.py` decides it, because release-drafter's `default` cannot say "no release".
+- `render_changelog.sh` writes the heading in the form the repository's CHANGELOG already uses.
+
+**Why**: the release commit is pushed with `GITHUB_TOKEN`, so main's CI never runs on it. On 2026-11-19 it broke two mains:
+- sound-design-skill: a `## v0.3.4` heading, where the file and its tests use `## 0.3.4`;
+- hyperframes-skill: no CHANGELOG section for 0.10.3.
+
+Both releases shipped only a CI change.
+
+**Evidence**: [ADR-023](../adr/ADR-023-release-commit-tested-and-gated.md) has the per-repository table and the measurements.
+
+**What follows**: ffmpeg-skill and video-production-agent are not changed. artifacts-skill and blender-skill release through a pull request, so CI already runs on their release commit. transcription-skill keeps its path-based rule (its ADR-036), which already holds release back for docs / ci / test-only changes. `owns` is unchanged.
+
+**Addendum** (owner, 2026-11-19): a pull request labelled `dependencies` releases, as a patch, in every Skill whose release is decided from labels or changed paths. Before, 18 of the 21 such Skills released nothing for it, or only for some updates; color-grading, media-analysis and qc already released it. `release_gate.py` is one file again in all 17 repositories that have it. Every `version-resolver` maps `dependencies` to a patch and maps no maintenance label. imagemagick and remotion-ffmpeg give it a patch in `resolve_version.py`, and transcription in `release_scope.py` (its ADR-049). [ADR-023](../adr/ADR-023-release-commit-tested-and-gated.md#addendum-2026-11-19-a-dependencies-pull-request-releases-a-patch) has the before / after table.
+
+**Addendum** (2026-11-20): `release_gate.py` no longer counts the `contract:none` / `contract:additive` / `contract:breaking` labels that contract-diff (ADR-020) puts on every pull request. Before, a pull request whose only label was `contract:none` counted as "other labels only" and released nothing, although an unlabelled one ships as a patch. A `contract:*` label that a `version-resolver` maps to a bump would still count; none does today, and no release script reads these labels for the version. The file stays identical in all 17 repositories, each with a regression test.
+
+## D38 — The shared data-format specs get JSON Schemas and conformance fixtures; Skills copy them into their tests
+
+**Decision** (owner, 2026-11-19, details delegated):
+- `kit@1`, `title.json`, `stinger.json` and the licence record each get a JSON Schema (draft 2020-12) in `registry/schemas/`. The schema follows the spec document, PROPOSED fields included as optional.
+- What a schema cannot state (a time on a frame, `cut_point` inside `cover`, frame numbers agreeing with seconds) is a rule in `registry/spec_conformance.py`.
+- Valid and invalid examples sit in `registry/conformance/<spec>/`, listed with their hashes in a generated `manifest.json`. Velisa's CI (`spec-conformance.yml`) fails when one does not behave as its directory says.
+- A Skill copies the schemas and fixtures it needs into its tests (`--export`), pinned to a Velisa commit, and tests its writer or reader against them. Trial: hyperframes-skill (writes `title.json` / `stinger.json`) and motion-graphics-skill (reads `title.json`).
+
+**Why**: the specs were tables. Each Skill checked its own reading of them, and nothing checked that a writer and its readers agree.
+
+**Evidence**: [ADR-024](../adr/ADR-024-spec-schemas-and-conformance-fixtures.md) has the table of every place an implementation differs from its spec, and the trial results.
+
+**What follows**: five rows are open for the spec owner and the Skill concerned. ffmpeg-skill refuses the keys kit@1 adds and `colours`, and reads keys the spec's table lacks (K1-K3). Whether a kit's `logo_position` may be `"X,Y"` (K5). Whether sound-design-skill's schema takes the video and image extension (L2). Other Skills take the fixtures one at a time.
+
+## D39 — Sidecar JSON files share a four-field envelope
+
+**Decision** (owner, 2026-11-19, details delegated): every sidecar a Skill writes beside an output carries `schema` (`<namespace>/<name>@<major>`), `producer` (`{skill_id, version}`), `generated_at` (UTC) and `inputs` (the sha256 of each input medium) at its top level. The spec is `docs/specs/sidecar-envelope.md`, the schema `registry/schemas/sidecar-envelope.schema.json`.
+
+**Why**: the sidecars that exist say who wrote them, when, and from what in five different spellings, or not at all.
+
+**Evidence**: [ADR-025](../adr/ADR-025-sidecar-envelope.md); the inventory of today's sidecars is in the spec.
+
+**What follows**: no Skill adopts it in this change. The spec lists one additive follow-up per Skill: hyperframes-skill and subtitle-skill first, then the work-directory manifests of audio-production, color-grading, motion-graphics and video-editing (optional), then a check in skillpact's conformance job.
+
+## D40 — One timebase: exact rates, a half rounds up, drop-frame at 29.97 and 59.94 only
+
+**Decision** (owner request, 2026-11-20, details delegated):
+- Frame rates and times are exact fractions. 29.97 is read as 30000/1001, never as 2997/100; no `limit_denominator` on a rounded decimal. Two rates are the same only when their fractions are equal.
+- One rounding rule for positions: a half up (`floor(x + 1/2)`). Lengths joined at their own rate round down, keeping a frame within 1 ms. Positions are counted in whole frames, never summed from rounded values.
+- SMPTE timecode: NDF at every rate; DF only at 30000/1001 and 60000/1001, written with `;`; a DF label that does not exist is refused; no wrap at 24 hours.
+- The spec is `docs/specs/timebase.md`, its vectors `docs/specs/timebase-vectors.json`, and the reference implementation `scripts/timebase.py` here (not in system-intelligence, which is general-purpose).
+
+**Why**: Skills read rates and round in three different ways; the agent's concat landed a frame early per join until its ADR-115; ingest-skill reads DF labels that do not exist; hyperframes-skill cannot render at 29.97.
+
+**Evidence**: [ADR-026](../adr/ADR-026-timebase.md) has the per-repository findings and the issue for each.
+
+**What follows**: no Skill code is changed here; each non-conforming repository has an issue. ffmpeg-skill is listed, not filed. video-editing-skill and video-production-agent must change their rate reading together.
+
+## D41 — Error codes stay per Skill; one taxonomy of 15 classes above them, report only
+
+**Decision** (owner request, 2026-11-20, details delegated):
+- Every error code and failure kind a Skill contract declares maps to one of 15 classes in `docs/specs/error-taxonomy.json`. Each class has a meaning, a retry policy and a rule for its message to a person.
+- Skills keep their codes and exit codes. A caller retries only when the class allows it and the Skill does not say `retryable: false`. A cancelled run is never retried by a caller.
+- `scripts/error_taxonomy.py` lists unknown codes, contracts with no code and retry verdicts that differ. `.github/workflows/error-taxonomy.yml` runs it weekly; it fails nothing.
+
+**Why**: 23 contracts use five shapes and 113 codes, with several names for one meaning and different retry verdicts for the same code; the agent keeps a mapping table per adapter, and those tables disagree.
+
+**Evidence**: [ADR-027](../adr/ADR-027-error-taxonomy.md); every code with its class is in `docs/specs/error-taxonomy-map.md`.
+
+**What follows**: report only. The agent has one issue for its tables; no Skill is filed for its codes now.
+
+## D42 — Maintenance tools are a second plugin, `velisa-maintainer`, with /repin, /release and /roadmap
+
+**Decision** (owner request, 2026-11-20, details delegated):
+- `plugins/velisa-maintainer/` is a second local plugin in the marketplace, listed after `velisa` by `scripts/marketplace.py`. `velisa` does not depend on it, so installing the OS does not install it.
+- Its skill `velisa-maintainer` is a short `SKILL.md` with six references: re-pin (ADR-117 of the agent), releases (ADR-022, ADR-023 and its addendum, `release_gate.py`, the labels, `dependencies` as a patch), contract diff (ADR-020), the timebase and error taxonomy (ADR-026, ADR-027), the schemas and conformance fixtures (ADR-024, ADR-025), and what a session cannot do on GitHub (tag push, branch deletion, GraphQL, draft to ready, repository settings, `@coderabbitai` comments).
+- Commands: `/repin` dispatches the agent's `repin.yml` and reports the pull request; `/release <repo>` explains the repository's release and dispatches only where `workflow_dispatch` exists; `/roadmap <repo>` lists open roadmap steps (`scripts/roadmap.py` in the plugin). REST only; none pushes a tag, merges or marks a draft ready.
+
+**Why**: the facts a maintenance session needs were in five long ADRs and in refusals it met one by one; the OS plugin is for people producing video and should not carry them.
+
+**Evidence**: [ADR-028](../adr/ADR-028-maintainer-plugin-and-field-test-kit.md); `scripts/tests/test_marketplace.py` checks the entry, the skill's length and links, the references' topics, the commands and the roadmap parser.
+
+**What follows**: a reference changes with its ADR. The commands were checked as files, not run from an installed plugin.
+
+## D43 — Steps that need real hardware or media get a field test kit; results are committed here
+
+**Decision** (owner request, 2026-11-20, details delegated):
+- `docs/field-test/steps.json` lists the roadmap steps whose "Done when" needs a GPU with weights, a commercial NLE, platform test accounts, a set-top disc player or consented recordings: nine steps in diarization, voice-enhance, nle-bridge, publish, sound-design, transcription (three) and oncemore. No roadmap marks a step 確認待ち / "awaiting confirmation"; they were found by reading each open step and each "still to do" note.
+- `docs/field-test/README.md` is the procedure; `scripts/field_test.py record` writes a JSON record (`velisa/field-test-result@1`) and a Markdown page into `docs/field-test/results/`. Media are hashed, never copied, and their paths are not written; media of people need `--consent`; credential-like values are refused; `check` validates committed results in CI.
+- The step's own repository is updated from a committed result, and ticked only on `pass`.
+
+**Why**: the owner holds the hardware, accounts and venues; without a fixed list of what to measure and a file to bring back, a field run's numbers do not reach the roadmap.
+
+**Evidence**: [ADR-028](../adr/ADR-028-maintainer-plugin-and-field-test-kit.md); `scripts/tests/test_field_test.py`.
+
+**What follows**: none of the nine steps was run here. A new hardware or media step is added to `steps.json` by hand.
+
+## D44 — The repositories stay separate (no monorepo)
+
+**Decision** (owner request, 2026-11-20, details delegated): no migration to a monorepo, in whole or in part. Cross-repository costs are reduced where they are: reusable workflows here, identical copies checked by tests, the agent's automated re-pin from release tags, shared specs, schemas and vectors here that Skills copy.
+
+**Why**: every Skill installs and releases alone, and the agent pins releases, not a sibling's main; the licences differ (MIT, LGPL-3.0, Apache-2.0, GPL-3.0); ffmpeg-skill, the largest dependency, is maintained apart; the costs measured in November (one pull request per repository per rollout, hand re-pins) are bounded and now automated, while a migration would rewrite every release method, the marketplace sources, the history and every link.
+
+**Evidence**: [ADR-029](../adr/ADR-029-polyrepo-stays.md), with the comparison table.
+
+**What follows**: revisit when ADR-029's conditions hold over a month (for example, a quarter of merged pull requests split across three or more repositories, re-pins regularly needing hand fixes, drifting copies in more than five repositories, or per-subdirectory installs shown to work).
+
+## D45 — A kit is projected onto ffmpeg-skill's brand keys before it is passed (ADR-024 K1, K3)
+
+**Decision** (owner, 2026-11-20, details delegated): a consumer that hands a `kit@1` file to ffmpeg-skill writes a projection and passes that: only the keys of the spec's `brand.json` table, `colours` written as `colors`, `logo` and `font_file` as absolute paths, nothing added. `colours` stays an accepted kit spelling. ffmpeg-skill is not changed.
+
+**Why**: ffmpeg-skill refuses every brand-file key it does not read, so the kit@1 keys and `colours` stop it; that refusal also catches misspelt keys, and Velisa does not change ffmpeg-skill.
+
+**Evidence**: [ADR-030](../adr/ADR-030-kit-projection-for-ffmpeg-skill.md), with the consumers checked; `docs/specs/kit.md` "Rule"; ADR-024's K1 and K3 rows marked decided.
+
+**What follows**: remotion-ffmpeg-skill passes its `--brand` file to ffmpeg-skill's delivery template unchanged ([remotion-ffmpeg-skill#32](https://github.com/kajisho5/remotion-ffmpeg-skill/issues/32)). K2 and K5 stay open.
+
+## D46 — What 1.0 means for a Skill; the Skills go to 1.0 one at a time, most stable first
+
+**Decision** (owner request, 2026-11-20, details delegated):
+- From a Skill's 1.0.0, a change that `si contract-diff` calls breaking, to a part of the contract the promise covers, ships only in a major release. Additive changes are minor, and a release with no contract change can be a patch.
+- The promise covers the `provides[]` entries marked `STABLE` and the tools they map to. `EXPERIMENTAL` entries may still change in a minor release, with a CHANGELOG line.
+- A `STABLE` entry is first marked `DEPRECATED` in a minor release. It keeps working for at least one more minor release and 30 days, and is removed only in the next major release.
+- 1.0 is cut through each repository's own flow: the `major` label in the release-drafter Skills.
+- The agent's re-pin treats a 0.x → 1.0.0 release with a `none` or `additive` diff as a gate widening.
+- Order, from the 2026-11-20 measurements: thumbnail-skill, motion-graphics-skill, publish-skill, imagemagick-skill, subtitle-skill, then the rest of ADR-031's table.
+- Enforcement is by review for now: the release flow takes the bump from labels, and contract-diff reports without blocking. A blocking check is a follow-up (ADR-031 section 5).
+
+**Why**: 24 Skills on 0.x, and every lifecycle `EXPERIMENTAL`, meant a version number told a dependent nothing about breakage.
+
+**Evidence**: [ADR-031](../adr/ADR-031-skills-at-1-0.md), with the ranking table and its sources.
+
+**What follows**: each Skill's 1.0 is its own pull request and release. A Skill that hits a problem on the way stops the sequence until it is fixed.
+
+**Addendum** (2026-11-20): the blocking check of ADR-031 section 5 is implemented in the 17 Skills that carry `release_gate.py`. Three files are identical in all 17: `release_gate.py`, `major-label-check.yml` and `tests/test_release_gate_major.py`.
+- From a latest tag of 1.0.0, a pull request labelled `contract:breaking` without a major label (what `release-drafter.yml` maps to major) fails the new `major-label-check.yml`, unless the pull request itself bumps the major version in `pyproject.toml`. That check waits for the commit's contract-diff run (and fails if it did not succeed), and runs again on `labeled` / `unlabeled`.
+- The release job stops on the same rule, per pull request: `release_gate.py` prints the reason, writes `releasable=false` and exits 1. A major version bumped by hand lets it go.
+- From 1.0.0, a pull request that contract-diff left with no `contract:*` label (a fork) fails its check until a maintainer adds one.
+- 0.x is unchanged.
+- An `EXPERIMENTAL`-only break has no named exception yet: the reviewer removes `contract:breaking` by hand.
+- The check goes by version, so the three pre-ADR 1.x Skills (audio-production, color-grading, qc) are covered too.
+
+[ADR-031 section 5, addendum](../adr/ADR-031-skills-at-1-0.md#addendum-2026-11-20-the-check-is-implemented) lists the pull requests.
+
+## D47 — Editing by transcript: word-index selections, cut edges in the gaps, frames by the timebase
+
+**Decision** (owner request, 2026-11-20, details delegated):
+- A person's selection is word indices and whole segments, `remove` or `keep`; never seconds.
+- transcription-skill `transcription/select` (rule `transcript-selection@1`) turns it into removed runs of words, each with the window each cut edge may use (the gap to the kept speech, found by time), the sentences, speakers and seconds touched. It cuts nothing.
+- video-editing-skill `video-editing ripple` (rule `ripple@1`, an additive top-level block, no new operation type) places each edge in its window: 0.20 s kept after speech and 0.10 s before it, never past the window's middle; into a measured silence when the source is given; to the nearest frame of the source's rate (timebase@1, a half up), staying inside the window, or on the removed side when the window holds no frame. It returns the frame cut list, a JSON EDL, a `CONDENSE` request for `run`, and the transcript and SRT / VTT retimed to the cut.
+- A kept word of any speaker that overlaps a removed span is refused (`selection_overlaps_kept_speech`) unless `overlap: include` removes it too.
+- The agent shows the sentences, speakers and seconds before anything is cut (`video-agent transcript-edit`, MCP `transcript_edit`); `edit.transcript_edit` is a CONFIRM decision cut by `CONDENSE`.
+
+**Why**: indices make the same selection give the same cut; the Skill that knows the words gives their times, the Skill that knows the media and the frame grid places the cut; a new tool and a new block keep both contracts additive.
+
+**Evidence**: [ADR-032](../adr/ADR-032-editing-by-transcript.md).
+
+**What follows**: transcription-skill, video-editing-skill and video-production-agent implement it, each in its own pull request; the agent re-pins through its repin workflow.
+
+## D48 — Batch selects: facts from the measuring Skills, the choice in the agent, a yes before the render
+
+**Decision** (owner request, 2026-11-20, details delegated):
+- Each flag has one owner: shot boundaries, silence and speech from media-analysis-skill (`scene_detection`, `silence`, `speech_regions`); black and frozen frames from qc-skill `inspect` (`video.black_segments`, `video.freeze_segments`).
+- media-analysis-skill adds the one missing measurement, `picture_quality` (`media-analysis/picture`, `measure.video.picture_quality`): per window, `blurdetect` sharpness, `signalstats` luma mean / 10th / 90th percentile, and camera jitter, speed and motion agreement from block-median projection shifts. Facts only, no threshold; an additive contract change in a minor release.
+- The agent chooses by its rule `selects@1`: per shot, reject for black / frozen over half the shot, soft (blur at least 1.3 × the batch's 25th percentile, or over `max_blur`), under- / over-exposed (mean luma below 40 / above 210), shaky (jitter above 1.0 % of the width, judged only when at least 0.6 of the textured blocks agree with the median shift) or shorter than 1.0 s; dead air is flagged and rejects only on request; a score ranks the usable shots; `min_score` and `max_duration` select by score; the sequence stays in source order.
+- `video-agent selects` and MCP `selects` show every shot with its reasons and the total duration; nothing renders before `--set edit.selects=<file>` makes CONFIRM `selects.keep` decisions, assembled by the existing trim + `video.concat` path.
+
+**Why**: the Skill that already measures a fact keeps it; the measuring Skill states facts and the agent decides; the existing assembly path renders the selection, so no Skill gains an operation.
+
+**Evidence**: [ADR-033](../adr/ADR-033-batch-selects.md).
+
+**What follows**: media-analysis-skill and video-production-agent implement it, each in its own pull request; the agent re-pins through its repin workflow.

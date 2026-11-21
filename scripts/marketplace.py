@@ -11,6 +11,9 @@ Writes two files, both generated (edit ecosystem.json, not them):
                                                         (skills/wakeup/SKILL.md, hand-written)
                                                         says which skill to use for what; its "who owns
                                                         what" table is regenerated here too
+  The maintainer plugin (plugins/velisa-maintainer, hand-written) gets its marketplace entry here, right after the
+  meta plugin. It is for whoever maintains the repositories (re-pins, releases, roadmaps) and is not a dependency of
+  the meta plugin, so installing the OS does not install it (ADR-028, decision D42).
 
 Usage:
   python3 scripts/marketplace.py           write both files
@@ -29,6 +32,8 @@ MARKETPLACE_NAME = "velisa"
 META = "velisa"
 ROUTING_SKILL = "wakeup"  # invoked as /velisa:wakeup
 META_DIR = f"plugins/{META}"
+MAINTAINER = "velisa-maintainer"   # skills/velisa-maintainer and the commands /repin, /release, /roadmap
+MAINTAINER_DIR = f"plugins/{MAINTAINER}"
 
 
 def build(manifest: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
@@ -40,6 +45,12 @@ def build(manifest: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         "source": f"./{META_DIR}",
         "description": "Installs the whole of Velisa (formerly AI Video Production OS): every Skill below except the optional disc-authoring kits, and the routing skill that picks the right one.",
         "category": "os",
+    }, {
+        "name": MAINTAINER,
+        "source": f"./{MAINTAINER_DIR}",
+        "description": "For maintainers of the Velisa repositories, not for production: re-pins, releases, contract diffs, the shared specs and schemas, and the commands /repin, /release and /roadmap.",
+        "category": "maintenance",
+        "tags": ["maintenance", "保守"],
     }]
     for c in plugins:
         dep = departments[c["department"]]
@@ -48,7 +59,7 @@ def build(manifest: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
             "source": {"source": "github", "repo": f"{org}/{c['repo']}"},
             "description": c["role"],
             "category": dep["en"].lower(),
-            "tags": [dep["en"].lower(), dep["name"]] + (["optional"] if c.get("optional") else []) + (["scaffold"] if c["status"] == "scaffold" else []),
+            "tags": [dep["en"].lower(), dep["name"]] + (["optional"] if c.get("optional") else []) + (["scaffold"] if c["status"] == "scaffold" else []) + (["app"] if c.get("kind") == "app" else []),
         })
     marketplace = {
         "name": MARKETPLACE_NAME,
@@ -81,7 +92,8 @@ def owner_table(manifest: Dict[str, Any], skill_text: str) -> str:
         if c.get("status") == "planned":
             continue
         note = " (optional)" if c.get("optional") else (" (scaffold)" if c["status"] == "scaffold" else "")
-        how = "" if c.get("plugin") else " -- CLI only, no skill yet"
+        note += " (app)" if c.get("kind") == "app" else ""
+        how = "" if c.get("plugin") else (" -- stand-alone app" if c.get("kind") == "app" else " -- CLI only, no skill yet")
         rows.append(f"| `{c['repo']}`{note}{how} | {departments[c['department']]['name']} | {', '.join(c['owns'])} |")
     head, rest = skill_text.split(BEGIN, 1)
     _, tail = rest.split(END, 1)

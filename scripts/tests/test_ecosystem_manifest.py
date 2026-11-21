@@ -37,12 +37,37 @@ class ManifestTests(unittest.TestCase):
                 self.assertIn(c["install"], {"pip", "npm", "checkout"})
                 self.assertIn(c["department"], departments)
                 self.assertIn(c["status"], {"active", "scaffold", "planned"})
+                self.assertIn(c.get("kind", "skill"), {"skill", "app"})  # "app": a stand-alone application; default skill
                 self.assertTrue(c["role"].strip())
                 self.assertTrue(c["owns"])
                 self.assertIsInstance(c.get("extras", []), list)
                 self.assertIsInstance(c.get("optional", False), bool)
                 for e in c.get("engines", []):
                     self.assertTrue(e["name"].strip())
+
+    def test_every_component_has_a_layer_the_layering_names(self):
+        # ADR-019 / D33: the order and the exceptions are in registry/layering.json, the definitions in $comment.
+        layering = json.loads((ROOT / "registry" / "layering.json").read_text(encoding="utf-8"))
+        layers = layering["layers"]
+        self.assertEqual(layers, ["engine", "skill", "app", "orchestrator", "governance"])
+        for name in layers:
+            self.assertIn(f'\"{name}\"', MANIFEST["$comment"])
+        repos = {c["repo"] for c in MANIFEST["components"]}
+        for c in MANIFEST["components"]:
+            with self.subTest(repo=c["repo"]):
+                self.assertIn(c.get("layer"), layers)
+                if c.get("kind") == "app":
+                    self.assertEqual(c["layer"], "app")
+        self.assertEqual([c["repo"] for c in MANIFEST["components"] if c["layer"] == "orchestrator"],
+                         [c["repo"] for c in MANIFEST["components"] if c["department"] == "command"])
+        for e in layering["exceptions"]:
+            with self.subTest(exception=f'{e["from"]} -> {e["to"]}'):
+                self.assertEqual(set(e), {"from", "to", "reason"})
+                self.assertIn(e["from"], repos)
+                self.assertIn(e["to"], repos)
+                self.assertTrue(e["reason"].strip())
+                rank = {c["repo"]: layers.index(c["layer"]) for c in MANIFEST["components"]}
+                self.assertLessEqual(rank[e["from"]], rank[e["to"]], "a downward call needs no exception")
 
     def test_every_department_is_staffed(self):
         staffed = {c["department"] for c in MANIFEST["components"]}

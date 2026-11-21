@@ -8,10 +8,12 @@ name: SkillPact conformance
 # each Skill's own CI sets its own min-level.
 #
 # It reports, it never blocks: the per-repository step and job are continue-on-error, and this
-# workflow is not a required check. The table of levels is the run's job summary.
+# workflow is not a required check. The table of levels is the run's job summary, with which
+# Skills declare progress events and error classes (the Action's `declares` output; skillpact
+# ECOSYSTEM_ROADMAP.md step 5).
 #
-# The Action is pinned to a full commit SHA (kajisho5/skillpact#33's merge commit), as
-# skillpact's README asks; Dependabot (github-actions) moves it.
+# The Action is pinned to a full commit SHA (the v0.8.1 tag's commit), as skillpact's README
+# asks; Dependabot (github-actions) moves it.
 
 on:
   pull_request:
@@ -72,7 +74,7 @@ jobs:
           sudo apt-get install -y -q $APT_PACKAGES
       - id: skillpact
         continue-on-error: true
-        uses: kajisho5/skillpact@90895aa3920b503e77c29fa5ff231aeba8251a32 # skillpact #33 merge commit
+        uses: kajisho5/skillpact@9f0559ee4837edfff05c75d4e709ea9f1a7d92a2 # v0.8.1
         with:
           path: ${{ matrix.repo }}
           min-level: L1
@@ -82,9 +84,12 @@ jobs:
           REPO: ${{ matrix.repo }}
           LEVEL: ${{ steps.skillpact.outputs.level }}
           OUTCOME: ${{ steps.skillpact.outcome }}
+          # What the contract declares under x.runtime (progress events, error classes, idempotency); compact
+          # JSON, empty when the contract is invalid. The summary job turns it into columns.
+          DECLARES: ${{ steps.skillpact.outputs.declares }}
         run: |
           mkdir -p "$RUNNER_TEMP/result"
-          python3 -c 'import json, os; print(json.dumps({"repo": os.environ["REPO"], "level": os.environ["LEVEL"] or "none", "outcome": os.environ["OUTCOME"]}))' \
+          python3 -c 'import json, os; print(json.dumps({"repo": os.environ["REPO"], "level": os.environ["LEVEL"] or "none", "outcome": os.environ["OUTCOME"], "declares": os.environ.get("DECLARES", "")}))' \
             > "$RUNNER_TEMP/result/result-$REPO.json"
           cat "$RUNNER_TEMP/result/result-$REPO.json"
           if [ "$OUTCOME" != "success" ]; then

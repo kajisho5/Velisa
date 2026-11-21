@@ -1,5 +1,8 @@
 # Current State — the whole ecosystem, as of 2026-09-06
 
+> **2026-09 record, frozen; the current state is [docs/ecosystem/ROADMAP.md](ROADMAP.md).** Kept as written for its history
+> (owner decision 2026-11-12, [DECISION_LOG.md](DECISION_LOG.md) D32); counts and statuses below are not updated.
+
 **Status: CURRENT / IMPLEMENTED** (this document itself — a snapshot, re-verified against
 real repository state, not carried forward from memory). A fresh session should read this
 file first, then `CROSS_REPO_STATUS.md` for per-repo detail, `WORK_QUEUE.md` for what's

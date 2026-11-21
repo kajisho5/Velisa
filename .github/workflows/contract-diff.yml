@@ -1,0 +1,220 @@
+name: Contract diff
+
+# Reusable: is a pull request's change to the Skill's committed contract (contract/contract.json,
+# ADR-019-committed-contract-file) none, additive or breaking? Decision D34, ADR-020.
+#
+# The comparison is kajisho5/system-intelligence's `si contract-diff` (its ADR-019): the contract at
+# the merge base of the pull request against the one at its head. The result goes on the pull
+# request as one label, `contract:none`, `contract:additive` or `contract:breaking` (the other two
+# are removed), and one comment that is updated in place, with every change, its effect and the
+# release bump it needs (before 1.0: breaking minor, additive patch; from 1.0: major, minor).
+#
+# REPORT ONLY: the job stays green whatever it finds, unless the caller sets
+# `fail-on-breaking: true` (the comment then says the check fails on a breaking change). Labelling and commenting need `pull-requests: write` and
+# `issues: write` from the caller; without them (a pull request from a fork) the result is still
+# in the job summary and the artifact.
+#
+# A Skill calls it with:
+#
+#   on:
+#     pull_request:
+#       paths: ["contract/contract.json"]
+#   permissions:
+#     contents: read
+#     issues: write
+#     pull-requests: write
+#   concurrency: # a newer push cancels the older run, so an old result never lands last
+#     group: contract-diff-${{ github.event.pull_request.number }}
+#     cancel-in-progress: true
+#   jobs:
+#     contract-diff:
+#       uses: kajisho5/Velisa/.github/workflows/contract-diff.yml@main
+#
+# Runs that overlap on one pull request: besides the caller's `concurrency`, the label and the
+# comment are written only while the commit this run compared is still the pull request's head; a
+# run on an older commit leaves them to the newer run. The comment it updates is the one this
+# workflow's token posted (`comment-author`), never one a person wrote with the same first line.
+#
+# System Intelligence is pinned to a full commit SHA (the tag in the comment), like layering.yml.
+
+on:
+  workflow_call:
+    inputs:
+      contract-path:
+        description: The committed contract, relative to the repository root.
+        type: string
+        default: contract/contract.json
+      fail-on-breaking:
+        description: Fail the job on a breaking change (default false, report only).
+        type: boolean
+        default: false
+      label:
+        description: Put a contract:none / contract:additive / contract:breaking label on the pull request.
+        type: boolean
+        default: true
+      comment:
+        description: Keep one comment on the pull request with the changes.
+        type: boolean
+        default: true
+      comment-author:
+        description: The login whose comment is updated in place (the account of the token that posts it).
+        type: string
+        default: github-actions[bot]
+    outputs:
+      classification:
+        description: none, additive or breaking (empty when neither side has a contract).
+        value: ${{ jobs.contract-diff.outputs.classification }}
+      recommended-bump:
+        description: none, patch, minor or major.
+        value: ${{ jobs.contract-diff.outputs.recommended-bump }}
+
+permissions:
+  contents: read
+
+jobs:
+  contract-diff:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    outputs:
+      classification: ${{ steps.diff.outputs.classification }}
+      recommended-bump: ${{ steps.diff.outputs.recommended_bump }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0 # the merge base must be present
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install System Intelligence
+        run: python -m pip install -q "git+https://github.com/kajisho5/system-intelligence@32e087fb3aa499d054e71338e27bcf967eed91cc" # v0.7.0
+      - name: Compare the contract at the merge base and at the head
+        id: diff
+        shell: bash
+        env:
+          SI_READ_ONLY: "1" # system-intelligence ADR-013
+          CONTRACT_PATH: ${{ inputs.contract-path }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          base="$(git merge-base "$BASE_SHA" "$HEAD_SHA")"
+          report="$RUNNER_TEMP/contract-diff.json"
+          if ! si contract-diff --base-ref "$base" --head-ref "$HEAD_SHA" --path "$CONTRACT_PATH" \
+              --out "$report" > contract-diff.md 2> contract-diff.err; then
+            cat contract-diff.err >&2
+            if grep -q "neither side has a contract" contract-diff.err; then
+              echo "No $CONTRACT_PATH at the merge base or the head: nothing to compare." | tee contract-diff.md
+              echo "classification=" >> "$GITHUB_OUTPUT"
+              echo "recommended_bump=" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            exit 1
+          fi
+          sed -i '/^Report written to /d' contract-diff.md # the path is the runner's; the artifact has the file
+          cat contract-diff.md
+          echo "classification=$(jq -r .classification "$report")" >> "$GITHUB_OUTPUT"
+          echo "recommended_bump=$(jq -r .recommended_bump "$report")" >> "$GITHUB_OUTPUT"
+      - name: Job summary
+        if: always()
+        run: if [ -f contract-diff.md ]; then cat contract-diff.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: contract-diff
+          path: |
+            contract-diff.md
+            ${{ runner.temp }}/contract-diff.json
+          if-no-files-found: ignore
+      - name: Is the compared commit still the pull request's head?
+        id: fresh
+        if: (inputs.label || inputs.comment) && steps.diff.outputs.classification != ''
+        continue-on-error: true
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          current="$(gh api "repos/$REPO/pulls/$PR" --jq .head.sha)"
+          if [ "$current" = "$HEAD_SHA" ]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::the pull request moved on to $current; the run for that commit writes the label and the comment"
+          fi
+      - name: Label the pull request
+        if: inputs.label && steps.diff.outputs.classification != '' && steps.fresh.outputs.current == 'true'
+        continue-on-error: true # a fork's token cannot write; the summary still has the result
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          CLASSIFICATION: ${{ steps.diff.outputs.classification }}
+        run: |
+          set -euo pipefail
+          declare -A color=([none]=c5def5 [additive]=0e8a16 [breaking]=b60205)
+          declare -A text=(
+            [none]="The committed contract did not change in a way dependents see"
+            [additive]="The committed contract only gained things (si contract-diff)"
+            [breaking]="The committed contract changed incompatibly (si contract-diff)"
+          )
+          for kind in none additive breaking; do
+            gh api "repos/$REPO/labels" -f name="contract:$kind" -f color="${color[$kind]}" \
+              -f description="${text[$kind]}" > /dev/null 2>&1 || true
+            if [ "$kind" != "$CLASSIFICATION" ]; then
+              gh api -X DELETE "repos/$REPO/issues/$PR/labels/contract:$kind" > /dev/null 2>&1 || true
+            fi
+          done
+          gh api "repos/$REPO/issues/$PR/labels" -f "labels[]=contract:$CLASSIFICATION" > /dev/null
+      - name: Comment on the pull request
+        if: inputs.comment && steps.diff.outputs.classification != '' && steps.fresh.outputs.current == 'true'
+        continue-on-error: true
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          CONTRACT_PATH: ${{ inputs.contract-path }}
+          FAIL_ON_BREAKING: ${{ inputs.fail-on-breaking }}
+          AUTHOR: ${{ inputs.comment-author }}
+        run: |
+          set -euo pipefail
+          marker="<!-- velisa:contract-diff -->"
+          {
+            echo "$marker"
+            echo "### Contract diff: \`$CONTRACT_PATH\`"
+            echo
+            # GitHub caps a comment at 65536 characters; the artifact has the whole report.
+            head -c 60000 contract-diff.md
+            echo
+            if [ "$FAIL_ON_BREAKING" = "true" ]; then
+              echo "This check fails the pull request on a breaking change (\`fail-on-breaking\`; Velisa D34, ADR-020)."
+            else
+              echo "Report only: this check does not fail the pull request (Velisa D34, ADR-020)."
+            fi
+            echo
+            echo "---"
+            echo "_Posted by Velisa's contract-diff workflow_"
+          } > comment.md
+          # Only this workflow's own comment: a person's comment that starts with the marker is left alone.
+          existing="$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+            --jq ".[] | select(.user.login == \"$AUTHOR\" and (.body | startswith(\"$marker\"))) | .id" | head -n 1)"
+          if [ -n "$existing" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$existing" -F body=@comment.md > /dev/null
+          else
+            gh api "repos/$REPO/issues/$PR/comments" -F body=@comment.md > /dev/null
+          fi
+      - name: Fail on a breaking change (only when asked)
+        if: inputs.fail-on-breaking && steps.diff.outputs.classification == 'breaking'
+        run: |
+          echo "::error::the contract change is breaking (recommended bump: ${{ steps.diff.outputs.recommended_bump }})"
+          exit 1

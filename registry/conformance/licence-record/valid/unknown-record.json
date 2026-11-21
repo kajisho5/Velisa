@@ -1,0 +1,20 @@
+{
+  "licence": "unknown",
+  "status": "unknown",
+  "declared_as": null,
+  "verified": false,
+  "usable": false,
+  "declared_in": null,
+  "source": "https://example.org/sounds/1234",
+  "provider": "Example Sounds",
+  "author": "A. Author",
+  "title": "Door slam",
+  "credit": null,
+  "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+  "licence_file": null,
+  "licence_text_sha256": null,
+  "content_id": "unknown",
+  "attribution": null,
+  "attribution_source": null,
+  "note": "No licence is declared for this file; it is not used."
+}

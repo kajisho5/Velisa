@@ -1,0 +1,4 @@
+{
+  "$comment": "Contract-shape violations known on 2026-11-13, each accepted until its contract or the schema changes (ADR-018). .github/workflows/contract-shape.yml fails on any violation not listed here and lists an entry that matches nothing as stale; delete it then. Pointers cover everything below them.",
+  "known_violations": []
+}
