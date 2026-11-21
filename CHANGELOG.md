@@ -1,3 +1,14 @@
+## v0.15.7 (2026-11-21)
+
+## What's Changed
+
+## Other changes
+
+- docs: English-first engine choices per skill (research, 2026-11) (#191)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.15.6 (2026-11-20)
 
 ## What's Changed
