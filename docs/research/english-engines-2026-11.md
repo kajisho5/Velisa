@@ -296,6 +296,7 @@
 - **帰属表示（CC-BY-4.0）が増える。** Parakeet、Pocket TTS の重み、OPUS-MT の tc-big と一部の旧型（`opus-mt-en-de` など）は CC-BY-4.0 なので、クレジットが必要になる。MIT と Apache-2.0 は出力ごとのクレジットを求めないが、コードや重みを複製・再配布するときは著作権表示と許諾表示（Apache-2.0 では NOTICE も）を残す。
   - transcription-skill の `MODELS[...]["attribution"]`（ADR-040）や dubbing-skill の `credit` と同じ形で provenance に記録し、ProductionReceipt まで運ぶ。
   - CC-BY-4.0 のモデル（変換・量子化したものを含む）を再配布するときは、帰属表示に加えて、ライセンスへの参照（CC-BY-4.0 の全文か URI）と、変更を加えたかどうかの表示が要る（CC-BY-4.0 第 3 条 (a)(1)(B)・(C)）。CTranslate2 への変換、GGUF や int8 への量子化、ONNX への書き出しは変更にあたるので、元のモデル名と、加えた変更を書く。
+  - 受け取ったモデルがすでに誰かの変更を経ている（他者が変換・量子化して公開したものなど）ときは、前の改変者が付けた変更の表示も消さずに残し、自分の変更をその後に足す。第 3 条 (a)(1)(B) は "indicate if You modified the Licensed Material and retain an indication of any previous modifications" と定める。あわせて (a)(1)(A) により、ライセンサーが素材に付けて提供した表示（"a copyright notice"、"a notice that refers to this Public License"、"a notice that refers to the disclaimer of warranties"、"a URI or hyperlink to the Licensed Material to the extent reasonably practicable" など）も保持する（[CC BY 4.0 legal code](https://creativecommons.org/licenses/by/4.0/legalcode)）。
 - **ゲート付きの取得が増える。** pyannote community-1 と Pocket TTS の複製版は、HF アカウントと同意が要る。doctor が取得手順を出す形（diarization ADR-001）に揃える。
 - **既定の切り替えは 3 つのリポジトリで ADR になる**（transcription、dubbing、subtitle）。いずれも contract の `default` が変わるので、video-production-agent の再ピン留めが要る。
 - **ecosystem.json** の `engines` 欄も合わせて直す（このリポジトリの管轄）。対象は次の 3 か所。
