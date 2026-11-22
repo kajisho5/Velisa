@@ -286,6 +286,10 @@ a frame, and retimes the transcript and subtitles; the agent shows what goes and
 shake, black and frozen frames, silence, speech); the agent keeps or rejects each shot by its rule `selects@1`, lists why,
 and renders the selects sequence through its existing trim and join only after a yes.
 
+**Entity memory** (ADR-034, decision D49). The agent keeps the user's speakers, company and product names, venues and
+terms (spellings, mis-hearings, titles, readings) per workspace and per project, and passes them to transcription,
+subtitles, lower thirds and dubbing through inputs those Skills already have. Names stay on the machine.
+
 **Update notices.** `.github/workflows/skill-updates.yml` checks every repository daily and
 posts what changed (new commits with their subjects, new version tags) on the issue labelled
 `skill-updates`, mentioning the owner, so GitHub notifies by mail and in the app. Locally:
