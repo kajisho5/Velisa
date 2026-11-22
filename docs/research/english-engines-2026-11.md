@@ -80,7 +80,7 @@
 ### 2.4 推奨
 
 1. **新しい既定**: `faster_whisper` の `default_model` を `base` から **`large-v3-turbo`** に変える。
-   - エンジンは変えず、pip extra のまま動く。ライセンス（MIT）は帰属表示が要らない。
+   - エンジンは変えず、pip extra のまま動く。重みのライセンスは MIT。MIT は出力（文字起こし）ごとのクレジットを求めないが、重みそのものやその主要部分を複製・再配布するときは、著作権表示と許諾表示を残す必要がある。
    - 99 言語に対応し、言語検出もある。既定に求められる「言語が分からない入力」を受けられる。
    - ディスクは 1.6 GB 必要になる。これが厳しい環境向けに、doctor で `small`（`model.bin` 484 MB、[Systran/faster-whisper-small](https://huggingface.co/Systran/faster-whisper-small)）を勧める道を残す。
    - 既定が変わるとキャッシュキーと出力が変わる。そのため ADR を書き、agent を再ピン留めする。
@@ -214,7 +214,7 @@
 ### 5.4 推奨
 
 1. **英語の NARRATE と AUDIO_DESCRIPTION の既定を Kokoro-82M（`af_heart` / `bf_emma`）にする。**
-   - Apache-2.0 で声にもクレジットが要らない。327 MB と軽い。プリセットの声なので同意の手続きが要らない。
+   - Apache-2.0 で、合成した音声ごとのクレジットは求められない（重みや声のファイルを再配布するときは、ライセンス文と NOTICE を残す）。327 MB と軽い。プリセットの声なので同意の手続きが要らない。
    - エンジンはすでに組み込み済みなので、`DEFAULT_ENGINE` を言語ごとに引けるようにすればよい。
    - パッケージの更新が止まりがちな点は、kokoro-onnx（2026-08 も更新あり）を予備の実行系として見ておく。
    - espeak-ng へのフォールバックは別の venv に閉じ込め、ライセンスを確かめる。
@@ -257,7 +257,7 @@
 | 候補 | ライセンス | サイズ | 品質 | 最新 | 出典 |
 |---|---|---|---|---|---|
 | **OPUS-MT tc-big**（`opus-mt-tc-big-en-{es,fr,it,pt,ko,ar,tr,…}` と逆向き）。CTranslate2 で動かす | CC-BY-4.0（帰属表示が必要） | 約 0.2B（en-es は 232,760,051 パラメータ） | en-es: flores101-devtest で BLEU 28.5 / chrF 0.564 | モデルは 2022〜2023。実行系の CTranslate2 は 4.9.0（2026-11-10、MIT） | [opus-mt-tc-big-en-es](https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-es)、[HF の一覧](https://huggingface.co/models?author=Helsinki-NLP&search=opus-mt-tc-big-en-)、[PyPI ctranslate2](https://pypi.org/project/ctranslate2/) |
-| OPUS-MT の旧型（`opus-mt-en-de`、`en-zh`、`en-ru`、`en-hi` など。tc-big がないペア用） | `opus-mt-en-de` は CC-BY-4.0。他のペアは個別に **未確認** | 約 0.07〜0.3B（**未確認**） | ペアごと | 2023-08（en-de） | [opus-mt-en-de](https://huggingface.co/Helsinki-NLP/opus-mt-en-de) |
+| OPUS-MT の旧型（`opus-mt-en-de`、`en-es`、`en-zh`、`en-ru`、`en-hi` など。tc-big がないペア用） | ペアごとに違う。`opus-mt-en-de` は CC-BY-4.0、`opus-mt-en-es` と `opus-mt-en-zh` は Apache-2.0（各モデルカード）。他のペアは個別に **未確認**。`en-zh` は複数の出力言語を持ち、文頭に `>>cmn_Hans<<` のような言語トークンが要る | 約 0.07〜0.3B（**未確認**） | ペアごと | 2023-08（en-de） | [opus-mt-en-de](https://huggingface.co/Helsinki-NLP/opus-mt-en-de)、[opus-mt-en-es](https://huggingface.co/Helsinki-NLP/opus-mt-en-es)、[opus-mt-en-zh](https://huggingface.co/Helsinki-NLP/opus-mt-en-zh) |
 | **Qwen3.5**（Ollama の `qwen3.5:4b` / `:9b`） | Apache-2.0 | ダウンロードは 4b が 3.3〜4.0 GB、9b が 6.6〜7.6 GB | WMT24++（55 言語、XCOMET-XXL）で 9B は 72.6、4B は 66.6。201 言語。思考モードが既定 | 2026-02-27 | [Qwen3.5-9B](https://huggingface.co/Qwen/Qwen3.5-9B)、[Qwen3.5-4B](https://huggingface.co/Qwen/Qwen3.5-4B)、[Ollama](https://ollama.com/library/qwen3.5) |
 | **Gemma 4 E4B**（`gemma4:e4b`） | **Apache-2.0**（Gemma 3 の独自規約から変わった） | 実効 4.5B（埋め込み込みで 8B）。Ollama では 6.6〜9.5 GB | 35 以上の言語に対応。翻訳ベンチマークはカードにない（**未確認**） | カードの更新 2026-11-03 | [カード](https://huggingface.co/google/gemma-4-E4B-it)、[Ollama](https://ollama.com/library/gemma4) |
 | EuroLLM-9B-Instruct-2512 | Apache-2.0 | 9.15B | 35 言語（欧州言語と日・中・韓など）。翻訳の数値はカードにない（**未確認**） | 2026-07-31 | [カード](https://huggingface.co/utter-project/EuroLLM-9B-Instruct-2512) |
@@ -274,10 +274,11 @@
 ### 6.4 推奨
 
 1. **既定を `argos` から `opus-mt` に変える。** 対象は、英語↔主要言語のうち tc-big か旧型の OPUS-MT が公開されているペア。
-   - 実行系（CTranslate2）は保守が活発で、ライセンスは CC-BY-4.0 と明記されている。PyTorch なしの CPU で動き、1 ペアあたり 0.2B 程度と軽い。
+   - 実行系（CTranslate2）は保守が活発で、ライセンスは MIT（[LICENSE](https://github.com/OpenNMT/CTranslate2/blob/master/LICENSE)）。PyTorch なしの CPU で動き、1 ペアあたり 0.2B 程度と軽い。
+   - モデルのライセンスは実行系とは別で、ペアごとに違う。tc-big は CC-BY-4.0（en-es など）。旧型は `opus-mt-en-de` が CC-BY-4.0、`opus-mt-en-es` が Apache-2.0。使うペアのモデルカードを読む。
    - 必要な作業:
      - `SUBTITLE_SKILL_OPUS_MT_DIR` の下にペアごとの変換済みディレクトリを置き、doctor が使えるペアを一覧にする。
-     - CC-BY の帰属表示（「OPUS-MT, Helsinki-NLP」）を provenance に入れる。
+     - CC-BY-4.0 のペアでは、帰属表示（「OPUS-MT, Helsinki-NLP」）を provenance に入れる。
      - ペアのモデルがないときは、Argos へ黙って切り替えず `DEPENDENCY_ERROR` を返す（ADR-004 の方針と同じ）。
    - en→ja は相変わらず汎用の OPUS-MT がないので、日本語は opt-in（`ollama` または `memory`）のままにする。
    - 既定が変わると既存の呼び出し側の出力が変わる（ADR-004 の決定 11）。そのため ADR と agent の再ピン留めが必要になる。
@@ -292,7 +293,7 @@
 
 ## 7. 横断的な注意
 
-- **帰属表示（CC-BY-4.0）が増える。** Parakeet、Pocket TTS、OPUS-MT はいずれも CC-BY-4.0 なので、クレジットが必要になる。
+- **帰属表示（CC-BY-4.0）が増える。** Parakeet、Pocket TTS の重み、OPUS-MT の tc-big と一部の旧型（`opus-mt-en-de` など）は CC-BY-4.0 なので、クレジットが必要になる。MIT と Apache-2.0 は出力ごとのクレジットを求めないが、コードや重みを複製・再配布するときは著作権表示と許諾表示（Apache-2.0 では NOTICE も）を残す。
   - transcription-skill の `MODELS[...]["attribution"]`（ADR-040）や dubbing-skill の `credit` と同じ形で provenance に記録し、ProductionReceipt まで運ぶ。
 - **ゲート付きの取得が増える。** pyannote community-1 と Pocket TTS の複製版は、HF アカウントと同意が要る。doctor が取得手順を出す形（diarization ADR-001）に揃える。
 - **既定の切り替えは 3 つのリポジトリで ADR になる**（transcription、dubbing、subtitle）。いずれも contract の `default` が変わるので、video-production-agent の再ピン留めが要る。
@@ -317,6 +318,6 @@
 - Pocket TTS のプリセット声それぞれの出所（Expresso・EARS 由来かどうか）。
 - Qwen3-TTS CustomVoice の品質と CPU 速度。
 - NeuTTS Air の対応言語。
-- OPUS-MT 旧型の各ペアのライセンスとサイズ。
+- OPUS-MT 旧型の各ペアのライセンスとサイズ（en-de、en-es、en-zh のライセンスは確認済み）。
 - Gemma 4 と EuroLLM の翻訳ベンチマーク。
 - Ollama 経由の Qwen3.5 で `think: false` が効くかどうか。
