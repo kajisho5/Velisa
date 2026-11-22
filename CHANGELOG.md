@@ -1,3 +1,14 @@
+## v0.15.10 (2026-11-22)
+
+## What's Changed
+
+## Other changes
+
+- docs(research): CC-BY redistribution needs a licence reference and an indication of changes (#194)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.15.9 (2026-11-22)
 
 ## What's Changed
