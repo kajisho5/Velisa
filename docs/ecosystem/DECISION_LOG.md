@@ -917,3 +917,16 @@ Both releases shipped only a CI change.
 **Evidence**: [ADR-033](../adr/ADR-033-batch-selects.md).
 
 **What follows**: media-analysis-skill and video-production-agent implement it, each in its own pull request; the agent re-pins through its repin workflow.
+
+## D49 — Entity memory: the agent keeps the names; the Skills receive them through the inputs they already have
+
+**Decision** (owner request, 2026-11-22, details delegated):
+- video-production-agent owns a user-editable store of people and proper nouns (`video-agent/entity-store@1`, per workspace and per project; JSON with CSV import / export): canonical spelling, aliases and mis-hearings, type, title, readings, and an optional speaker id or enrolled voiceprint.
+- Plans apply it through existing inputs only: transcription-skill `domain_vocabulary` + `corrections`, subtitle-skill `emphasis` words (burn-in, when asked), motion-graphics-skill's lower-third `name` / `title`, dubbing-skill `--pronunciation`. No Skill contract changes.
+- Names are sent only to local Skills (to transcription only when every engine the request can reach runs locally), never to an AI provider. Candidates suggested from a transcript are added only by a person. The plan summary counts every use; an empty store changes nothing.
+
+**Why**: the names belong to the user's projects, not to any one Skill; every Skill already takes what it needs, so the change stays in the agent.
+
+**Evidence**: [ADR-034](../adr/ADR-034-entity-memory.md).
+
+**What follows**: video-production-agent implements it (its ADR-128); no Skill release, no repin.
