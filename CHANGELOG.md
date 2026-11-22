@@ -1,3 +1,14 @@
+## v0.15.8 (2026-11-22)
+
+## What's Changed
+
+## Other changes
+
+- docs(ecosystem): entity memory: the agent keeps the names, the Skills receive them through existing inputs (ADR-034, D49) (#193)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.15.7 (2026-11-21)
 
 ## What's Changed
