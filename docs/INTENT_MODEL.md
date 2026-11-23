@@ -167,6 +167,43 @@ neither is more "important" than the other, they are simply provenanced differen
 future policy engine (`PRINCIPLES.md` Principle 4) can distinguish "the client asked for
 this" from "we always require this."
 
+### 5.1 Duration fitting: how a target duration is reached
+
+A target duration in an Intent ("make it 60 seconds", a Hard Constraint like
+`duration <= 60s`) states *how long* the result must be, never *how* to get there.
+The method is a Decision the planner makes explicitly; it is never delegated to a
+tool's default. Standing policy for every Project:
+
+- **Cut first.** The default way to reach a target duration is to cut: remove
+  silence and dead air, and spans outside the ones the user asked to keep. A span
+  the user named ("keep 0:45–3:10") is kept whole; the fitting happens around it.
+- **Speed is the exception, and it is capped.** Retiming the whole picture and
+  sound is used only when the user explicitly asks for it, or when cutting alone
+  cannot reach the target. The retime factor is capped at **1.25x in either
+  direction**.
+- **Unreachable under the cap is asked, not patched.** If cutting plus a retime
+  within 1.25x still cannot reach the target, the planner asks the user. It does
+  not silently cut further to make up the remainder.
+- **Ambiguous intent is asked, not assumed.** When the request does not make clear
+  whether to cut or to retime, the planner asks before executing. The typical case
+  is "make it 60 seconds" for material far longer than the target, where the two
+  readings produce visibly different videos.
+- **The method is always passed explicitly.** Every `fit` call carries `--method`.
+  When the planner chooses speed, it also passes `--max-speed 1.25`, so the hand
+  itself refuses any factor beyond the cap.
+- **Reading `large_speed_change`.** A ffmpeg-skill version that registers
+  `large_speed_change` reports any retime beyond 1.15x in `diagnostics.warnings`,
+  with the factor.
+  - A planner-chosen retime between 1.15x and 1.25x still draws this warning, and
+    that is expected. The planner records its own method choice for each run so it
+    can tell the cases apart.
+  - The same warning on a run where the planner did **not** choose speed means the
+    plan was wrong. The run is redone as a cut.
+
+Provenance: a user report against ffmpeg-skill v3.10.0, in which a clip asked for
+at a shorter duration was retimed whole and nothing was cut. Nobody had chosen
+speed; it was the tool's default `--method`.
+
 ## 6. Permissions
 
 **FUTURE — entirely proposed, no current use case anywhere in the ecosystem.**
