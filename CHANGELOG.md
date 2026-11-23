@@ -1,3 +1,24 @@
+## v0.16.0 (2026-11-23)
+
+## What's Changed
+
+## Features
+
+- feat(routing): reframing steps that keep the subject in the frame (#164)
+- feat(routing): silence removal lists its cuts and waits for a yes (#165)
+- feat(routing): default stage order, a before-export list, and what a check does not accept (#166)
+
+## Other changes
+
+- feat(routing): reframing steps that keep the subject in the frame (#164)
+- feat(routing): silence removal lists its cuts and waits for a yes (#165)
+- feat(routing): default stage order, a before-export list, and what a check does not accept (#166)
+- policy: duration fitting is cut-first; speed is capped and never a default (#171)
+- docs: roadmap audit and acceptance criteria for all 33 components (#198)
+
+Cross-check this against CHANGELOG.md's own entry for this version before relying on it as the full picture.
+
+
 ## v0.15.11 (2026-11-22)
 
 ## What's Changed
