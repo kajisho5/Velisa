@@ -22,21 +22,28 @@
       "type": "object",
       "properties": {
         "noise_floor_db": {
-          "type": "number"
+          "type": "number",
+          "minimum": -120,
+          "maximum": 0
         },
         "noise_floor_offset_db": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0,
+          "maximum": 60
         },
         "analysis_bandpass_hz": {
           "type": "array",
           "minItems": 2,
           "maxItems": 2,
           "items": {
-            "type": "number"
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "exclusiveMaximum": 4000
           }
         },
         "min_silence_detect_ms": {
-          "type": "number"
+          "type": "number",
+          "minimum": 10
         }
       },
       "required": [
@@ -50,25 +57,32 @@
       "type": "object",
       "properties": {
         "max_keep_silence_ms": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0
         },
         "target_keep_silence_ms": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0
         },
         "pad_before_speech_ms": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0
         },
         "pad_after_speech_ms": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0
         },
         "trim_leading_max_ms": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0
         },
         "trim_trailing_max_ms": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0
         },
         "flag_long_pause_above_ms": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0
         }
       },
       "required": [
@@ -85,13 +99,16 @@
       "type": "object",
       "properties": {
         "min_clip_frames": {
-          "type": "integer"
+          "type": "integer",
+          "minimum": 1
         },
         "min_removed_frames": {
-          "type": "integer"
+          "type": "integer",
+          "minimum": 1
         },
         "merge_gap_below_ms": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0
         },
         "frame_snap_mode": {
           "enum": [
@@ -117,13 +134,19 @@
           ]
         },
         "micro_fade_ms": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0,
+          "maximum": 50
         },
         "zero_cross_search_ms": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0,
+          "maximum": 50
         },
         "max_boundary_sample_delta": {
-          "type": "number"
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2
         }
       },
       "required": [
@@ -189,7 +212,8 @@
           "type": "string"
         },
         "analysis_count": {
-          "type": "integer"
+          "type": "integer",
+          "minimum": 0
         },
         "sample_names": {
           "type": "array",
