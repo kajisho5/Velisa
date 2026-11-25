@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kajisho5/Velisa/blob/main/registry/schemas/protect-ranges.schema.json",
+  "title": "protect-ranges@1",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "start_ms",
+      "end_ms",
+      "reason"
+    ],
+    "properties": {
+      "start_ms": {
+        "type": "number",
+        "minimum": 0
+      },
+      "end_ms": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      },
+      "reason": {
+        "type": "string",
+        "pattern": "\\S"
+      }
+    }
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kajisho5/Velisa/blob/main/registry/schemas/pacing-profile.schema.json",
+  "title": "pacing-profile@1",
+  "type": "object",
+  "required": [
+    "contract",
+    "silence_detection",
+    "pacing",
+    "cut_rules",
+    "audio_seam",
+    "loudness",
+    "video_rhythm",
+    "probe_meta"
+  ],
+  "properties": {
+    "contract": {
+      "const": "pacing-profile@1",
+      "type": "string"
+    },
+    "silence_detection": {
+      "type": "object",
+      "properties": {
+        "noise_floor_db": {
+          "type": "number"
+        },
+        "noise_floor_offset_db": {
+          "type": "number"
+        },
+        "analysis_bandpass_hz": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number"
+          }
+        },
+        "min_silence_detect_ms": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "noise_floor_db",
+        "noise_floor_offset_db",
+        "analysis_bandpass_hz",
+        "min_silence_detect_ms"
+      ]
+    },
+    "pacing": {
+      "type": "object",
+      "properties": {
+        "max_keep_silence_ms": {
+          "type": "number"
+        },
+        "target_keep_silence_ms": {
+          "type": "number"
+        },
+        "pad_before_speech_ms": {
+          "type": "number"
+        },
+        "pad_after_speech_ms": {
+          "type": "number"
+        },
+        "trim_leading_max_ms": {
+          "type": "number"
+        },
+        "trim_trailing_max_ms": {
+          "type": "number"
+        },
+        "flag_long_pause_above_ms": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "max_keep_silence_ms",
+        "target_keep_silence_ms",
+        "pad_before_speech_ms",
+        "pad_after_speech_ms",
+        "trim_leading_max_ms",
+        "trim_trailing_max_ms",
+        "flag_long_pause_above_ms"
+      ]
+    },
+    "cut_rules": {
+      "type": "object",
+      "properties": {
+        "min_clip_frames": {
+          "type": "integer"
+        },
+        "min_removed_frames": {
+          "type": "integer"
+        },
+        "merge_gap_below_ms": {
+          "type": "number"
+        },
+        "frame_snap_mode": {
+          "enum": [
+            "inclusive_speech"
+          ]
+        }
+      },
+      "required": [
+        "min_clip_frames",
+        "min_removed_frames",
+        "merge_gap_below_ms",
+        "frame_snap_mode"
+      ]
+    },
+    "audio_seam": {
+      "type": "object",
+      "properties": {
+        "seam_mode": {
+          "enum": [
+            "zero_cross_shift",
+            "micro_fade",
+            "none"
+          ]
+        },
+        "micro_fade_ms": {
+          "type": "number"
+        },
+        "zero_cross_search_ms": {
+          "type": "number"
+        },
+        "max_boundary_sample_delta": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "seam_mode",
+        "micro_fade_ms",
+        "zero_cross_search_ms",
+        "max_boundary_sample_delta"
+      ]
+    },
+    "loudness": {
+      "type": "object",
+      "properties": {
+        "target_lufs": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "true_peak_db": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "lra_max": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "target_lufs",
+        "true_peak_db",
+        "lra_max"
+      ]
+    },
+    "video_rhythm": {
+      "type": "object",
+      "properties": {
+        "median_shot_ms": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "min_shot_ms": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "median_shot_ms",
+        "min_shot_ms"
+      ]
+    },
+    "probe_meta": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "type": "string"
+        },
+        "analysis_count": {
+          "type": "integer"
+        },
+        "sample_names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bgm_suspected": {
+          "type": "boolean"
+        },
+        "confidence": {
+          "type": "string"
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "analysis_count",
+        "sample_names",
+        "bgm_suspected",
+        "confidence",
+        "reasons"
+      ]
+    }
+  }
+}

@@ -12,6 +12,14 @@ ffmpeg-skill references:
 [design decisions: silence.py says where it cut](https://github.com/kajisho5/ffmpeg-skill/blob/main/docs/design-decisions.md),
 [FAQ: are silence removal and captions stable?](https://github.com/kajisho5/ffmpeg-skill#are-silence-removal-and-captions-stable).
 
+## Reference-based pacing
+
+When a finished reference is supplied, follow [ADR-035](../../../../docs/adr/ADR-035-reference-pacing.md).
+Use the agent pacing route for extraction, preview, approved application and independent verification.
+Carry upstream word-ending, filler and context intervals through each step. Stop for a voice-only
+reference, explicit preset or reviewed threshold when the estimate is flagged. Do not fall back
+to an ad hoc command or the generic list below.
+
 ## 1. List first; write nothing
 
 Run the list, not the cut: `silence.py SRC --list --json` (add `--edl keep.txt` to save the kept
