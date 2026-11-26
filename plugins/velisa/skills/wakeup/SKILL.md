@@ -63,4 +63,9 @@ For any job that writes media: probe the inputs, show the plan (`--dry-run --jso
 
 ## Transcript search and retakes
 
+When a pacing request includes past edits or reference videos, route it through the agent's
+reference pacing workflow in [silence.md](silence.md). Collect any word endings, intentional
+fillers or contextual pauses to preserve as source-time ranges. Show the measured plan and its
+confidence before approval, then require the independent check on the delivered file.
+
 No skill searches a transcript for a phrase or finds retakes yet. Transcribe once with word timings and keep the JSON, then follow [transcript.md](transcript.md): report every hit with times and context, list retakes and repeated sentences as candidates the user confirms one by one, and cut only the confirmed ranges with ffmpeg-skill `cut.py`. Fillers stay with `silence.py --filler`. The same page says which commonly claimed features (speaker-based multicam, Chinese filler removal, CJK fonts, BGM ducking) exist and how.

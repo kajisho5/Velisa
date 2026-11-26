@@ -37,6 +37,8 @@ MANIFEST = FIXTURE_DIR / "manifest.json"
 
 # spec name -> (schema file, the spec document it formalizes)
 SPECS: Dict[str, tuple] = {
+    "pacing-profile": ("pacing-profile.schema.json", "docs/adr/ADR-035-reference-pacing.md"),
+    "protect-ranges": ("protect-ranges.schema.json", "docs/adr/ADR-035-reference-pacing.md"),
     "kit": ("kit.schema.json", "docs/specs/kit.md"),
     "title": ("title.schema.json", "docs/specs/title-and-stinger.md"),
     "stinger": ("stinger.schema.json", "docs/specs/title-and-stinger.md"),
@@ -76,7 +78,18 @@ def _on_frame(t: float, rate: Fraction) -> bool:
 def rules(spec: str, doc: Any) -> List[str]:
     """Problems JSON Schema cannot state, for a document that already passed the schema. Empty when it holds."""
     out: List[str] = []
-    if spec == "stinger":
+    if spec == "pacing-profile":
+        low, high = doc["silence_detection"]["analysis_bandpass_hz"]
+        if low >= high:
+            out.append("analysis band must increase")
+        if doc["pacing"]["target_keep_silence_ms"] > doc["pacing"]["max_keep_silence_ms"]:
+            out.append("pause target exceeds maximum")
+        if doc["probe_meta"]["analysis_count"] != len(doc["probe_meta"]["sample_names"]):
+            out.append("analysis count differs from sample names")
+    elif spec == "protect-ranges":
+        if any(r["end_ms"] <= r["start_ms"] for r in doc):
+            out.append("end must follow start")
+    elif spec == "stinger":
         c, cover = doc["cut_point"], doc["cover"]
         if not cover["start"] <= c < cover["end"]:
             out.append(f"cut_point {c} is not inside cover [{cover['start']}, {cover['end']})")

@@ -503,3 +503,10 @@ delegate plain image conversion to `image-skill`, or does it grow its own WebP p
 this document deliberately leaves open, the same way §8a leaves the qc-skill/
 media-analysis-skill loudness/silence/integrity overlap unresolved pending
 `ROADMAP.md` Phase 3.
+
+### Reference pacing (capability-gated)
+
+The agent requires ffmpeg-skill `silence --extract-profile --references`, `silence --profile
+--protect-ranges` and `verify --profile --source --protect-ranges`. The execution engine owns the
+measurements, the upstream transcript/editor supplies protected source times, and the agent owns
+routing, approval and delivery. [ADR-035](adr/ADR-035-reference-pacing.md)
