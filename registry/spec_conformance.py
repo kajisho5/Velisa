@@ -86,6 +86,10 @@ def rules(spec: str, doc: Any) -> List[str]:
             out.append("pause target exceeds maximum")
         if doc["probe_meta"]["analysis_count"] != len(doc["probe_meta"]["sample_names"]):
             out.append("analysis count differs from sample names")
+        counts = (doc["cut_rules"]["min_clip_frames"], doc["cut_rules"]["min_removed_frames"],
+                  doc["probe_meta"]["analysis_count"])
+        if any(type(v) is not int for v in counts):   # JSON Schema's integer takes 2.0; the engine reads only a JSON integer
+            out.append("frame and analysis counts must be JSON integers, not 2.0")
     elif spec == "protect-ranges":
         if any(r["end_ms"] <= r["start_ms"] for r in doc):
             out.append("end must follow start")

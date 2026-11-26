@@ -9,7 +9,8 @@ and [protect-ranges@1](../../registry/schemas/protect-ranges.schema.json). The f
 identified by its contract field. The second is a bare array in source milliseconds relative to
 the first picture. Each interval includes its start and excludes its end. End must exceed start
 and fit the source. Overlaps are allowed. Runtime checks also enforce profile cross-field ordering,
-finite measurements, and agreement between sample count and sample names.
+finite measurements, agreement between sample count and sample names, and frame and analysis
+counts written as JSON integers (the engine refuses `2.0`, which JSON Schema's `integer` accepts).
 
 For a reference-based request the agent must extract a profile from all named references, preview
 the cut plan, apply the approved edit and run the independent source-bound verify gate. Handwritten
