@@ -14,6 +14,14 @@
           "fails": []
         },
         {
+          "path": "conformance/pacing-profile/invalid/frames-not-integer.json",
+          "sha256": "fc33e905611968929b08ef47a79802abf008d15aaa69b7348e735351ebac98f2",
+          "expect": "invalid",
+          "fails": [
+            "rules"
+          ]
+        },
+        {
           "path": "conformance/pacing-profile/invalid/target-over-limit.json",
           "sha256": "6976f824cc451f0bc954388922a572aff9b8d6cfcabe55e088e51883eda1d885",
           "expect": "invalid",

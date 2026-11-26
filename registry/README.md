@@ -84,6 +84,8 @@ and another reads, as JSON Schemas (draft 2020-12) and examples:
 | `stinger.json` (same page) | `schemas/stinger.schema.json` | `conformance/stinger/` |
 | licence record ([licence-record.md](../docs/specs/licence-record.md)) | `schemas/licence-record.schema.json` | `conformance/licence-record/` |
 | sidecar envelope ([sidecar-envelope.md](../docs/specs/sidecar-envelope.md)) | `schemas/sidecar-envelope.schema.json` | `conformance/sidecar-envelope/` |
+| `pacing-profile@1` ([ADR-035](../docs/adr/ADR-035-reference-pacing.md)) | `schemas/pacing-profile.schema.json` | `conformance/pacing-profile/` |
+| `protect-ranges@1` (same ADR) | `schemas/protect-ranges.schema.json` | `conformance/protect-ranges/` |
 
 - `conformance/<spec>/valid/*.json` must pass; `invalid/*.json` must fail, each for the one
   reason its file name gives.

@@ -1,0 +1,51 @@
+{
+  "contract": "pacing-profile@1",
+  "silence_detection": {
+    "noise_floor_db": -60,
+    "noise_floor_offset_db": 12,
+    "analysis_bandpass_hz": [
+      120,
+      3800
+    ],
+    "min_silence_detect_ms": 50
+  },
+  "pacing": {
+    "max_keep_silence_ms": 400,
+    "target_keep_silence_ms": 240,
+    "pad_before_speech_ms": 80,
+    "pad_after_speech_ms": 160,
+    "trim_leading_max_ms": 60,
+    "trim_trailing_max_ms": 160,
+    "flag_long_pause_above_ms": 900
+  },
+  "cut_rules": {
+    "min_clip_frames": 2.0,
+    "min_removed_frames": 2,
+    "merge_gap_below_ms": 30,
+    "frame_snap_mode": "inclusive_speech"
+  },
+  "audio_seam": {
+    "seam_mode": "zero_cross_shift",
+    "micro_fade_ms": 3,
+    "zero_cross_search_ms": 3,
+    "max_boundary_sample_delta": 0.08
+  },
+  "loudness": {
+    "target_lufs": null,
+    "true_peak_db": null,
+    "lra_max": null
+  },
+  "video_rhythm": {
+    "median_shot_ms": null,
+    "min_shot_ms": null
+  },
+  "probe_meta": {
+    "origin": "youtube-talk",
+    "analysis_count": 0,
+    "sample_names": [],
+    "bgm_suspected": false,
+    "confidence": "preset",
+    "reasons": [],
+    "warnings": []
+  }
+}

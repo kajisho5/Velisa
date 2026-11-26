@@ -930,3 +930,16 @@ Both releases shipped only a CI change.
 **Evidence**: [ADR-034](../adr/ADR-034-entity-memory.md).
 
 **What follows**: video-production-agent implements it (its ADR-128); no Skill release, no repin.
+
+## D50 — Reference pacing: the engine measures, the upstream caller protects, the agent previews, applies and verifies
+
+**Decision** (owner request, 2026-11-25, details delegated):
+- Two wire formats: `pacing-profile@1`, measured by ffmpeg-skill `silence --extract-profile` from finished references or taken from a preset, and `protect-ranges@1`, a bare array of source-millisecond intervals with a reason, each including its start and excluding its end.
+- Transcription or the upstream editorial caller turns word endings, intentional fillers and contextual pauses into protected intervals. The same intervals go to the preview, the edit and the verification.
+- The agent previews the cut plan and applies only the approved plan. It publishes the delivery only after ffmpeg-skill `verify --source --profile` passes. A suspected music bed or low confidence stops the request for a voice-only reference, a preset or a reviewed profile.
+
+**Why**: only the engine can measure the media, only the caller knows which pauses mean something, and the agent owns approval. A finished reference cannot show what was removed, so an uncertain estimate must not drive an edit unseen.
+
+**Evidence**: [ADR-035](../adr/ADR-035-reference-pacing.md).
+
+**What follows**: ffmpeg-skill 4.8.0 implements the measurement, edit and gate. video-production-agent implements the route in its ADR-130. No repin.
